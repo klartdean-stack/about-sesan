@@ -1,0 +1,38 @@
+{
+  "nav": {
+    "home": "Home",
+    "about": "About",
+    "services": "Services",
+    "vision": "Vision",
+    "contact": "Contact",
+    "download": "Download App"
+  },
+
+  "hero": {
+    "badge": "Cambodia's Agriculture Ecosystem",
+
+    "title1": "Building the future of",
+
+    "title2": "Cambodian agriculture.",
+
+    "description": "Sesan connects farmers, businesses and consumers through technology, digital marketplaces, agricultural knowledge and trusted services.",
+
+    "download": "Download Sesan App",
+
+    "explore": "Explore Ecosystem",
+
+    "feature1": "Direct marketplace",
+
+    "feature2": "Agricultural knowledge",
+
+    "feature3": "Digital technology",
+
+    "technology": "Sesan Technology",
+
+    "technologyText": "Smart agricultural platform",
+
+    "marketplace": "Sesan Marketplace",
+
+    "marketplaceText": "Connect directly with buyers"
+  }
+}
