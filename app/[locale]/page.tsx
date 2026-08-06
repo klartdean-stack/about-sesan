@@ -1,6 +1,6 @@
 "use client";
 import { useState, type FormEvent } from "react";
-import { useTranslations } from "next-intl";
+import {useLocale, useTranslations} from "next-intl";
 import { Globe, Mail } from "lucide-react";
 
 import {
@@ -266,6 +266,7 @@ function GlobeIcon() {
 }
 
 export default function Home() {
+  const locale = useLocale();
   const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
@@ -340,13 +341,17 @@ export default function Home() {
   ];
 
  const navItems = [
-  { label: t("nav.home"), href: "#home" },
-  { label: t("nav.about"), href: "#about" },
-  { label: t("nav.services"), href: "#ecosystem" },
-  { label: t("nav.vision"), href: "#mission" },
-  { label: "News", href: "#news" },
-  { label: "Promote", href: "#promote" },
-  { label: t("nav.contact"), href: "#contact" },
+  {label: t("nav.home"), href: "#home"},
+  {label: t("nav.about"), href: "#about"},
+  {label: t("nav.services"), href: "#ecosystem"},
+  {label: t("nav.vision"), href: "#mission"},
+  {label: "News", href: "#news"},
+  {
+    label: locale === "km" ? "ចំណេះដឹង" : "Knowledge",
+    href: `/${locale}/knowledge`,
+  },
+  {label: "Promote", href: "#promote"},
+  {label: t("nav.contact"), href: "#contact"},
 ];
 
 const promotionPlans = [
