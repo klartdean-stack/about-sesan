@@ -269,6 +269,7 @@ function GlobeIcon() {
 export default function Home() {
   const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [openFaq, setOpenFaq] = useState<number | null>(0);
 
   const ecosystemItems: EcosystemItem[] = [
     {
@@ -339,11 +340,12 @@ export default function Home() {
     },
   ];
 
- const navItems = [
+  const navItems = [
   { label: t("nav.home"), href: "#home" },
   { label: t("nav.about"), href: "#about" },
   { label: t("nav.services"), href: "#ecosystem" },
   { label: t("nav.vision"), href: "#mission" },
+  { label: "News", href: "#news" },
   { label: t("nav.contact"), href: "#contact" },
 ];
 
@@ -847,6 +849,163 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* Latest Updates */}
+<section
+  id="news"
+  className="scroll-mt-24 bg-slate-50 px-5 py-24 lg:px-8"
+>
+  <div className="mx-auto max-w-6xl">
+
+    <div className="text-center">
+      <p className="section-label">
+        Latest Updates
+      </p>
+
+      <h2 className="section-title">
+        What's New at
+        <span className="block text-green-700">
+          Sesan Group
+        </span>
+      </h2>
+
+      <p className="mt-6 text-lg text-slate-600">
+        Follow our latest progress, announcements and product updates.
+      </p>
+    </div>
+
+    <div className="mt-14 space-y-6">
+
+      <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+
+        <p className="text-sm font-bold text-green-700">
+          August 2026
+        </p>
+
+        <h3 className="mt-2 text-2xl font-black">
+          🌐 Official Website is Now Live
+        </h3>
+
+        <p className="mt-4 leading-8 text-slate-600">
+          Sesan Group officially launched its multilingual corporate website
+          to introduce our ecosystem, technology and agricultural services.
+        </p>
+
+      </div>
+
+      <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+
+        <p className="text-sm font-bold text-green-700">
+          August 2026
+        </p>
+
+        <h3 className="mt-2 text-2xl font-black">
+          📧 Official Business Email Available
+        </h3>
+
+        <p className="mt-4 leading-8 text-slate-600">
+          Contact us anytime at
+          <span className="font-bold text-green-700">
+            {" "}info@sesanshop.com
+          </span>
+        </p>
+
+      </div>
+
+      <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
+
+        <p className="text-sm font-bold text-orange-600">
+          Coming Soon
+        </p>
+
+        <h3 className="mt-2 text-2xl font-black">
+          📱 Sesan App for iPhone
+        </h3>
+
+        <p className="mt-4 leading-8 text-slate-600">
+          The iOS version of Sesan App will be available soon on the App Store.
+        </p>
+
+      </div>
+
+    </div>
+
+  </div>
+</section>
+
+{/* FAQ */}
+<section
+  className="scroll-mt-24 bg-white px-5 py-24 lg:px-8"
+>
+  <div className="mx-auto max-w-4xl">
+
+    <div className="text-center mb-14">
+
+      <p className="section-label">
+        Frequently Asked Questions
+      </p>
+
+      <h2 className="section-title">
+        Everything you need to know
+      </h2>
+
+    </div>
+
+    {[
+      {
+        q: "What is Sesan Group?",
+        a: "Sesan Group is Cambodia's agriculture technology ecosystem connecting farmers, businesses and consumers."
+      },
+      {
+        q: "Is Sesan App free?",
+        a: "Yes. Sesan App is free to download and use."
+      },
+      {
+        q: "Where can I download Sesan App?",
+        a: "Google Play is available now. App Store is coming soon."
+      },
+      {
+        q: "How can I contact Sesan Group?",
+        a: "Email: info@sesanshop.com"
+      }
+    ].map((faq, index) => (
+
+      <div
+        key={index}
+        className="mb-4 rounded-2xl border border-slate-200 bg-white shadow-sm"
+      >
+
+        <button
+          onClick={() =>
+            setOpenFaq(openFaq === index ? null : index)
+          }
+          className="flex w-full items-center justify-between px-6 py-5 text-left font-bold"
+        >
+
+          {faq.q}
+
+          <span>
+            {openFaq === index ? "−" : "+"}
+          </span>
+
+        </button>
+
+        {openFaq === index && (
+
+          <div className="border-t px-6 py-5 text-slate-600">
+
+            {faq.a}
+
+          </div>
+
+        )}
+
+      </div>
+
+    ))}
+
+  </div>
+</section>
 
       {/* Download App */}
       <section
