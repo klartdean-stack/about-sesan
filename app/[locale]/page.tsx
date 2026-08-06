@@ -948,11 +948,11 @@ export default function Home() {
                   </span>
                 </a>
 
-                <a href="mailto:sesanagriculture@gmail.com" className="contact-row">
+                <a href="mailto:info@sesanshop.com" className="contact-row">
                   <MailIcon />
                   <span>
                     <small>Email</small>
-                    <strong>sesanagriculture@gmail.com</strong>
+                    <strong>info@sesanshop.com</strong>
                   </span>
                 </a>
 
@@ -1052,7 +1052,7 @@ export default function Home() {
     </a>
 
     <a
-      href="mailto:sesanagriculture@gmail.com"
+      href="mailto:info@sesanshop.com"
       title="Email"
       className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-500 hover:bg-amber-50"
     >

@@ -379,7 +379,7 @@ export default function TermsPage() {
               </p>
 
               <a
-                href="mailto:sesanagriculture@gmail.com"
+                href="mailto:info@sesanshop.com"
                 className="mt-5 inline-flex rounded-full bg-white px-5 py-3 text-sm font-bold text-green-700 transition hover:bg-green-50"
               >
                 Contact Sesan
@@ -1381,7 +1381,7 @@ export default function TermsPage() {
     <div className="rounded-2xl bg-white/10 p-6">
       <p className="text-sm text-green-200">Email</p>
       <p className="mt-2 text-xl font-bold">
-        sesanagriculture@gmail.com
+        info@sesanshop.com
       </p>
     </div>
 
@@ -1425,7 +1425,7 @@ export default function TermsPage() {
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <a
-                  href="mailto:sesanagriculture@gmail.com"
+                  href="mailto:info@sesanshop.com"
                   className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur transition hover:bg-white/20"
                 >
                   <MailIcon />
@@ -1434,7 +1434,7 @@ export default function TermsPage() {
                     <small className="block text-green-100">Email</small>
 
                     <strong className="mt-1 block truncate text-sm">
-                      sesanagriculture@gmail.com
+                      info@sesanshop.com
                     </strong>
                   </span>
                 </a>

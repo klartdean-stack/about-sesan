@@ -100,7 +100,7 @@ export default function RootLayout({
         logo: "https://about.sesanshop.com/sesan-logo.png",
         description:
           "Cambodia agriculture ecosystem connecting farmers, businesses and consumers through technology.",
-        email: "sesanagriculture@gmail.com",
+        email: "info@sesanshop.com",
         telephone: "+85511930717",
         address: {
           "@type": "PostalAddress",

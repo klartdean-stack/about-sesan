@@ -385,7 +385,7 @@ export default function PrivacyPage() {
               </p>
 
               <a
-                href="mailto:sesanagriculture@gmail.com"
+                href="mailto:info@sesanshop.com"
                 className="mt-5 inline-flex rounded-full bg-green-600 px-5 py-3 text-sm font-bold text-white transition hover:bg-green-700"
               >
                 Contact Sesan
@@ -1180,7 +1180,7 @@ export default function PrivacyPage() {
     </p>
 
     <div className="rounded-2xl border border-green-200 bg-green-50 p-6">
-      <p><strong>Email:</strong> sesanagriculture@gmail.com</p>
+      <p><strong>Email:</strong> info@sesanshop.com</p>
       <p><strong>Phone:</strong> +855 11 930 717</p>
       <p><strong>Subject:</strong> Account Deletion Request</p>
     </div>
@@ -1385,7 +1385,7 @@ export default function PrivacyPage() {
 
               <div className="mt-8 grid gap-4 sm:grid-cols-3">
                 <a
-                  href="mailto:sesanagriculture@gmail.com"
+                  href="mailto:info@sesanshop.com"
                   className="flex items-center gap-4 rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur transition hover:bg-white/20"
                 >
                   <MailIcon />
@@ -1394,7 +1394,7 @@ export default function PrivacyPage() {
                     <small className="block text-green-100">Email</small>
 
                     <strong className="mt-1 block truncate text-sm">
-                      sesanagriculture@gmail.com
+                      info@sesanshop.com
                     </strong>
                   </span>
                 </a>
