@@ -553,31 +553,71 @@ ${message}
           </button>
         </div>
 
-        {mobileMenuOpen && (
-          <div className="my-3 border-t border-slate-200 pt-3">
-  <p className="px-4 pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-    Language
-  </p>
+       {mobileMenuOpen && (
+  <div className="border-t border-slate-200 bg-white px-5 pb-6 pt-4 shadow-xl lg:hidden">
 
-  <a
-    href="/"
-    onClick={() => setMobileMenuOpen(false)}
-    className="flex items-center gap-3 rounded-xl px-4 py-3 font-semibold text-green-700 transition hover:bg-green-50"
-  >
-    <span>🇬🇧</span>
-    English
-  </a>
+    {/* Mobile Navigation */}
+    <nav className="flex flex-col">
+      {navItems.map((item) => (
+        <a
+          key={item.href}
+          href={item.href}
+          onClick={() => setMobileMenuOpen(false)}
+          className="border-b border-slate-100 py-3.5 font-bold text-slate-700 transition hover:text-green-700"
+        >
+          {item.label}
+        </a>
+      ))}
 
-  <a
-    href="/km"
-    onClick={() => setMobileMenuOpen(false)}
-    className="flex items-center gap-3 rounded-xl px-4 py-3 font-semibold text-slate-700 transition hover:bg-green-50 hover:text-green-700"
-  >
-    <span>🇰🇭</span>
-    ខ្មែរ
-  </a>
-</div>
-        )}
+      <a
+        href="https://sesanshop.com"
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={() => setMobileMenuOpen(false)}
+        className="border-b border-slate-100 py-3.5 font-bold text-slate-700 transition hover:text-green-700"
+      >
+        Sesan Shop
+      </a>
+    </nav>
+
+    {/* Language */}
+    <div className="mt-5">
+      <p className="pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
+        Language
+      </p>
+
+      <div className="grid grid-cols-2 gap-3">
+        <a
+          href="/"
+          onClick={() => setMobileMenuOpen(false)}
+          className="rounded-xl border border-slate-200 px-4 py-3 text-center font-semibold text-green-700"
+        >
+          🇬🇧 English
+        </a>
+
+        <a
+          href="/km"
+          onClick={() => setMobileMenuOpen(false)}
+          className="rounded-xl border border-slate-200 px-4 py-3 text-center font-semibold text-slate-700"
+        >
+          🇰🇭 ខ្មែរ
+        </a>
+      </div>
+    </div>
+
+    {/* Download */}
+    <a
+      href="#download"
+      onClick={() => setMobileMenuOpen(false)}
+      className="mt-5 inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-6 py-4 font-black !text-yellow-200 shadow-lg"
+    >
+      {t("nav.download")}
+    </a>
+
+  </div>
+)}
+
+
       </header>
 
       {/* Hero */}
