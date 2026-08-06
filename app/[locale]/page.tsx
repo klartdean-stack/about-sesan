@@ -1,6 +1,5 @@
 "use client";
-
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useTranslations } from "next-intl";
 import { Globe, Mail } from "lucide-react";
 
@@ -403,6 +402,48 @@ const promotionPlans = [
     popular: false,
   },
 ];
+
+const handlePromotionSubmit = (
+  event: FormEvent<HTMLFormElement>
+) => {
+  event.preventDefault();
+
+  const form = new FormData(event.currentTarget);
+
+  const companyName = String(form.get("companyName") || "");
+  const contactPerson = String(form.get("contactPerson") || "");
+  const phone = String(form.get("phone") || "");
+  const telegram = String(form.get("telegram") || "");
+  const email = String(form.get("email") || "");
+  const website = String(form.get("website") || "");
+  const packageName = String(form.get("packageName") || "");
+  const message = String(form.get("message") || "");
+
+  const subject = encodeURIComponent(
+    `Promotion Request - ${companyName}`
+  );
+
+  const body = encodeURIComponent(
+`Hello Sesan Group,
+
+I would like to request a business promotion.
+
+Company Name: ${companyName}
+Contact Person: ${contactPerson}
+Phone: ${phone}
+Telegram: ${telegram}
+Email: ${email}
+Website / Facebook: ${website}
+Promotion Package: ${packageName}
+
+Message:
+${message}
+`
+  );
+
+  window.location.href =
+    `mailto:info@sesanshop.com?subject=${subject}&body=${body}`;
+};
 
   return (
     <main className="site-home overflow-hidden bg-white text-slate-900">
@@ -1410,6 +1451,213 @@ const promotionPlans = [
         </div>
       </div>
     </div>
+
+    {/* Promotion Request Form */}
+<div className="mt-12 overflow-hidden rounded-[34px] border border-white/10 bg-white/5">
+  <div className="grid lg:grid-cols-[0.8fr_1.2fr]">
+    {/* Left information */}
+    <div className="bg-gradient-to-br from-green-700 to-emerald-500 p-8 sm:p-12">
+      <p className="text-sm font-bold uppercase tracking-[0.22em] text-green-100">
+        Promotion Request
+      </p>
+
+      <h3 className="mt-4 text-3xl font-black sm:text-4xl">
+        Tell us about your business
+      </h3>
+
+      <p className="mt-5 leading-8 text-green-50">
+        Complete this form and the Sesan team will contact you to discuss
+        your promotion, banner design, preferred date and campaign package.
+      </p>
+
+      <div className="mt-8 space-y-4 text-sm font-semibold text-white">
+        <p>✓ Sesan App banner promotion</p>
+        <p>✓ Telegram sponsored posts</p>
+        <p>✓ Website and Facebook promotion</p>
+        <p>✓ Agricultural product campaigns</p>
+      </div>
+
+      <div className="mt-9 rounded-2xl border border-white/20 bg-white/10 p-5">
+        <p className="text-sm text-green-100">Official sales email</p>
+
+        <a
+          href="mailto:info@sesanshop.com"
+          className="mt-1 block font-black text-white"
+        >
+          info@sesanshop.com
+        </a>
+
+        <p className="mt-4 text-sm text-green-100">Phone</p>
+
+        <a
+          href="tel:+85511930717"
+          className="mt-1 block font-black text-white"
+        >
+          +855 11 930 717
+        </a>
+      </div>
+    </div>
+
+    {/* Form */}
+    <form
+      onSubmit={handlePromotionSubmit}
+      className="grid gap-5 bg-white p-8 text-slate-900 sm:p-12"
+    >
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Company Name *
+          </span>
+
+          <input
+            type="text"
+            name="companyName"
+            required
+            placeholder="Your company name"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Contact Person *
+          </span>
+
+          <input
+            type="text"
+            name="contactPerson"
+            required
+            placeholder="Full name"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Phone Number *
+          </span>
+
+          <input
+            type="tel"
+            name="phone"
+            required
+            placeholder="+855..."
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Telegram
+          </span>
+
+          <input
+            type="text"
+            name="telegram"
+            placeholder="@username or phone"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+      </div>
+
+      <div className="grid gap-5 sm:grid-cols-2">
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Email
+          </span>
+
+          <input
+            type="email"
+            name="email"
+            placeholder="company@example.com"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+
+        <label className="block">
+          <span className="text-sm font-bold text-slate-700">
+            Website or Facebook
+          </span>
+
+          <input
+            type="text"
+            name="website"
+            placeholder="Website or page link"
+            className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+          />
+        </label>
+      </div>
+
+      <label className="block">
+        <span className="text-sm font-bold text-slate-700">
+          Promotion Package *
+        </span>
+
+        <select
+          name="packageName"
+          required
+          defaultValue=""
+          className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+        >
+          <option value="" disabled>
+            Select a promotion package
+          </option>
+
+          <option value="Basic Listing - Free">
+            Basic Listing — Free
+          </option>
+
+          <option value="Featured Partner - $25/month">
+            Featured Partner — $25/month
+          </option>
+
+          <option value="Premium Promotion - $50/month">
+            Premium Promotion — $50/month
+          </option>
+
+          <option value="Telegram Promotion">
+            Telegram Channel Promotion
+          </option>
+
+          <option value="Product Launch Campaign - $99">
+            Product Launch Campaign — $99
+          </option>
+
+          <option value="Custom Promotion">
+            Custom Promotion Package
+          </option>
+        </select>
+      </label>
+
+      <label className="block">
+        <span className="text-sm font-bold text-slate-700">
+          Message
+        </span>
+
+        <textarea
+          name="message"
+          rows={5}
+          placeholder="Tell us about your product, promotion date and target customers..."
+          className="mt-2 w-full resize-none rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
+        />
+      </label>
+
+      <button
+        type="submit"
+        className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-8 py-4 font-black text-white shadow-xl shadow-green-600/20 transition hover:-translate-y-1 hover:from-green-700 hover:to-emerald-600"
+      >
+        Submit Promotion Request
+      </button>
+
+      <p className="text-center text-xs leading-5 text-slate-500">
+        Submitting this form will prepare an email to the official Sesan
+        sales team.
+      </p>
+    </form>
+  </div>
+</div>
 
     {/* Contact sales */}
     <div className="mt-12 text-center">
