@@ -1,7 +1,10 @@
 import type { Metadata } from "next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://about.sesanshop.com"),
+
   title: "Sesan Group | Cambodia Agriculture Technology",
 
   description:
@@ -34,6 +37,7 @@ export const metadata: Metadata = {
     title: "Sesan Group | Cambodia Agriculture Technology",
     description:
       "Cambodia's agriculture ecosystem connecting farmers, businesses and consumers through technology, markets, agricultural knowledge and trusted services.",
+    url: "https://about.sesanshop.com",
     type: "website",
     locale: "en_US",
     siteName: "Sesan Group",
@@ -60,6 +64,8 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>{children}</body>
+
+      <GoogleAnalytics gaId="G-V4YYJQV2RG" />
     </html>
   );
 }
