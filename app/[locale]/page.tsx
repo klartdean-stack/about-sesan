@@ -1039,8 +1039,7 @@ export default function Home() {
             <div>
   <h3 className="footer-title">Follow Us</h3>
 
-  <div className="mt-5 flex flex-wrap gap-3">
-
+ <div className="relative z-40 mt-5 flex flex-wrap gap-3 pointer-events-auto">
     <a
       href="https://sesanshop.com"
       target="_blank"
@@ -1052,12 +1051,13 @@ export default function Home() {
     </a>
 
     <a
-      href="mailto:info@sesanshop.com"
-      title="Email"
-      className="flex h-11 w-11 items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-500 hover:bg-amber-50"
-    >
-      <Mail className="h-5 w-5 text-amber-500" />
-    </a>
+  href="mailto:info@sesanshop.com"
+  title="Email"
+  aria-label="Email Sesan Group"
+  className="relative z-50 flex h-11 w-11 cursor-pointer items-center justify-center rounded-full border border-slate-200 bg-white shadow-sm transition hover:-translate-y-1 hover:border-amber-500 hover:bg-amber-50 pointer-events-auto"
+>
+  <Mail className="pointer-events-none h-5 w-5 text-amber-500" />
+</a>
 
     <a
       href="https://www.facebook.com/share/1EBrJfNXP4/"
