@@ -1073,6 +1073,93 @@ export default function Home() {
         </div>
       </section>
 
+{/* Company Timeline */}
+<section
+  className="bg-slate-50 px-5 py-24 lg:px-8"
+>
+  <div className="mx-auto max-w-5xl">
+
+    <div className="text-center mb-16">
+
+      <p className="section-label">
+        Our Journey
+      </p>
+
+      <h2 className="section-title">
+        Growing Together
+      </h2>
+
+      <p className="mt-6 text-lg text-slate-600">
+        A journey of innovation, technology and agriculture.
+      </p>
+
+    </div>
+
+    <div className="relative border-l-4 border-green-600 ml-6">
+
+      {[
+        {
+          year: "2025",
+          title: "Sesan Project Started",
+          color: "bg-green-600",
+        },
+        {
+          year: "2026",
+          title: "Official Website Launch",
+          color: "bg-green-600",
+        },
+        {
+          year: "2026",
+          title: "Business Email Released",
+          color: "bg-green-600",
+        },
+        {
+          year: "2026",
+          title: "Android App Available",
+          color: "bg-green-600",
+        },
+        {
+          year: "Coming Soon",
+          title: "iPhone App",
+          color: "bg-orange-500",
+        },
+        {
+          year: "Future",
+          title: "ASEAN Agriculture Platform",
+          color: "bg-blue-600",
+        },
+      ].map((item, index) => (
+
+        <div
+          key={index}
+          className="relative mb-14 pl-10"
+        >
+
+          <div
+            className={`absolute -left-[14px] top-2 h-6 w-6 rounded-full border-4 border-white shadow ${item.color}`}
+          />
+
+          <p className="text-sm font-bold uppercase tracking-widest text-green-700">
+
+            {item.year}
+
+          </p>
+
+          <h3 className="mt-2 text-2xl font-bold text-slate-900">
+
+            {item.title}
+
+          </h3>
+
+        </div>
+
+      ))}
+
+    </div>
+
+  </div>
+</section>
+
       {/* Contact */}
       <section id="contact" className="scroll-mt-24 px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">
