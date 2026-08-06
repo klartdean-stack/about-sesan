@@ -35,19 +35,36 @@ export const metadata: Metadata = {
 
   openGraph: {
     title: "Sesan Group | Cambodia Agriculture Technology",
+
     description:
-      "Cambodia's agriculture ecosystem connecting farmers, businesses and consumers through technology, markets, agricultural knowledge and trusted services.",
+      "Cambodia's agriculture ecosystem connecting farmers, businesses and consumers through technology, markets, knowledge and trusted services.",
+
     url: "https://about.sesanshop.com",
-    type: "website",
-    locale: "en_US",
+
     siteName: "Sesan Group",
+
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "Sesan Group Cambodia Agriculture Technology",
+      },
+    ],
+
+    locale: "en_US",
+    type: "website",
   },
 
   twitter: {
     card: "summary_large_image",
+
     title: "Sesan Group | Cambodia Agriculture Technology",
+
     description:
-      "Cambodia's agriculture ecosystem connecting farmers, businesses and consumers.",
+      "Connecting Cambodian agriculture through technology, markets, knowledge and trusted services.",
+
+    images: ["/og-image.png"],
   },
 
   robots: {
