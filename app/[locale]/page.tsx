@@ -340,13 +340,68 @@ export default function Home() {
     },
   ];
 
-  const navItems = [
+ const navItems = [
   { label: t("nav.home"), href: "#home" },
   { label: t("nav.about"), href: "#about" },
   { label: t("nav.services"), href: "#ecosystem" },
   { label: t("nav.vision"), href: "#mission" },
   { label: "News", href: "#news" },
+  { label: "Promote", href: "#promote" },
   { label: t("nav.contact"), href: "#contact" },
+];
+
+const promotionPlans = [
+  {
+    name: "Basic Listing",
+    price: "Free",
+    description:
+      "Introduce your agricultural business to the Sesan community.",
+    features: [
+      "Business name and profile",
+      "Company contact information",
+      "Website or social media link",
+      "Listed on Sesan business directory",
+    ],
+    button: "Apply for Free",
+    buttonClass:
+      "border border-green-600 bg-white text-green-700 hover:bg-green-50",
+    popular: false,
+  },
+  {
+    name: "Featured Partner",
+    price: "$25 / month",
+    description:
+      "Increase your visibility through Sesan platforms and communities.",
+    features: [
+      "Featured business listing",
+      "Sesan App homepage banner",
+      "Featured shop placement",
+      "Website promotion",
+      "One Facebook mention",
+    ],
+    button: "Become Featured",
+    buttonClass:
+      "bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600",
+    popular: true,
+  },
+  {
+    name: "Premium Promotion",
+    price: "$50 / month",
+    description:
+      "A complete promotion package across the Sesan ecosystem.",
+    features: [
+      "Premium Sesan App banner",
+      "Featured products and business",
+      "Website banner promotion",
+      "Telegram Channel sponsored post",
+      "Facebook promotion",
+      "Priority support",
+    ],
+    button: "Choose Premium",
+    buttonClass:
+      "bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 hover:from-amber-500 hover:to-orange-600",
+    popular: false,
+  },
 ];
 
   return (
@@ -1157,6 +1212,218 @@ export default function Home() {
 
     </div>
 
+  </div>
+</section>
+
+{/* Promote Your Business */}
+<section
+  id="promote"
+  className="scroll-mt-24 bg-slate-950 px-5 py-24 text-white lg:px-8"
+>
+  <div className="mx-auto max-w-7xl">
+    {/* Heading */}
+    <div className="mx-auto max-w-3xl text-center">
+      <p className="text-sm font-bold uppercase tracking-[0.25em] text-green-400">
+        Advertising & Partnership
+      </p>
+
+      <h2 className="mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
+        Promote Your Business
+        <span className="block bg-gradient-to-r from-green-400 to-amber-300 bg-clip-text text-transparent">
+          across the Sesan ecosystem.
+        </span>
+      </h2>
+
+      <p className="mt-6 text-lg leading-8 text-slate-300">
+        Reach farmers, agricultural dealers, businesses and consumers through
+        Sesan App, Sesan Website, Facebook and Telegram.
+      </p>
+    </div>
+
+    {/* Promotion packages */}
+    <div className="mt-16 grid gap-7 lg:grid-cols-3">
+      {promotionPlans.map((plan) => (
+        <article
+          key={plan.name}
+          className={`relative flex flex-col rounded-[32px] border p-8 transition duration-300 hover:-translate-y-2 ${
+            plan.popular
+              ? "border-green-400 bg-white text-slate-950 shadow-2xl shadow-green-500/20"
+              : "border-white/10 bg-white/5 text-white hover:bg-white/10"
+          }`}
+        >
+          {plan.popular && (
+            <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-green-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg">
+              Most Popular
+            </div>
+          )}
+
+          <p
+            className={`text-sm font-bold uppercase tracking-[0.18em] ${
+              plan.popular ? "text-green-700" : "text-green-400"
+            }`}
+          >
+            {plan.name}
+          </p>
+
+          <p className="mt-5 text-3xl font-black">{plan.price}</p>
+
+          <p
+            className={`mt-4 leading-7 ${
+              plan.popular ? "text-slate-600" : "text-slate-400"
+            }`}
+          >
+            {plan.description}
+          </p>
+
+          <div className="mt-8 flex-1 space-y-4">
+            {plan.features.map((feature) => (
+              <div key={feature} className="flex items-start gap-3">
+                <span
+                  className={`mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full ${
+                    plan.popular
+                      ? "bg-green-100 text-green-700"
+                      : "bg-green-500/20 text-green-400"
+                  }`}
+                >
+                  <CheckIcon />
+                </span>
+
+                <p
+                  className={`text-sm font-semibold leading-6 ${
+                    plan.popular ? "text-slate-700" : "text-slate-300"
+                  }`}
+                >
+                  {feature}
+                </p>
+              </div>
+            ))}
+          </div>
+
+          <a
+            href={`mailto:info@sesanshop.com?subject=${encodeURIComponent(
+              `${plan.name} Promotion Request`
+            )}&body=${encodeURIComponent(
+              `Hello Sesan Group,\n\nI am interested in the ${plan.name} package.\n\nCompany Name:\nContact Person:\nPhone:\nTelegram:\nWebsite:\nMessage:\n`
+            )}`}
+            className={`mt-9 inline-flex items-center justify-center rounded-full px-6 py-4 text-sm font-black shadow-lg transition ${plan.buttonClass}`}
+          >
+            {plan.button}
+          </a>
+        </article>
+      ))}
+    </div>
+
+    {/* Telegram promotion */}
+    <div className="mt-10 overflow-hidden rounded-[34px] bg-gradient-to-r from-sky-500 to-blue-700 p-8 sm:p-12">
+      <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-blue-100">
+            Telegram Promotion
+          </p>
+
+          <h3 className="mt-4 text-3xl font-black sm:text-4xl">
+            Reach 3,300+ Sesan Telegram subscribers
+          </h3>
+
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-blue-50">
+            Promote your company, product or agricultural service through a
+            sponsored post in the official Sesan Telegram Channel.
+          </p>
+
+          <div className="mt-7 grid gap-3 text-sm font-semibold text-white sm:grid-cols-2">
+            <p>✓ Sponsored Telegram post</p>
+            <p>✓ Product photos and description</p>
+            <p>✓ Website and contact links</p>
+            <p>✓ Pinned post up to 24 hours</p>
+          </div>
+        </div>
+
+        <a
+          href={`mailto:info@sesanshop.com?subject=${encodeURIComponent(
+            "Telegram Promotion Request"
+          )}&body=${encodeURIComponent(
+            "Hello Sesan Group,\n\nI would like to promote my business through the Sesan Telegram Channel.\n\nCompany Name:\nContact Person:\nPhone:\nTelegram:\nProduct or Service:\nPreferred Date:\n"
+          )}`}
+          className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 font-black text-blue-700 shadow-xl transition hover:-translate-y-1 hover:bg-blue-50"
+        >
+          Book Telegram Promotion
+        </a>
+      </div>
+    </div>
+
+    {/* Launch campaign */}
+    <div className="mt-10 rounded-[34px] border border-amber-300/30 bg-gradient-to-br from-amber-400 to-orange-500 p-8 text-slate-950 sm:p-12">
+      <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
+        <div>
+          <p className="text-sm font-bold uppercase tracking-[0.22em] text-orange-950/70">
+            Product Launch Campaign
+          </p>
+
+          <h3 className="mt-4 text-3xl font-black sm:text-4xl">
+            Launch your agricultural product with Sesan
+          </h3>
+
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-orange-950/80">
+            One campaign combining Sesan App, Website, Telegram, Facebook and
+            featured product promotion.
+          </p>
+
+          <div className="mt-7 flex flex-wrap gap-3">
+            {[
+              "Sesan App",
+              "Website",
+              "Telegram",
+              "Facebook",
+              "Featured Product",
+            ].map((item) => (
+              <span
+                key={item}
+                className="rounded-full border border-orange-950/10 bg-white/40 px-4 py-2 text-sm font-bold"
+              >
+                {item}
+              </span>
+            ))}
+          </div>
+        </div>
+
+        <div className="text-center lg:text-right">
+          <p className="text-sm font-bold uppercase tracking-wider text-orange-950/70">
+            Starting from
+          </p>
+
+          <p className="mt-2 text-5xl font-black">$99</p>
+
+          <p className="mt-1 font-semibold text-orange-950/70">
+            per campaign
+          </p>
+
+          <a
+            href={`mailto:info@sesanshop.com?subject=${encodeURIComponent(
+              "Product Launch Campaign Request"
+            )}&body=${encodeURIComponent(
+              "Hello Sesan Group,\n\nI am interested in launching my product through Sesan.\n\nCompany Name:\nContact Person:\nPhone:\nTelegram:\nProduct Name:\nLaunch Date:\nMessage:\n"
+            )}`}
+            className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-4 font-black text-white shadow-xl transition hover:-translate-y-1 hover:bg-slate-800"
+          >
+            Start Campaign
+          </a>
+        </div>
+      </div>
+    </div>
+
+    {/* Contact sales */}
+    <div className="mt-12 text-center">
+      <p className="text-slate-400">
+        Need a custom promotion package?
+      </p>
+
+      <a
+        href="mailto:info@sesanshop.com?subject=Custom%20Promotion%20Request"
+        className="mt-3 inline-flex font-bold text-green-400 transition hover:text-green-300"
+      >
+        Contact our sales team: info@sesanshop.com
+      </a>
+    </div>
   </div>
 </section>
 
