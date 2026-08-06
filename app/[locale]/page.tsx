@@ -472,7 +472,7 @@ ${message}
             </div>
           </a>
 
-          <nav className="hidden items-center gap-8 lg:flex">
+          <nav className="hidden items-center gap-5 xl:gap-7 lg:flex">
             {navItems.map((item) => (
               <a
                 key={item.label}
