@@ -87,7 +87,32 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body>{children}</body>
+<body>
+  <script
+    type="application/ld+json"
+    dangerouslySetInnerHTML={{
+      __html: JSON.stringify({
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        name: "Sesan Group",
+        url: "https://about.sesanshop.com",
+        logo: "https://about.sesanshop.com/sesan-logo.png",
+        description:
+          "Cambodia agriculture ecosystem connecting farmers, businesses and consumers through technology.",
+        email: "sesanagriculture@gmail.com",
+        telephone: "+85511930717",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: "Chamkar Mon",
+          addressRegion: "Phnom Penh",
+          addressCountry: "KH",
+        },
+      }),
+    }}
+  />
+
+  {children}
+</body>
 
       <GoogleAnalytics gaId="G-V4YYJQV2RG" />
     </html>
