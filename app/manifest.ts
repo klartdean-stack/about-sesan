@@ -3,7 +3,7 @@ import type { MetadataRoute } from "next";
 export default function manifest(): MetadataRoute.Manifest {
   return {
     name: "Sesan Group",
-    short_name: "Sesan",
+    short_name: "Sesan Group",
     description:
       "Cambodia agriculture ecosystem connecting farmers, businesses and consumers through technology, markets, knowledge and trusted services.",
 
