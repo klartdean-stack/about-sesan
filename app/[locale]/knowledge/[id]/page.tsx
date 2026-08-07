@@ -1,6 +1,6 @@
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {ArrowLeft, BookOpen, CalendarDays} from "lucide-react";
+import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
 import {getPublishedKnowledgeArticle} from "@/lib/firebase-rest";
 
 type PageProps = {
@@ -60,16 +60,25 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
               {locale === "km" ? "SESAN APP" : "SESAN APP"}
             </p>
             <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
-              {locale === "km" ? "ទាញយក Sesan App ដោយឥតគិតថ្លៃ" : "Download Sesan App for free"}
+              {locale === "km" ? "ប្រើ Sesan Shop តាម Web ឬទាញយក App" : "Use Sesan Shop on the web or download the app"}
             </h2>
             <p className="mt-4 leading-8 text-slate-300">
               {locale === "km"
-                ? "ស្វែងរកផលិតផលកសិកម្ម ទាក់ទងអ្នកលក់ និងភ្ជាប់ជាមួយសហគមន៍កសិកម្មកម្ពុជា។"
-                : "Explore agricultural products, contact sellers and connect with Cambodia’s growing farming community."}
+                ? "ចូល sesanshop.com តាមកុំព្យូទ័រ ឬប្រើ Sesan App ដើម្បីស្វែងរកផលិតផលកសិកម្ម និងទាក់ទងអ្នកលក់។"
+                : "Visit sesanshop.com on your computer or use Sesan App to explore agricultural products and contact sellers."}
             </p>
           </div>
 
           <div className="mt-8 flex shrink-0 flex-col gap-3 sm:flex-row lg:mt-0 lg:flex-col">
+            <a
+              href="https://sesanshop.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 font-black text-slate-950 transition hover:-translate-y-1 hover:bg-slate-100"
+            >
+              <Monitor className="h-6 w-6 text-sky-600" />
+              <span><small className="block text-[10px] font-bold uppercase text-slate-500">{locale === "km" ? "ប្រើលើកុំព្យូទ័រ" : "Use on computer"}</small>Sesan Shop Web</span>
+            </a>
             <a
               href="https://play.google.com/store/apps/details?id=com.sesan.app"
               target="_blank"
