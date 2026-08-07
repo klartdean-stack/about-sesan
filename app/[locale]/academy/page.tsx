@@ -1,7 +1,7 @@
 import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {ArrowLeft, ArrowRight, Bot, Check, Clock3, Code2, GraduationCap, Leaf, PackageOpen, Play, Search, Smartphone, Sparkles, Users, Utensils, Video, Wrench} from "lucide-react";
+import {ArrowLeft, ArrowRight, Bot, Check, Clock3, Code2, GraduationCap, Leaf, PackageOpen, Play, Search, Sparkles, Users, Utensils, Video, Wrench} from "lucide-react";
 import {academyCourses, type AcademyCategory, CREATOR_SHARE_RATE, MINIMUM_WITHDRAWAL_RIEL} from "@/lib/academy";
 
 type PageProps = {
@@ -16,7 +16,6 @@ const categories: {id: AcademyCategory | "all"; km: string; en: string; icon: ty
   {id: "agriculture", km: "កសិកម្ម", en: "Agriculture", icon: Leaf},
   {id: "food-production", km: "ផលិតអាហារ", en: "Food Production", icon: Utensils},
   {id: "home-products", km: "ផលិតផលប្រើប្រាស់", en: "Home Products", icon: PackageOpen},
-  {id: "phone-repair", km: "ជួសជុលទូរស័ព្ទ", en: "Phone Repair", icon: Smartphone},
   {id: "technical-repair", km: "ជំនាញជួសជុល", en: "Technical Repair", icon: Wrench},
   {id: "business", km: "អាជីវកម្ម", en: "Business", icon: Bot},
 ];
