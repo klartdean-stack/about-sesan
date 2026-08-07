@@ -69,6 +69,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: "yearly",
       priority: 0.4,
     },
+    ...(["en", "km"] as const).flatMap((locale) => [
+      {
+        url: `${baseUrl}/${locale}/academy`,
+        lastModified,
+        changeFrequency: "weekly" as const,
+        priority: 0.9,
+        alternates: {languages: {en: `${baseUrl}/en/academy`, km: `${baseUrl}/km/academy`}},
+      },
+      {
+        url: `${baseUrl}/${locale}/academy/creator`,
+        lastModified,
+        changeFrequency: "monthly" as const,
+        priority: 0.7,
+        alternates: {languages: {en: `${baseUrl}/en/academy/creator`, km: `${baseUrl}/km/academy/creator`}},
+      },
+    ]),
     ...knowledgePages,
   ];
 }
