@@ -1899,11 +1899,11 @@ ${message}
             <p>{text("© 2026 Sesan Group. All rights reserved.", "© ២០២៦ Sesan Group។ រក្សាសិទ្ធិគ្រប់យ៉ាង។")}</p>
 
             <div className="flex gap-6">
-  <Link href="/privacy" className="hover:text-green-700">
+  <Link href={locale === "km" ? "/km/privacy" : "/privacy"} className="hover:text-green-700">
     {text("Privacy Policy", "គោលការណ៍ឯកជនភាព")}
   </Link>
 
-  <Link href="/terms" className="hover:text-green-700">
+  <Link href={locale === "km" ? "/km/terms" : "/terms"} className="hover:text-green-700">
     {text("Terms of Use", "លក្ខខណ្ឌប្រើប្រាស់")}
   </Link>
 </div>
