@@ -52,6 +52,40 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
           )}
         </div>
       </article>
+
+      <section className="border-t border-green-100 bg-gradient-to-br from-green-50 via-white to-sky-50 px-5 py-16 sm:py-20">
+        <div className="mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-slate-950 px-6 py-10 text-white shadow-2xl sm:px-10 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-14">
+          <div className="max-w-2xl">
+            <p className="text-sm font-black uppercase tracking-[0.2em] text-green-400">
+              {locale === "km" ? "SESAN APP" : "SESAN APP"}
+            </p>
+            <h2 className="mt-4 text-3xl font-black leading-tight sm:text-4xl">
+              {locale === "km" ? "ទាញយក Sesan App ដោយឥតគិតថ្លៃ" : "Download Sesan App for free"}
+            </h2>
+            <p className="mt-4 leading-8 text-slate-300">
+              {locale === "km"
+                ? "ស្វែងរកផលិតផលកសិកម្ម ទាក់ទងអ្នកលក់ និងភ្ជាប់ជាមួយសហគមន៍កសិកម្មកម្ពុជា។"
+                : "Explore agricultural products, contact sellers and connect with Cambodia’s growing farming community."}
+            </p>
+          </div>
+
+          <div className="mt-8 flex shrink-0 flex-col gap-3 sm:flex-row lg:mt-0 lg:flex-col">
+            <a
+              href="https://play.google.com/store/apps/details?id=com.sesan.app"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-green-500 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-green-400"
+            >
+              <span className="text-xl">▶</span>
+              <span><small className="block text-[10px] font-bold uppercase opacity-80">{locale === "km" ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
+            </a>
+            <button disabled className="inline-flex min-w-48 cursor-not-allowed items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white/60">
+              <span className="text-2xl"></span>
+              <span><small className="block text-[10px] font-bold uppercase">{locale === "km" ? "នឹងមកដល់ឆាប់ៗ" : "Coming soon"}</small>App Store</span>
+            </button>
+          </div>
+        </div>
+      </section>
     </main>
   );
 }
