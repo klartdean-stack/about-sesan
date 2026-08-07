@@ -58,6 +58,7 @@ type KnowledgeArticle = {
 };
 
 const SESSION_KEY = "sesan-knowledge-admin-session";
+const AUTOSAVE_KEY = "sesan-knowledge-admin-autosave";
 
 const categories = [
   "ដំណាំ និងបច្ចេកទេស",
@@ -100,6 +101,8 @@ export default function KnowledgeAdminPage() {
   const [errorMessage, setErrorMessage] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [autoSaveNotice, setAutoSaveNotice] = useState(false);
+  const [recoverableDraft, setRecoverableDraft] = useState<KnowledgeArticle | null>(null);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
@@ -116,6 +119,12 @@ export default function KnowledgeAdminPage() {
       } catch {
         window.sessionStorage.removeItem(SESSION_KEY);
       } finally {
+        try {
+          const savedDraft = window.localStorage.getItem(AUTOSAVE_KEY);
+          if (savedDraft) setRecoverableDraft(JSON.parse(savedDraft) as KnowledgeArticle);
+        } catch {
+          window.localStorage.removeItem(AUTOSAVE_KEY);
+        }
         setAuthLoading(false);
       }
     });
@@ -139,6 +148,16 @@ export default function KnowledgeAdminPage() {
       active = false;
     };
   }, [session]);
+
+  useEffect(() => {
+    if (!editingArticle) return;
+    const timer = window.setTimeout(() => {
+      window.localStorage.setItem(AUTOSAVE_KEY, JSON.stringify(editingArticle));
+      setAutoSaveNotice(true);
+      window.setTimeout(() => setAutoSaveNotice(false), 1800);
+    }, 1200);
+    return () => window.clearTimeout(timer);
+  }, [editingArticle]);
 
   async function handleLogin(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -209,6 +228,8 @@ export default function KnowledgeAdminPage() {
     setErrorMessage("");
     try {
       await saveKnowledgeArticle(session, savedArticle);
+      window.localStorage.removeItem(AUTOSAVE_KEY);
+      setRecoverableDraft(null);
       setArticles((current) => {
         const exists = current.some((article) => article.id === savedArticle.id);
         return exists
@@ -392,6 +413,16 @@ export default function KnowledgeAdminPage() {
             </div>
           )}
 
+          {recoverableDraft && !editingArticle && (
+            <div className="mt-5 flex flex-col gap-4 rounded-2xl border border-sky-200 bg-sky-50 px-5 py-4 sm:flex-row sm:items-center sm:justify-between">
+              <div><p className="font-black text-sky-900">មានអត្ថបទព្រាងដែលបានរក្សាទុកស្វ័យប្រវត្តិ</p><p className="mt-1 text-sm text-sky-700">{recoverableDraft.titleKm || recoverableDraft.titleEn || "អត្ថបទថ្មី"}</p></div>
+              <div className="flex gap-2">
+                <button type="button" onClick={() => {setActiveLanguage("km"); setEditingArticle(recoverableDraft);}} className="rounded-xl bg-sky-600 px-4 py-2.5 text-sm font-black text-white hover:bg-sky-700">ស្ដារអត្ថបទ</button>
+                <button type="button" onClick={() => {window.localStorage.removeItem(AUTOSAVE_KEY); setRecoverableDraft(null);}} className="rounded-xl border border-sky-200 bg-white px-4 py-2.5 text-sm font-black text-sky-700 hover:bg-sky-100">លុបព្រាង</button>
+              </div>
+            </div>
+          )}
+
           {errorMessage && (
             <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">{errorMessage}</div>
           )}
@@ -514,6 +545,10 @@ export default function KnowledgeAdminPage() {
               <button type="button" onClick={() => setEditingArticle(null)} className="rounded-xl bg-slate-100 p-2 text-slate-500 transition hover:bg-slate-200 hover:text-slate-900">
                 <X className="h-5 w-5" />
               </button>
+            </div>
+
+            <div className="flex min-h-9 items-center justify-end border-b border-slate-100 bg-slate-50 px-5 text-xs font-bold text-slate-400 sm:px-7">
+              {autoSaveNotice ? <span className="inline-flex items-center gap-2 text-sky-600"><Check className="h-3.5 w-3.5" /> បានរក្សាទុកព្រាងស្វ័យប្រវត្តិ</span> : <span>Auto-save បើកដំណើរការ</span>}
             </div>
 
             <div className="flex border-b border-slate-200 px-5 sm:px-7">
