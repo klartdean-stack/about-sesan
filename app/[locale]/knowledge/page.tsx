@@ -13,6 +13,7 @@ import {
   Sprout,
   Tractor,
 } from "lucide-react";
+import {listPublishedKnowledgeArticles} from "@/lib/firebase-rest";
 
 const locales = ["en", "km"] as const;
 type Locale = (typeof locales)[number];
@@ -272,6 +273,14 @@ export default async function KnowledgePage({
   }
 
   const pageContent = content[locale as Locale];
+  const publishedArticles = await listPublishedKnowledgeArticles().catch(() => []);
+  const featuredArticle =
+    publishedArticles.find((article) => article.featured) ?? publishedArticles[0];
+
+  const articleText = (article: (typeof publishedArticles)[number]) => ({
+    title: locale === "km" ? article.titleKm : article.titleEn,
+    summary: locale === "km" ? article.summaryKm : article.summaryEn,
+  });
 
   return (
     <main className="min-h-screen bg-white text-slate-950">
@@ -341,10 +350,14 @@ export default async function KnowledgePage({
         <div className="mx-auto max-w-7xl">
           <article className="overflow-hidden rounded-[36px] bg-slate-950 text-white shadow-2xl">
             <div className="grid lg:grid-cols-[0.9fr_1.1fr]">
-              <div className="flex min-h-[360px] items-center justify-center bg-gradient-to-br from-green-600 to-emerald-400 p-10">
-                <div className="flex h-40 w-40 items-center justify-center rounded-full border border-white/30 bg-white/15 backdrop-blur-sm">
-                  <Sprout className="h-20 w-20 text-white" />
-                </div>
+              <div className="flex min-h-[360px] items-center justify-center overflow-hidden bg-gradient-to-br from-green-600 to-emerald-400">
+                {featuredArticle?.coverImage ? (
+                  <img src={featuredArticle.coverImage} alt="" className="h-full min-h-[360px] w-full object-cover" />
+                ) : (
+                  <div className="flex h-40 w-40 items-center justify-center rounded-full border border-white/30 bg-white/15 backdrop-blur-sm">
+                    <Sprout className="h-20 w-20 text-white" />
+                  </div>
+                )}
               </div>
 
               <div className="p-8 sm:p-12 lg:p-16">
@@ -353,20 +366,24 @@ export default async function KnowledgePage({
                 </p>
 
                 <p className="mt-6 text-sm font-bold text-amber-300">
-                  {pageContent.featuredCategory}
+                  {featuredArticle?.category ?? pageContent.featuredCategory}
                 </p>
 
                 <h2 className="mt-3 text-3xl font-black leading-tight sm:text-4xl">
-                  {pageContent.featuredTitle}
+                  {featuredArticle ? articleText(featuredArticle).title : pageContent.featuredTitle}
                 </h2>
 
                 <p className="mt-6 text-lg leading-8 text-slate-300">
-                  {pageContent.featuredDescription}
+                  {featuredArticle ? articleText(featuredArticle).summary : pageContent.featuredDescription}
                 </p>
 
-                <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300">
-                  {pageContent.comingSoon}
-                </div>
+                {featuredArticle ? (
+                  <Link href={`/${locale}/knowledge/${featuredArticle.id}`} className="mt-8 inline-flex items-center gap-2 rounded-full bg-green-500 px-5 py-3 text-sm font-black text-white transition hover:bg-green-400">
+                    {pageContent.readArticle}<ArrowRight className="h-4 w-4" />
+                  </Link>
+                ) : (
+                  <div className="mt-8 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-5 py-3 text-sm font-bold text-slate-300">{pageContent.comingSoon}</div>
+                )}
               </div>
             </div>
           </article>
@@ -435,34 +452,40 @@ export default async function KnowledgePage({
           </div>
 
           <div className="mt-14 grid gap-7 lg:grid-cols-3">
-            {pageContent.articles.map((article) => {
-              const Icon = article.icon;
+            {(publishedArticles.length ? publishedArticles : pageContent.articles).map((article) => {
+              const isFirebaseArticle = "id" in article;
+              const Icon = isFirebaseArticle ? BookOpen : article.icon;
+              const title = isFirebaseArticle ? articleText(article).title : article.title;
+              const description = isFirebaseArticle ? articleText(article).summary : article.description;
 
               return (
                 <article
-                  key={article.title}
+                  key={isFirebaseArticle ? article.id : article.title}
                   className="flex flex-col rounded-[30px] border border-slate-200 bg-white p-8 shadow-sm transition duration-300 hover:-translate-y-2 hover:shadow-xl"
                 >
-                  <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-100 to-emerald-50 text-green-700">
-                    <Icon className="h-8 w-8" />
-                  </div>
+                  {isFirebaseArticle && article.coverImage ? (
+                    <img src={article.coverImage} alt="" className="aspect-video w-full rounded-2xl object-cover" />
+                  ) : (
+                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-green-100 to-emerald-50 text-green-700"><Icon className="h-8 w-8" /></div>
+                  )}
 
                   <p className="mt-7 text-sm font-black uppercase tracking-[0.14em] text-green-700">
                     {article.category}
                   </p>
 
                   <h3 className="mt-3 text-2xl font-black leading-tight">
-                    {article.title}
+                    {title}
                   </h3>
 
                   <p className="mt-4 flex-1 leading-7 text-slate-600">
-                    {article.description}
+                    {description}
                   </p>
 
-                  <div className="mt-7 flex items-center gap-2 text-sm font-black text-slate-400">
-                    {pageContent.comingSoon}
-                    <ArrowRight className="h-4 w-4" />
-                  </div>
+                  {isFirebaseArticle ? (
+                    <Link href={`/${locale}/knowledge/${article.id}`} className="mt-7 flex items-center gap-2 text-sm font-black text-green-700 hover:text-green-600">{pageContent.readArticle}<ArrowRight className="h-4 w-4" /></Link>
+                  ) : (
+                    <div className="mt-7 flex items-center gap-2 text-sm font-black text-slate-400">{pageContent.comingSoon}<ArrowRight className="h-4 w-4" /></div>
+                  )}
                 </article>
               );
             })}
