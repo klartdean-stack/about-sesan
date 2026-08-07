@@ -353,6 +353,10 @@ export default function Home() {
     label: locale === "km" ? "ចំណេះដឹង" : "Knowledge",
     href: `/${locale}/knowledge`,
   },
+  {
+    label: "Academy",
+    href: `/${locale}/academy`,
+  },
   {label: text("Promote", "ផ្សព្វផ្សាយ"), href: "#promote"},
   {label: t("nav.contact"), href: "#contact"},
 ];
