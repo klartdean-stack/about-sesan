@@ -384,6 +384,27 @@ export async function listAllAcademyCourses(session: AcademySession) {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
+export async function listPublishedAcademyCourses() {
+  const data = await requestJson<Array<{document?: FirestoreDocument}>>(
+    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({structuredQuery: {
+        from: [{collectionId: "academyCourses"}],
+        where: {fieldFilter: {
+          field: {fieldPath: "status"},
+          op: "EQUAL",
+          value: {stringValue: "published"},
+        }},
+      }}),
+      cache: "no-store",
+    },
+  );
+  return data.flatMap(item => item.document ? [courseFromDocument(item.document)] : [])
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
 export async function submitAcademyCourse(
   session: AcademySession,
   input: Omit<AcademyCourseRecord, "id" | "creatorId" | "status" | "adminNote" | "createdAt" | "updatedAt">,
@@ -436,7 +457,10 @@ export async function getAcademyVideoBlobUrl(
     `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o/${encodeURIComponent(videoPath)}?alt=media`,
     {headers: {Authorization: `Bearer ${session.idToken}`}},
   );
-  if (!response.ok) throw new Error("VIDEO_PREVIEW_FAILED");
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`VIDEO_PREVIEW_FAILED_${response.status}_${detail}`);
+  }
   return URL.createObjectURL(await response.blob());
 }
 
@@ -448,5 +472,7 @@ export function readableAcademyError(error: unknown) {
   if (message.includes("PERMISSION_DENIED")) return "Firebase Rules មិនទាន់អនុញ្ញាតមុខងារនេះទេ។";
   if (message.includes("NOT_ACADEMY_ADMIN")) return "គណនីនេះមិនមែនជា Academy Admin ទេ។";
   if (message.includes("storage/unauthorized")) return "អ្នកមិនមានសិទ្ធិ Upload ឯកសារនេះទេ។";
+  if (message.includes("VIDEO_PREVIEW_FAILED_403")) return "Storage បានបដិសេធសិទ្ធិមើលវីដេអូ។ សូមពិនិត្យ Storage Rules។";
+  if (message.includes("VIDEO_PREVIEW_FAILED")) return "Browser មិនអាចទាញវីដេអូពី Storage បានទេ។ សូមពិនិត្យ CORS។";
   return "មានបញ្ហាក្នុងការភ្ជាប់ Sesan Academy។ សូមសាកល្បងម្ដងទៀត។";
 }
