@@ -21,11 +21,34 @@ export type CreatorApplication = {
   updatedAt: string;
 };
 
+export type AcademyCourseRecord = {
+  id: string;
+  creatorId: string;
+  creatorName: string;
+  titleKm: string;
+  titleEn: string;
+  descriptionKm: string;
+  descriptionEn: string;
+  category: string;
+  priceRiel: number;
+  coverImage: string;
+  coverPath: string;
+  videoPath: string;
+  videoFileName: string;
+  status: "pending" | "published" | "rejected";
+  adminNote: string;
+  createdAt: string;
+  updatedAt: string;
+};
+
 const apiKey =
   process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_API_KEY ??
   "AIzaSyAn2AB1Lx0z2zf1GGkfdq2SCa7hC8nzJgM";
 const projectId =
   process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_PROJECT_ID ?? "sesan-academy";
+const storageBucket =
+  process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_STORAGE_BUCKET ??
+  "sesan-academy.firebasestorage.app";
 const firestoreBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
 
 type FirestoreValue =
@@ -96,6 +119,56 @@ export async function signInAcademyUser(email: string, password: string) {
 function fieldString(fields: FirestoreDocument["fields"], name: string) {
   const value = fields?.[name];
   return value && "stringValue" in value ? value.stringValue : "";
+}
+
+function fieldInteger(fields: FirestoreDocument["fields"], name: string) {
+  const value = fields?.[name];
+  return value && "integerValue" in value ? Number(value.integerValue) || 0 : 0;
+}
+
+function courseFromDocument(document: FirestoreDocument): AcademyCourseRecord {
+  const fields = document.fields;
+  const status = fieldString(fields, "status");
+  return {
+    id: document.name.split("/").pop() ?? "",
+    creatorId: fieldString(fields, "creatorId"),
+    creatorName: fieldString(fields, "creatorName"),
+    titleKm: fieldString(fields, "titleKm"),
+    titleEn: fieldString(fields, "titleEn"),
+    descriptionKm: fieldString(fields, "descriptionKm"),
+    descriptionEn: fieldString(fields, "descriptionEn"),
+    category: fieldString(fields, "category"),
+    priceRiel: fieldInteger(fields, "priceRiel"),
+    coverImage: fieldString(fields, "coverImage"),
+    coverPath: fieldString(fields, "coverPath"),
+    videoPath: fieldString(fields, "videoPath"),
+    videoFileName: fieldString(fields, "videoFileName"),
+    status: status === "published" || status === "rejected" ? status : "pending",
+    adminNote: fieldString(fields, "adminNote"),
+    createdAt: fieldString(fields, "createdAt"),
+    updatedAt: fieldString(fields, "updatedAt"),
+  };
+}
+
+function courseFields(course: AcademyCourseRecord) {
+  return {
+    creatorId: {stringValue: course.creatorId},
+    creatorName: {stringValue: course.creatorName},
+    titleKm: {stringValue: course.titleKm},
+    titleEn: {stringValue: course.titleEn},
+    descriptionKm: {stringValue: course.descriptionKm},
+    descriptionEn: {stringValue: course.descriptionEn},
+    category: {stringValue: course.category},
+    priceRiel: {integerValue: String(course.priceRiel)},
+    coverImage: {stringValue: course.coverImage},
+    coverPath: {stringValue: course.coverPath},
+    videoPath: {stringValue: course.videoPath},
+    videoFileName: {stringValue: course.videoFileName},
+    status: {stringValue: course.status},
+    adminNote: {stringValue: course.adminNote},
+    createdAt: {stringValue: course.createdAt},
+    updatedAt: {stringValue: course.updatedAt},
+  };
 }
 
 function applicationFromDocument(document: FirestoreDocument): CreatorApplication {
@@ -249,6 +322,124 @@ export async function reviewCreatorApplication(
   return reviewed;
 }
 
+function safeFileName(name: string) {
+  return name.replace(/[^a-zA-Z0-9._-]/g, "-");
+}
+
+export async function uploadAcademyCourseFile(
+  session: AcademySession,
+  file: File,
+  kind: "cover" | "video",
+) {
+  const folder = kind === "cover" ? "academy-course-covers" : "academy-course-videos";
+  const path = `${folder}/${session.uid}/${Date.now()}-${safeFileName(file.name)}`;
+  const uploaded = await requestJson<{name: string}>(
+    `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o?uploadType=media&name=${encodeURIComponent(path)}`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.idToken}`,
+        "Content-Type": file.type,
+      },
+      body: file,
+    },
+  );
+  return {
+    path: uploaded.name,
+    publicUrl: kind === "cover"
+      ? `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o/${encodeURIComponent(uploaded.name)}?alt=media`
+      : "",
+  };
+}
+
+export async function listCreatorCourses(session: AcademySession) {
+  const data = await requestJson<Array<{document?: FirestoreDocument}>>(
+    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:runQuery`,
+    {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.idToken}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({structuredQuery: {
+        from: [{collectionId: "academyCourses"}],
+        where: {fieldFilter: {
+          field: {fieldPath: "creatorId"},
+          op: "EQUAL",
+          value: {stringValue: session.uid},
+        }},
+      }}),
+    },
+  );
+  return data.flatMap(item => item.document ? [courseFromDocument(item.document)] : [])
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function listAllAcademyCourses(session: AcademySession) {
+  const data = await requestJson<{documents?: FirestoreDocument[]}>(
+    `${firestoreBase}/academyCourses?pageSize=500`,
+    {headers: {Authorization: `Bearer ${session.idToken}`}, cache: "no-store"},
+  );
+  return (data.documents ?? []).map(courseFromDocument)
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function submitAcademyCourse(
+  session: AcademySession,
+  input: Omit<AcademyCourseRecord, "id" | "creatorId" | "status" | "adminNote" | "createdAt" | "updatedAt">,
+) {
+  const now = new Date().toISOString();
+  const id = `${session.uid}-${Date.now()}`;
+  const course: AcademyCourseRecord = {
+    id,
+    creatorId: session.uid,
+    ...input,
+    status: "pending",
+    adminNote: "",
+    createdAt: now,
+    updatedAt: now,
+  };
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(id)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${session.idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({fields: courseFields(course)}),
+  });
+  return course;
+}
+
+export async function reviewAcademyCourse(
+  session: AcademySession,
+  course: AcademyCourseRecord,
+  status: "published" | "rejected",
+  adminNote: string,
+) {
+  const updated = {...course, status, adminNote, updatedAt: new Date().toISOString()};
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${session.idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({fields: courseFields(updated)}),
+  });
+  return updated;
+}
+
+export async function getAcademyVideoBlobUrl(
+  session: AcademySession,
+  videoPath: string,
+) {
+  const response = await fetch(
+    `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o/${encodeURIComponent(videoPath)}?alt=media`,
+    {headers: {Authorization: `Bearer ${session.idToken}`}},
+  );
+  if (!response.ok) throw new Error("VIDEO_PREVIEW_FAILED");
+  return URL.createObjectURL(await response.blob());
+}
+
 export function readableAcademyError(error: unknown) {
   const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
   if (message.includes("EMAIL_EXISTS")) return "អ៊ីមែលនេះបានចុះឈ្មោះរួចហើយ។";
@@ -256,5 +447,6 @@ export function readableAcademyError(error: unknown) {
   if (message.includes("WEAK_PASSWORD")) return "លេខសម្ងាត់ត្រូវមានយ៉ាងតិច 6 តួ។";
   if (message.includes("PERMISSION_DENIED")) return "Firebase Rules មិនទាន់អនុញ្ញាតមុខងារនេះទេ។";
   if (message.includes("NOT_ACADEMY_ADMIN")) return "គណនីនេះមិនមែនជា Academy Admin ទេ។";
+  if (message.includes("storage/unauthorized")) return "អ្នកមិនមានសិទ្ធិ Upload ឯកសារនេះទេ។";
   return "មានបញ្ហាក្នុងការភ្ជាប់ Sesan Academy។ សូមសាកល្បងម្ដងទៀត។";
 }
