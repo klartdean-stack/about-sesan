@@ -2,6 +2,7 @@
 import { useState, type FormEvent } from "react";
 import {useLocale, useTranslations} from "next-intl";
 import { Globe, Mail } from "lucide-react";
+import Link from "next/link";
 
 import {
   FaFacebookF,
@@ -270,14 +271,16 @@ export default function Home() {
   const t = useTranslations();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [openFaq, setOpenFaq] = useState<number | null>(0);
+  const text = (english: string, khmer: string) =>
+    locale === "km" ? khmer : english;
 
   const ecosystemItems: EcosystemItem[] = [
     {
       id: "app",
       title: "Sesan App",
-      subtitle: "Mobile Agriculture Platform",
+      subtitle: text("Mobile Agriculture Platform", "វេទិកាកសិកម្មលើទូរស័ព្ទ"),
       description:
-        "A smart mobile platform for buying, selling, chatting, ordering and connecting Cambodia’s agricultural community.",
+        text("A smart mobile platform for buying, selling, chatting, ordering and connecting Cambodia’s agricultural community.", "វេទិកាឆ្លាតវៃសម្រាប់ទិញ លក់ ជជែក បញ្ជាទិញ និងភ្ជាប់សហគមន៍កសិកម្មកម្ពុជា។"),
       color: "from-blue-500 to-blue-700",
       lightColor: "bg-blue-50 text-blue-700",
       icon: <PhoneIcon />,
@@ -286,9 +289,9 @@ export default function Home() {
     {
       id: "shop",
       title: "Sesan Shop",
-      subtitle: "Digital Marketplace",
+      subtitle: text("Digital Marketplace", "ទីផ្សារឌីជីថល"),
       description:
-        "A digital marketplace connecting farmers, sellers, businesses and consumers directly through technology.",
+        text("A digital marketplace connecting farmers, sellers, businesses and consumers directly through technology.", "ទីផ្សារឌីជីថលដែលភ្ជាប់កសិករ អ្នកលក់ អាជីវកម្ម និងអ្នកប្រើប្រាស់ដោយផ្ទាល់តាមបច្ចេកវិទ្យា។"),
       color: "from-orange-400 to-amber-500",
       lightColor: "bg-orange-50 text-orange-700",
       icon: <ShopIcon />,
@@ -297,9 +300,9 @@ export default function Home() {
     {
       id: "media",
       title: "Sesan Media",
-      subtitle: "Knowledge and Community",
+      subtitle: text("Knowledge and Community", "ចំណេះដឹង និងសហគមន៍"),
       description:
-        "Agricultural news, educational videos, community stories, market information and digital media for Cambodia.",
+        text("Agricultural news, educational videos, community stories, market information and digital media for Cambodia.", "ព័ត៌មានកសិកម្ម វីដេអូអប់រំ រឿងរ៉ាវសហគមន៍ ព័ត៌មានទីផ្សារ និងប្រព័ន្ធផ្សព្វផ្សាយឌីជីថលសម្រាប់កម្ពុជា។"),
       color: "from-sky-400 to-blue-600",
       lightColor: "bg-sky-50 text-sky-700",
       icon: <MediaIcon />,
@@ -308,9 +311,9 @@ export default function Home() {
     {
       id: "tools",
       title: "Sesan Tools",
-      subtitle: "Machinery and Equipment",
+      subtitle: text("Machinery and Equipment", "គ្រឿងយន្ត និងឧបករណ៍"),
       description:
-        "Agricultural machinery, farming tools, equipment, spare parts and modern solutions for productive farming.",
+        text("Agricultural machinery, farming tools, equipment, spare parts and modern solutions for productive farming.", "គ្រឿងយន្ត ឧបករណ៍កសិកម្ម គ្រឿងបន្លាស់ និងដំណោះស្រាយទំនើបសម្រាប់បង្កើនផលិតភាព។"),
       color: "from-emerald-500 to-green-700",
       lightColor: "bg-emerald-50 text-emerald-700",
       icon: <ToolsIcon />,
@@ -319,9 +322,9 @@ export default function Home() {
     {
       id: "plant",
       title: "Sesan Plant",
-      subtitle: "Plant and Crop Solutions",
+      subtitle: text("Plant and Crop Solutions", "ដំណោះស្រាយដំណាំ"),
       description:
-        "Seeds, crops, vegetables, fruits, fertilizers, plant protection and sustainable agricultural solutions.",
+        text("Seeds, crops, vegetables, fruits, fertilizers, plant protection and sustainable agricultural solutions.", "គ្រាប់ពូជ ដំណាំ បន្លែ ផ្លែឈើ ជី ការពារដំណាំ និងដំណោះស្រាយកសិកម្មប្រកបដោយចីរភាព។"),
       color: "from-lime-400 to-green-600",
       lightColor: "bg-lime-50 text-green-700",
       icon: <PlantIcon />,
@@ -330,9 +333,9 @@ export default function Home() {
     {
       id: "animal",
       title: "Sesan Animal",
-      subtitle: "Livestock Solutions",
+      subtitle: text("Livestock Solutions", "ដំណោះស្រាយចិញ្ចឹមសត្វ"),
       description:
-        "Livestock, animal feed, breeding, animal products, veterinary information and farming services.",
+        text("Livestock, animal feed, breeding, animal products, veterinary information and farming services.", "សត្វចិញ្ចឹម ចំណីសត្វ ពូជសត្វ ផលិតផលសត្វ ព័ត៌មានពេទ្យសត្វ និងសេវាកម្មចិញ្ចឹមសត្វ។"),
       color: "from-yellow-400 to-orange-500",
       lightColor: "bg-yellow-50 text-orange-700",
       icon: <AnimalIcon />,
@@ -345,63 +348,63 @@ export default function Home() {
   {label: t("nav.about"), href: "#about"},
   {label: t("nav.services"), href: "#ecosystem"},
   {label: t("nav.vision"), href: "#mission"},
-  {label: "News", href: "#news"},
+  {label: text("News", "ព័ត៌មាន"), href: "#news"},
   {
     label: locale === "km" ? "ចំណេះដឹង" : "Knowledge",
     href: `/${locale}/knowledge`,
   },
-  {label: "Promote", href: "#promote"},
+  {label: text("Promote", "ផ្សព្វផ្សាយ"), href: "#promote"},
   {label: t("nav.contact"), href: "#contact"},
 ];
 
 const promotionPlans = [
   {
-    name: "Basic Listing",
-    price: "Free",
+    name: text("Basic Listing", "ការចុះបញ្ជីមូលដ្ឋាន"),
+    price: text("Free", "ឥតគិតថ្លៃ"),
     description:
-      "Introduce your agricultural business to the Sesan community.",
+      text("Introduce your agricultural business to the Sesan community.", "ណែនាំអាជីវកម្មកសិកម្មរបស់អ្នកទៅកាន់សហគមន៍ Sesan។"),
     features: [
-      "Business name and profile",
-      "Company contact information",
-      "Website or social media link",
-      "Listed on Sesan business directory",
+      text("Business name and profile", "ឈ្មោះ និងប្រវត្តិអាជីវកម្ម"),
+      text("Company contact information", "ព័ត៌មានទំនាក់ទំនងក្រុមហ៊ុន"),
+      text("Website or social media link", "តំណ Website ឬបណ្ដាញសង្គម"),
+      text("Listed on Sesan business directory", "ចុះក្នុងបញ្ជីអាជីវកម្ម Sesan"),
     ],
-    button: "Apply for Free",
+    button: text("Apply for Free", "ស្នើសុំឥតគិតថ្លៃ"),
     buttonClass:
       "border border-green-600 bg-white text-green-700 hover:bg-green-50",
     popular: false,
   },
   {
-    name: "Featured Partner",
+    name: text("Featured Partner", "ដៃគូឆ្នើម"),
     price: "$25 / month",
     description:
-      "Increase your visibility through Sesan platforms and communities.",
+      text("Increase your visibility through Sesan platforms and communities.", "បង្កើនការមើលឃើញអាជីវកម្មតាមវេទិកា និងសហគមន៍ Sesan។"),
     features: [
-      "Featured business listing",
-      "Sesan App homepage banner",
-      "Featured shop placement",
-      "Website promotion",
-      "One Facebook mention",
+      text("Featured business listing", "បញ្ជីអាជីវកម្មពិសេស"),
+      text("Sesan App homepage banner", "Banner លើទំព័រដើម Sesan App"),
+      text("Featured shop placement", "ទីតាំងហាងពិសេស"),
+      text("Website promotion", "ផ្សព្វផ្សាយលើ Website"),
+      text("One Facebook mention", "ផ្សព្វផ្សាយលើ Facebook មួយដង"),
     ],
-    button: "Become Featured",
+    button: text("Become Featured", "ជ្រើសរើសដៃគូឆ្នើម"),
     buttonClass:
       "bg-gradient-to-r from-green-600 to-emerald-500 text-white hover:from-green-700 hover:to-emerald-600",
     popular: true,
   },
   {
-    name: "Premium Promotion",
+    name: text("Premium Promotion", "កញ្ចប់ផ្សព្វផ្សាយពិសេស"),
     price: "$50 / month",
     description:
-      "A complete promotion package across the Sesan ecosystem.",
+      text("A complete promotion package across the Sesan ecosystem.", "កញ្ចប់ផ្សព្វផ្សាយពេញលេញក្នុងប្រព័ន្ធ Sesan។"),
     features: [
-      "Premium Sesan App banner",
-      "Featured products and business",
-      "Website banner promotion",
-      "Telegram Channel sponsored post",
-      "Facebook promotion",
-      "Priority support",
+      text("Premium Sesan App banner", "Banner ពិសេសលើ Sesan App"),
+      text("Featured products and business", "ផលិតផល និងអាជីវកម្មពិសេស"),
+      text("Website banner promotion", "ផ្សព្វផ្សាយ Banner លើ Website"),
+      text("Telegram Channel sponsored post", "អត្ថបទផ្សព្វផ្សាយលើ Telegram"),
+      text("Facebook promotion", "ផ្សព្វផ្សាយលើ Facebook"),
+      text("Priority support", "ការគាំទ្រអាទិភាព"),
     ],
-    button: "Choose Premium",
+    button: text("Choose Premium", "ជ្រើសរើសកញ្ចប់ពិសេស"),
     buttonClass:
       "bg-gradient-to-r from-amber-400 to-orange-500 text-slate-950 hover:from-amber-500 hover:to-orange-600",
     popular: false,
@@ -498,7 +501,7 @@ ${message}
   <details className="group relative">
     <summary className="flex cursor-pointer list-none items-center gap-2 rounded-full border border-slate-300 bg-white px-4 py-3 text-sm font-semibold text-slate-700 shadow-sm transition hover:border-green-600 hover:text-green-700">
       <span>🌐</span>
-      <span>English</span>
+      <span>{text("English", "ខ្មែរ")}</span>
 
       <svg
         viewBox="0 0 24 24"
@@ -517,21 +520,21 @@ ${message}
     </summary>
 
     <div className="absolute right-0 top-full mt-3 w-48 overflow-hidden rounded-2xl border border-slate-200 bg-white p-2 shadow-2xl">
-      <a
+      <Link
         href="/"
         className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-green-700 transition hover:bg-green-50"
       >
         <span>🇬🇧</span>
         <span>English</span>
-      </a>
+      </Link>
 
-      <a
+      <Link
         href="/km"
         className="flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-slate-700 transition hover:bg-green-50 hover:text-green-700"
       >
         <span>🇰🇭</span>
         <span>ខ្មែរ</span>
-      </a>
+      </Link>
     </div>
   </details>
 
@@ -545,7 +548,7 @@ ${message}
 </div>
           <button
             type="button"
-            aria-label="Open menu"
+            aria-label={text("Open menu", "បើកម៉ឺនុយ")}
             onClick={() => setMobileMenuOpen((value) => !value)}
             className="flex h-11 w-11 items-center justify-center rounded-full bg-slate-100 text-slate-900 lg:hidden"
           >
@@ -583,25 +586,25 @@ ${message}
     {/* Language */}
     <div className="mt-5">
       <p className="pb-2 text-xs font-bold uppercase tracking-wider text-slate-400">
-        Language
+        {text("Language", "ភាសា")}
       </p>
 
       <div className="grid grid-cols-2 gap-3">
-        <a
+        <Link
           href="/"
           onClick={() => setMobileMenuOpen(false)}
           className="rounded-xl border border-slate-200 px-4 py-3 text-center font-semibold text-green-700"
         >
           🇬🇧 English
-        </a>
+        </Link>
 
-        <a
+        <Link
           href="/km"
           onClick={() => setMobileMenuOpen(false)}
           className="rounded-xl border border-slate-200 px-4 py-3 text-center font-semibold text-slate-700"
         >
           🇰🇭 ខ្មែរ
-        </a>
+        </Link>
       </div>
     </div>
 
@@ -725,10 +728,10 @@ ${message}
       <section className="border-y border-slate-100 bg-white">
         <div className="mx-auto grid max-w-7xl grid-cols-2 divide-x divide-slate-100 sm:grid-cols-4">
           {[
-            ["6", "Core platforms"],
-            ["25", "Provinces & capital"],
-            ["24/7", "Digital access"],
-            ["1", "Connected ecosystem"],
+            ["6", text("Core platforms", "វេទិកាស្នូល")],
+            ["25", text("Provinces & capital", "រាជធានី និងខេត្ត")],
+            ["24/7", text("Digital access", "ប្រើបានគ្រប់ពេល")],
+            ["1", text("Connected ecosystem", "ប្រព័ន្ធតភ្ជាប់តែមួយ")],
           ].map(([number, label]) => (
             <div key={label} className="px-5 py-9 text-center">
               <p className="text-3xl font-black text-green-700 sm:text-4xl">
@@ -751,31 +754,29 @@ ${message}
 
             <div className="relative">
               <p className="text-sm font-bold uppercase tracking-[0.28em] text-green-100">
-                About Sesan
+                {text("About Sesan", "អំពី Sesan")}
               </p>
 
               <h2 className="mt-6 text-4xl font-black leading-tight sm:text-5xl">
-                Technology created for Cambodia&apos;s agricultural community.
+                {text("Technology created for Cambodia's agricultural community.", "បច្ចេកវិទ្យាបង្កើតឡើងសម្រាប់សហគមន៍កសិកម្មកម្ពុជា។")}
               </h2>
 
               <p className="mt-6 max-w-xl text-lg leading-8 text-green-50">
-                Sesan is building a connected agricultural ecosystem where
-                farmers, businesses and consumers can access markets,
-                information, tools and services from one trusted network.
+                {text("Sesan is building a connected agricultural ecosystem where farmers, businesses and consumers can access markets, information, tools and services from one trusted network.", "Sesan កំពុងកសាងប្រព័ន្ធកសិកម្មដែលតភ្ជាប់កសិករ អាជីវកម្ម និងអ្នកប្រើប្រាស់ឱ្យអាចចូលដល់ទីផ្សារ ព័ត៌មាន ឧបករណ៍ និងសេវាកម្មពីបណ្ដាញដែលអាចទុកចិត្តបានតែមួយ។")}
               </p>
 
               <div className="mt-10 grid grid-cols-2 gap-4">
                 <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                  <p className="text-3xl font-black text-yellow-300">Fair</p>
+                  <p className="text-3xl font-black text-yellow-300">{text("Fair", "យុត្តិធម៌")}</p>
                   <p className="mt-2 text-sm text-green-50">
-                    Better opportunities and market access.
+                    {text("Better opportunities and market access.", "ឱកាស និងការចូលដល់ទីផ្សារកាន់តែប្រសើរ។")}
                   </p>
                 </div>
 
                 <div className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur">
-                  <p className="text-3xl font-black text-blue-200">Smart</p>
+                  <p className="text-3xl font-black text-blue-200">{text("Smart", "ឆ្លាតវៃ")}</p>
                   <p className="mt-2 text-sm text-green-50">
-                    Practical technology for daily agriculture.
+                    {text("Practical technology for daily agriculture.", "បច្ចេកវិទ្យាដែលអាចប្រើបានពិតក្នុងការងារកសិកម្មប្រចាំថ្ងៃ។")}
                   </p>
                 </div>
               </div>
@@ -783,27 +784,25 @@ ${message}
           </div>
 
           <div>
-            <p className="section-label">Who we are</p>
+            <p className="section-label">{text("Who we are", "យើងជានរណា")}</p>
 
             <h2 className="section-title">
-              More than a marketplace.
+              {text("More than a marketplace.", "លើសពីទីផ្សារមួយ។")}
               <span className="block text-green-700">
-                A complete agricultural network.
+                {text("A complete agricultural network.", "ជាបណ្ដាញកសិកម្មដ៏ពេញលេញ។")}
               </span>
             </h2>
 
             <p className="mt-7 text-lg leading-8 text-slate-600">
-              Sesan is designed to support the agricultural journey—from
-              farming tools, plants and animals to digital commerce, mobile
-              technology and agricultural media.
+              {text("Sesan is designed to support the agricultural journey—from farming tools, plants and animals to digital commerce, mobile technology and agricultural media.", "Sesan ត្រូវបានបង្កើតឡើងដើម្បីគាំទ្រដំណើរកសិកម្ម ចាប់ពីឧបករណ៍ ដំណាំ និងសត្វ រហូតដល់ពាណិជ្ជកម្មឌីជីថល បច្ចេកវិទ្យាទូរស័ព្ទ និងព័ត៌មានកសិកម្ម។")}
             </p>
 
             <div className="mt-8 space-y-5">
               {[
-                "Connecting agricultural sellers with real buyers.",
-                "Sharing useful knowledge and market information.",
-                "Supporting agricultural tools, crops and livestock.",
-                "Building a trusted Cambodian digital agriculture brand.",
+                text("Connecting agricultural sellers with real buyers.", "ភ្ជាប់អ្នកលក់កសិកម្មជាមួយអ្នកទិញពិតប្រាកដ។"),
+                text("Sharing useful knowledge and market information.", "ចែករំលែកចំណេះដឹង និងព័ត៌មានទីផ្សារដែលមានប្រយោជន៍។"),
+                text("Supporting agricultural tools, crops and livestock.", "គាំទ្រឧបករណ៍កសិកម្ម ដំណាំ និងការចិញ្ចឹមសត្វ។"),
+                text("Building a trusted Cambodian digital agriculture brand.", "កសាងម៉ាកកសិកម្មឌីជីថលកម្ពុជាដែលអាចទុកចិត្តបាន។"),
               ].map((item) => (
                 <div key={item} className="flex items-start gap-4">
                   <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-green-100 text-green-700">
@@ -826,18 +825,17 @@ ${message}
       >
         <div className="mx-auto max-w-7xl">
           <div className="mx-auto max-w-3xl text-center">
-            <p className="section-label">Our ecosystem</p>
+            <p className="section-label">{text("Our ecosystem", "ប្រព័ន្ធរបស់យើង")}</p>
 
             <h2 className="section-title">
-              Six platforms.
+              {text("Six platforms.", "វេទិកាចំនួនប្រាំមួយ។")}
               <span className="block text-green-700">
-                One connected purpose.
+                {text("One connected purpose.", "គោលបំណងតភ្ជាប់តែមួយ។")}
               </span>
             </h2>
 
             <p className="mt-6 text-lg leading-8 text-slate-600">
-              Each Sesan platform serves a different need while working
-              together to strengthen Cambodian agriculture.
+              {text("Each Sesan platform serves a different need while working together to strengthen Cambodian agriculture.", "វេទិកា Sesan នីមួយៗបំពេញតម្រូវការផ្សេងៗគ្នា និងធ្វើការរួមគ្នាដើម្បីពង្រឹងវិស័យកសិកម្មកម្ពុជា។")}
             </p>
           </div>
 
@@ -877,7 +875,7 @@ ${message}
                     }
                     className="mt-7 inline-flex items-center gap-2 font-bold text-green-700 transition group-hover:gap-3"
                   >
-                    Explore more
+                    {text("Explore more", "ស្វែងយល់បន្ថែម")}
                     <ArrowIcon />
                   </a>
                 </div>
@@ -896,17 +894,15 @@ ${message}
 
               <div className="relative">
                 <p className="text-sm font-bold uppercase tracking-[0.25em] text-blue-300">
-                  Our Vision
+                  {text("Our Vision", "ចក្ខុវិស័យរបស់យើង")}
                 </p>
 
                 <h2 className="mt-6 text-4xl font-black leading-tight sm:text-5xl">
-                  A connected future for every Cambodian farmer.
+                  {text("A connected future for every Cambodian farmer.", "អនាគតដែលតភ្ជាប់សម្រាប់កសិករកម្ពុជាគ្រប់រូប។")}
                 </h2>
 
                 <p className="mt-6 text-lg leading-8 text-slate-300">
-                  To become Cambodia&apos;s trusted agricultural technology
-                  ecosystem, connecting every farmer with knowledge,
-                  opportunity and markets.
+                  {text("To become Cambodia's trusted agricultural technology ecosystem, connecting every farmer with knowledge, opportunity and markets.", "ក្លាយជាប្រព័ន្ធបច្ចេកវិទ្យាកសិកម្មដែលកម្ពុជាទុកចិត្ត និងភ្ជាប់កសិករគ្រប់រូបទៅកាន់ចំណេះដឹង ឱកាស និងទីផ្សារ។")}
                 </p>
               </div>
             </article>
@@ -916,16 +912,15 @@ ${message}
 
               <div className="relative">
                 <p className="text-sm font-bold uppercase tracking-[0.25em] text-orange-950/70">
-                  Our Mission
+                  {text("Our Mission", "បេសកកម្មរបស់យើង")}
                 </p>
 
                 <h2 className="mt-6 text-4xl font-black leading-tight sm:text-5xl">
-                  Make agricultural technology useful, simple and accessible.
+                  {text("Make agricultural technology useful, simple and accessible.", "ធ្វើឱ្យបច្ចេកវិទ្យាកសិកម្មមានប្រយោជន៍ ងាយស្រួល និងអាចប្រើបានគ្រប់គ្នា។")}
                 </h2>
 
                 <p className="mt-6 text-lg leading-8 text-orange-950/80">
-                  We connect agriculture with digital tools, direct markets,
-                  practical information and trusted community services.
+                  {text("We connect agriculture with digital tools, direct markets, practical information and trusted community services.", "យើងភ្ជាប់កសិកម្មជាមួយឧបករណ៍ឌីជីថល ទីផ្សារផ្ទាល់ ព័ត៌មានជាក់ស្ដែង និងសេវាកម្មសហគមន៍ដែលអាចទុកចិត្តបាន។")}
                 </p>
               </div>
             </article>
@@ -939,16 +934,15 @@ ${message}
           <div className="grid gap-14 lg:grid-cols-[0.8fr_1.2fr]">
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.25em] text-green-400">
-                Why Sesan
+                {text("Why Sesan", "ហេតុអ្វីជ្រើសរើស Sesan")}
               </p>
 
               <h2 className="mt-5 text-4xl font-black leading-tight sm:text-5xl">
-                Built around real agricultural needs.
+                {text("Built around real agricultural needs.", "បង្កើតឡើងតាមតម្រូវការកសិកម្មពិតប្រាកដ។")}
               </h2>
 
               <p className="mt-6 text-lg leading-8 text-slate-400">
-                Sesan focuses on practical solutions that help agricultural
-                communities communicate, trade, learn and grow.
+                {text("Sesan focuses on practical solutions that help agricultural communities communicate, trade, learn and grow.", "Sesan ផ្ដោតលើដំណោះស្រាយជាក់ស្ដែងដែលជួយសហគមន៍កសិកម្មទាក់ទង ធ្វើពាណិជ្ជកម្ម រៀនសូត្រ និងរីកចម្រើន។")}
               </p>
             </div>
 
@@ -956,23 +950,23 @@ ${message}
               {[
                 {
                   number: "01",
-                  title: "Direct Connection",
-                  text: "Farmers and sellers can connect directly with buyers.",
+                  title: text("Direct Connection", "ការតភ្ជាប់ផ្ទាល់"),
+                  text: text("Farmers and sellers can connect directly with buyers.", "កសិករ និងអ្នកលក់អាចភ្ជាប់ដោយផ្ទាល់ជាមួយអ្នកទិញ។"),
                 },
                 {
                   number: "02",
-                  title: "Trusted Ecosystem",
-                  text: "One agricultural brand connecting several important services.",
+                  title: text("Trusted Ecosystem", "ប្រព័ន្ធដែលអាចទុកចិត្តបាន"),
+                  text: text("One agricultural brand connecting several important services.", "ម៉ាកកសិកម្មមួយដែលភ្ជាប់សេវាកម្មសំខាន់ៗជាច្រើន។"),
                 },
                 {
                   number: "03",
-                  title: "Local Understanding",
-                  text: "Designed around Cambodia’s agricultural community.",
+                  title: text("Local Understanding", "យល់ពីតម្រូវការក្នុងស្រុក"),
+                  text: text("Designed around Cambodia’s agricultural community.", "រចនាឡើងសម្រាប់សហគមន៍កសិកម្មកម្ពុជា។"),
                 },
                 {
                   number: "04",
-                  title: "Digital Opportunity",
-                  text: "Technology that creates more market access and visibility.",
+                  title: text("Digital Opportunity", "ឱកាសឌីជីថល"),
+                  text: text("Technology that creates more market access and visibility.", "បច្ចេកវិទ្យាដែលបង្កើតឱកាសចូលទីផ្សារ និងការមើលឃើញកាន់តែច្រើន។"),
                 },
               ].map((item) => (
                 <article
@@ -1000,18 +994,18 @@ ${message}
 
     <div className="text-center">
       <p className="section-label">
-        Latest Updates
+        {text("Latest Updates", "ព័ត៌មានថ្មីៗ")}
       </p>
 
       <h2 className="section-title">
-        What's New at
+        {text("What's New at", "អ្វីដែលថ្មីនៅ")}
         <span className="block text-green-700">
           Sesan Group
         </span>
       </h2>
 
       <p className="mt-6 text-lg text-slate-600">
-        Follow our latest progress, announcements and product updates.
+        {text("Follow our latest progress, announcements and product updates.", "តាមដានវឌ្ឍនភាព សេចក្ដីជូនដំណឹង និងព័ត៌មានផលិតផលថ្មីៗរបស់យើង។")}
       </p>
     </div>
 
@@ -1020,16 +1014,15 @@ ${message}
       <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
 
         <p className="text-sm font-bold text-green-700">
-          August 2026
+          {text("August 2026", "ខែសីហា ឆ្នាំ២០២៦")}
         </p>
 
         <h3 className="mt-2 text-2xl font-black">
-          🌐 Official Website is Now Live
+          {text("🌐 Official Website is Now Live", "🌐 Website ផ្លូវការបានដំណើរការហើយ")}
         </h3>
 
         <p className="mt-4 leading-8 text-slate-600">
-          Sesan Group officially launched its multilingual corporate website
-          to introduce our ecosystem, technology and agricultural services.
+          {text("Sesan Group officially launched its multilingual corporate website to introduce our ecosystem, technology and agricultural services.", "Sesan Group បានដាក់ឱ្យដំណើរការ Website ក្រុមហ៊ុនពហុភាសាជាផ្លូវការ ដើម្បីណែនាំប្រព័ន្ធ បច្ចេកវិទ្យា និងសេវាកម្មកសិកម្មរបស់យើង។")}
         </p>
 
       </div>
@@ -1037,15 +1030,15 @@ ${message}
       <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
 
         <p className="text-sm font-bold text-green-700">
-          August 2026
+          {text("August 2026", "ខែសីហា ឆ្នាំ២០២៦")}
         </p>
 
         <h3 className="mt-2 text-2xl font-black">
-          📧 Official Business Email Available
+          {text("📧 Official Business Email Available", "📧 អ៊ីមែលអាជីវកម្មផ្លូវការបានដំណើរការ")}
         </h3>
 
         <p className="mt-4 leading-8 text-slate-600">
-          Contact us anytime at
+          {text("Contact us anytime at", "ទាក់ទងមកយើងគ្រប់ពេលតាម")}
           <span className="font-bold text-green-700">
             {" "}info@sesanshop.com
           </span>
@@ -1056,15 +1049,15 @@ ${message}
       <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
 
         <p className="text-sm font-bold text-orange-600">
-          Coming Soon
+          {text("Coming Soon", "នឹងមកដល់ឆាប់ៗ")}
         </p>
 
         <h3 className="mt-2 text-2xl font-black">
-          📱 Sesan App for iPhone
+          {text("📱 Sesan App for iPhone", "📱 Sesan App សម្រាប់ iPhone")}
         </h3>
 
         <p className="mt-4 leading-8 text-slate-600">
-          The iOS version of Sesan App will be available soon on the App Store.
+          {text("The iOS version of Sesan App will be available soon on the App Store.", "Sesan App ជំនាន់ iOS នឹងមាននៅលើ App Store ក្នុងពេលឆាប់ៗនេះ។")}
         </p>
 
       </div>
@@ -1083,31 +1076,31 @@ ${message}
     <div className="text-center mb-14">
 
       <p className="section-label">
-        Frequently Asked Questions
+        {text("Frequently Asked Questions", "សំណួរដែលសួរញឹកញាប់")}
       </p>
 
       <h2 className="section-title">
-        Everything you need to know
+        {text("Everything you need to know", "អ្វីគ្រប់យ៉ាងដែលអ្នកគួរដឹង")}
       </h2>
 
     </div>
 
     {[
       {
-        q: "What is Sesan Group?",
-        a: "Sesan Group is Cambodia's agriculture technology ecosystem connecting farmers, businesses and consumers."
+        q: text("What is Sesan Group?", "តើ Sesan Group ជាអ្វី?"),
+        a: text("Sesan Group is Cambodia's agriculture technology ecosystem connecting farmers, businesses and consumers.", "Sesan Group ជាប្រព័ន្ធបច្ចេកវិទ្យាកសិកម្មកម្ពុជា ដែលភ្ជាប់កសិករ អាជីវកម្ម និងអ្នកប្រើប្រាស់។")
       },
       {
-        q: "Is Sesan App free?",
-        a: "Yes. Sesan App is free to download and use."
+        q: text("Is Sesan App free?", "តើ Sesan App ប្រើឥតគិតថ្លៃមែនទេ?"),
+        a: text("Yes. Sesan App is free to download and use.", "មែនហើយ។ Sesan App អាចទាញយក និងប្រើប្រាស់ដោយឥតគិតថ្លៃ។")
       },
       {
-        q: "Where can I download Sesan App?",
-        a: "Google Play is available now. App Store is coming soon."
+        q: text("Where can I download Sesan App?", "តើខ្ញុំអាចទាញយក Sesan App នៅឯណា?"),
+        a: text("Google Play is available now. App Store is coming soon.", "ឥឡូវនេះមាននៅលើ Google Play ហើយ App Store នឹងមកដល់ឆាប់ៗ។")
       },
       {
-        q: "How can I contact Sesan Group?",
-        a: "Email: info@sesanshop.com"
+        q: text("How can I contact Sesan Group?", "តើខ្ញុំអាចទាក់ទង Sesan Group ដោយរបៀបណា?"),
+        a: text("Email: info@sesanshop.com", "អ៊ីមែល៖ info@sesanshop.com")
       }
     ].map((faq, index) => (
 
@@ -1155,16 +1148,15 @@ ${message}
       >
         <div className="mx-auto grid max-w-7xl items-center gap-14 lg:grid-cols-2">
           <div>
-            <p className="section-label">Download Sesan App</p>
+            <p className="section-label">{text("Download Sesan App", "ទាញយក Sesan App")}</p>
 
             <h2 className="section-title">
-              Cambodia&apos;s agricultural marketplace
-              <span className="block text-green-700">in your pocket.</span>
+              {text("Cambodia's agricultural marketplace", "ទីផ្សារកសិកម្មកម្ពុជា")}
+              <span className="block text-green-700">{text("in your pocket.", "នៅក្នុងដៃរបស់អ្នក។")}</span>
             </h2>
 
             <p className="mt-6 max-w-2xl text-lg leading-8 text-slate-600">
-              Explore agricultural products, contact sellers, manage orders and
-              connect with Cambodia&apos;s growing agricultural community.
+              {text("Explore agricultural products, contact sellers, manage orders and connect with Cambodia's growing agricultural community.", "ស្វែងរកផលិតផលកសិកម្ម ទាក់ទងអ្នកលក់ គ្រប់គ្រងការបញ្ជាទិញ និងភ្ជាប់ជាមួយសហគមន៍កសិកម្មកម្ពុជាដែលកំពុងរីកចម្រើន។")}
             </p>
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
@@ -1174,7 +1166,7 @@ ${message}
 >
   <span className="text-2xl"></span>
   <span>
-    <small>Coming Soon</small>
+    <small>{text("Coming Soon", "នឹងមកដល់ឆាប់ៗ")}</small>
     <strong>App Store</strong>
   </span>
 </button>
@@ -1187,14 +1179,14 @@ ${message}
 >
   <span className="play-symbol">▶</span>
   <span>
-    <small>GET IT ON</small>
+    <small>{text("GET IT ON", "ទាញយកពី")}</small>
     <strong>Google Play</strong>
   </span>
 </a>
             </div>
 
             <p className="mt-5 text-sm text-slate-500">
-              Available for iOS and Android.
+              {text("Available for iOS and Android.", "មានសម្រាប់ iOS និង Android។")}
             </p>
           </div>
 
@@ -1223,15 +1215,15 @@ ${message}
     <div className="text-center mb-16">
 
       <p className="section-label">
-        Our Journey
+        {text("Our Journey", "ដំណើររបស់យើង")}
       </p>
 
       <h2 className="section-title">
-        Growing Together
+        {text("Growing Together", "រីកចម្រើនជាមួយគ្នា")}
       </h2>
 
       <p className="mt-6 text-lg text-slate-600">
-        A journey of innovation, technology and agriculture.
+        {text("A journey of innovation, technology and agriculture.", "ដំណើរនៃនវានុវត្តន៍ បច្ចេកវិទ្យា និងកសិកម្ម។")}
       </p>
 
     </div>
@@ -1241,32 +1233,32 @@ ${message}
       {[
         {
           year: "2025",
-          title: "Sesan Project Started",
+          title: text("Sesan Project Started", "គម្រោង Sesan បានចាប់ផ្ដើម"),
           color: "bg-green-600",
         },
         {
           year: "2026",
-          title: "Official Website Launch",
+          title: text("Official Website Launch", "ដាក់ឱ្យដំណើរការ Website ផ្លូវការ"),
           color: "bg-green-600",
         },
         {
           year: "2026",
-          title: "Business Email Released",
+          title: text("Business Email Released", "ដាក់ឱ្យប្រើអ៊ីមែលអាជីវកម្ម"),
           color: "bg-green-600",
         },
         {
           year: "2026",
-          title: "Android App Available",
+          title: text("Android App Available", "App Android បានដាក់ឱ្យប្រើប្រាស់"),
           color: "bg-green-600",
         },
         {
-          year: "Coming Soon",
-          title: "iPhone App",
+          year: text("Coming Soon", "ឆាប់ៗនេះ"),
+          title: text("iPhone App", "App សម្រាប់ iPhone"),
           color: "bg-orange-500",
         },
         {
-          year: "Future",
-          title: "ASEAN Agriculture Platform",
+          year: text("Future", "អនាគត"),
+          title: text("ASEAN Agriculture Platform", "វេទិកាកសិកម្មអាស៊ាន"),
           color: "bg-blue-600",
         },
       ].map((item, index) => (
@@ -1310,19 +1302,18 @@ ${message}
     {/* Heading */}
     <div className="mx-auto max-w-3xl text-center">
       <p className="text-sm font-bold uppercase tracking-[0.25em] text-green-400">
-        Advertising & Partnership
+        {text("Advertising & Partnership", "ការផ្សព្វផ្សាយ និងភាពជាដៃគូ")}
       </p>
 
       <h2 className="mt-5 text-4xl font-black leading-tight sm:text-5xl lg:text-6xl">
-        Promote Your Business
+        {text("Promote Your Business", "ផ្សព្វផ្សាយអាជីវកម្មរបស់អ្នក")}
         <span className="block bg-gradient-to-r from-green-400 to-amber-300 bg-clip-text text-transparent">
-          across the Sesan ecosystem.
+          {text("across the Sesan ecosystem.", "ទូទាំងប្រព័ន្ធ Sesan។")}
         </span>
       </h2>
 
       <p className="mt-6 text-lg leading-8 text-slate-300">
-        Reach farmers, agricultural dealers, businesses and consumers through
-        Sesan App, Sesan Website, Facebook and Telegram.
+        {text("Reach farmers, agricultural dealers, businesses and consumers through Sesan App, Sesan Website, Facebook and Telegram.", "ទៅដល់កសិករ ដេប៉ូកសិកម្ម អាជីវកម្ម និងអ្នកប្រើប្រាស់តាម Sesan App, Website, Facebook និង Telegram។")}
       </p>
     </div>
 
@@ -1339,7 +1330,7 @@ ${message}
         >
           {plan.popular && (
             <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-green-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg">
-              Most Popular
+              {text("Most Popular", "ពេញនិយមបំផុត")}
             </div>
           )}
 
@@ -1404,23 +1395,22 @@ ${message}
       <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.22em] text-blue-100">
-            Telegram Promotion
+            {text("Telegram Promotion", "ផ្សព្វផ្សាយតាម Telegram")}
           </p>
 
           <h3 className="mt-4 text-3xl font-black sm:text-4xl">
-            Reach 3,300+ Sesan Telegram subscribers
+            {text("Reach 3,300+ Sesan Telegram subscribers", "ទៅដល់សមាជិក Telegram របស់ Sesan ជាង ៣,៣០០ នាក់")}
           </h3>
 
           <p className="mt-5 max-w-3xl text-lg leading-8 text-blue-50">
-            Promote your company, product or agricultural service through a
-            sponsored post in the official Sesan Telegram Channel.
+            {text("Promote your company, product or agricultural service through a sponsored post in the official Sesan Telegram Channel.", "ផ្សព្វផ្សាយក្រុមហ៊ុន ផលិតផល ឬសេវាកម្មកសិកម្មរបស់អ្នក តាមអត្ថបទផ្សព្វផ្សាយក្នុង Telegram Channel ផ្លូវការរបស់ Sesan។")}
           </p>
 
           <div className="mt-7 grid gap-3 text-sm font-semibold text-white sm:grid-cols-2">
-            <p>✓ Sponsored Telegram post</p>
-            <p>✓ Product photos and description</p>
-            <p>✓ Website and contact links</p>
-            <p>✓ Pinned post up to 24 hours</p>
+            <p>✓ {text("Sponsored Telegram post", "អត្ថបទផ្សព្វផ្សាយលើ Telegram")}</p>
+            <p>✓ {text("Product photos and description", "រូបភាព និងការពិពណ៌នាផលិតផល")}</p>
+            <p>✓ {text("Website and contact links", "តំណ Website និងទំនាក់ទំនង")}</p>
+            <p>✓ {text("Pinned post up to 24 hours", "Pin អត្ថបទរហូតដល់ ២៤ ម៉ោង")}</p>
           </div>
         </div>
 
@@ -1432,7 +1422,7 @@ ${message}
           )}`}
           className="inline-flex items-center justify-center rounded-full bg-white px-8 py-4 font-black text-blue-700 shadow-xl transition hover:-translate-y-1 hover:bg-blue-50"
         >
-          Book Telegram Promotion
+          {text("Book Telegram Promotion", "កក់ការផ្សព្វផ្សាយ Telegram")}
         </a>
       </div>
     </div>
@@ -1442,16 +1432,15 @@ ${message}
       <div className="grid items-center gap-10 lg:grid-cols-[1fr_auto]">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.22em] text-orange-950/70">
-            Product Launch Campaign
+            {text("Product Launch Campaign", "យុទ្ធនាការដាក់លក់ផលិតផល")}
           </p>
 
           <h3 className="mt-4 text-3xl font-black sm:text-4xl">
-            Launch your agricultural product with Sesan
+            {text("Launch your agricultural product with Sesan", "ដាក់លក់ផលិតផលកសិកម្មរបស់អ្នកជាមួយ Sesan")}
           </h3>
 
           <p className="mt-5 max-w-3xl text-lg leading-8 text-orange-950/80">
-            One campaign combining Sesan App, Website, Telegram, Facebook and
-            featured product promotion.
+            {text("One campaign combining Sesan App, Website, Telegram, Facebook and featured product promotion.", "យុទ្ធនាការតែមួយដែលរួមបញ្ចូល Sesan App, Website, Telegram, Facebook និងការផ្សព្វផ្សាយផលិតផលពិសេស។")}
           </p>
 
           <div className="mt-7 flex flex-wrap gap-3">
@@ -1474,13 +1463,13 @@ ${message}
 
         <div className="text-center lg:text-right">
           <p className="text-sm font-bold uppercase tracking-wider text-orange-950/70">
-            Starting from
+            {text("Starting from", "ចាប់ផ្ដើមពី")}
           </p>
 
           <p className="mt-2 text-5xl font-black">$99</p>
 
           <p className="mt-1 font-semibold text-orange-950/70">
-            per campaign
+            {text("per campaign", "ក្នុងមួយយុទ្ធនាការ")}
           </p>
 
           <a
@@ -1491,7 +1480,7 @@ ${message}
             )}`}
             className="mt-6 inline-flex items-center justify-center rounded-full bg-slate-950 px-8 py-4 font-black text-white shadow-xl transition hover:-translate-y-1 hover:bg-slate-800"
           >
-            Start Campaign
+            {text("Start Campaign", "ចាប់ផ្ដើមយុទ្ធនាការ")}
           </a>
         </div>
       </div>
@@ -1503,27 +1492,26 @@ ${message}
     {/* Left information */}
     <div className="bg-gradient-to-br from-green-700 to-emerald-500 p-8 sm:p-12">
       <p className="text-sm font-bold uppercase tracking-[0.22em] text-green-100">
-        Promotion Request
+        {text("Promotion Request", "សំណើផ្សព្វផ្សាយ")}
       </p>
 
       <h3 className="mt-4 text-3xl font-black sm:text-4xl">
-        Tell us about your business
+        {text("Tell us about your business", "ប្រាប់យើងអំពីអាជីវកម្មរបស់អ្នក")}
       </h3>
 
       <p className="mt-5 leading-8 text-green-50">
-        Complete this form and the Sesan team will contact you to discuss
-        your promotion, banner design, preferred date and campaign package.
+        {text("Complete this form and the Sesan team will contact you to discuss your promotion, banner design, preferred date and campaign package.", "បំពេញបែបបទនេះ ហើយក្រុមការងារ Sesan នឹងទាក់ទងទៅអ្នក ដើម្បីពិភាក្សាអំពីការផ្សព្វផ្សាយ ការរចនា Banner កាលបរិច្ឆេទ និងកញ្ចប់យុទ្ធនាការ។")}
       </p>
 
       <div className="mt-8 space-y-4 text-sm font-semibold text-white">
-        <p>✓ Sesan App banner promotion</p>
-        <p>✓ Telegram sponsored posts</p>
-        <p>✓ Website and Facebook promotion</p>
-        <p>✓ Agricultural product campaigns</p>
+        <p>✓ {text("Sesan App banner promotion", "ផ្សព្វផ្សាយ Banner លើ Sesan App")}</p>
+        <p>✓ {text("Telegram sponsored posts", "អត្ថបទផ្សព្វផ្សាយលើ Telegram")}</p>
+        <p>✓ {text("Website and Facebook promotion", "ផ្សព្វផ្សាយលើ Website និង Facebook")}</p>
+        <p>✓ {text("Agricultural product campaigns", "យុទ្ធនាការផលិតផលកសិកម្ម")}</p>
       </div>
 
       <div className="mt-9 rounded-2xl border border-white/20 bg-white/10 p-5">
-        <p className="text-sm text-green-100">Official sales email</p>
+        <p className="text-sm text-green-100">{text("Official sales email", "អ៊ីមែលផ្នែកលក់ផ្លូវការ")}</p>
 
         <a
           href="mailto:info@sesanshop.com"
@@ -1532,7 +1520,7 @@ ${message}
           info@sesanshop.com
         </a>
 
-        <p className="mt-4 text-sm text-green-100">Phone</p>
+        <p className="mt-4 text-sm text-green-100">{text("Phone", "ទូរស័ព្ទ")}</p>
 
         <a
           href="tel:+85511930717"
@@ -1551,28 +1539,28 @@ ${message}
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Company Name *
+            {text("Company Name *", "ឈ្មោះក្រុមហ៊ុន *")}
           </span>
 
           <input
             type="text"
             name="companyName"
             required
-            placeholder="Your company name"
+            placeholder={text("Your company name", "ឈ្មោះក្រុមហ៊ុនរបស់អ្នក")}
             className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
           />
         </label>
 
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Contact Person *
+            {text("Contact Person *", "ឈ្មោះអ្នកទំនាក់ទំនង *")}
           </span>
 
           <input
             type="text"
             name="contactPerson"
             required
-            placeholder="Full name"
+            placeholder={text("Full name", "ឈ្មោះពេញ")}
             className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
           />
         </label>
@@ -1581,7 +1569,7 @@ ${message}
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Phone Number *
+            {text("Phone Number *", "លេខទូរស័ព្ទ *")}
           </span>
 
           <input
@@ -1595,7 +1583,7 @@ ${message}
 
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Telegram
+            {text("Telegram", "Telegram")}
           </span>
 
           <input
@@ -1610,7 +1598,7 @@ ${message}
       <div className="grid gap-5 sm:grid-cols-2">
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Email
+            {text("Email", "អ៊ីមែល")}
           </span>
 
           <input
@@ -1623,13 +1611,13 @@ ${message}
 
         <label className="block">
           <span className="text-sm font-bold text-slate-700">
-            Website or Facebook
+            {text("Website or Facebook", "Website ឬ Facebook")}
           </span>
 
           <input
             type="text"
             name="website"
-            placeholder="Website or page link"
+            placeholder={text("Website or page link", "តំណ Website ឬ Page")}
             className="mt-2 w-full rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
           />
         </label>
@@ -1637,7 +1625,7 @@ ${message}
 
       <label className="block">
         <span className="text-sm font-bold text-slate-700">
-          Promotion Package *
+          {text("Promotion Package *", "កញ្ចប់ផ្សព្វផ្សាយ *")}
         </span>
 
         <select
@@ -1647,44 +1635,44 @@ ${message}
           className="mt-2 w-full rounded-2xl border border-slate-300 bg-white px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
         >
           <option value="" disabled>
-            Select a promotion package
+            {text("Select a promotion package", "ជ្រើសរើសកញ្ចប់ផ្សព្វផ្សាយ")}
           </option>
 
           <option value="Basic Listing - Free">
-            Basic Listing — Free
+            {text("Basic Listing — Free", "ការចុះបញ្ជីមូលដ្ឋាន — ឥតគិតថ្លៃ")}
           </option>
 
           <option value="Featured Partner - $25/month">
-            Featured Partner — $25/month
+            {text("Featured Partner — $25/month", "ដៃគូឆ្នើម — $25/ខែ")}
           </option>
 
           <option value="Premium Promotion - $50/month">
-            Premium Promotion — $50/month
+            {text("Premium Promotion — $50/month", "កញ្ចប់ពិសេស — $50/ខែ")}
           </option>
 
           <option value="Telegram Promotion">
-            Telegram Channel Promotion
+            {text("Telegram Channel Promotion", "ផ្សព្វផ្សាយលើ Telegram Channel")}
           </option>
 
           <option value="Product Launch Campaign - $99">
-            Product Launch Campaign — $99
+            {text("Product Launch Campaign — $99", "យុទ្ធនាការដាក់លក់ផលិតផល — $99")}
           </option>
 
           <option value="Custom Promotion">
-            Custom Promotion Package
+            {text("Custom Promotion Package", "កញ្ចប់ផ្សព្វផ្សាយផ្ទាល់ខ្លួន")}
           </option>
         </select>
       </label>
 
       <label className="block">
         <span className="text-sm font-bold text-slate-700">
-          Message
+          {text("Message", "សារ")}
         </span>
 
         <textarea
           name="message"
           rows={5}
-          placeholder="Tell us about your product, promotion date and target customers..."
+          placeholder={text("Tell us about your product, promotion date and target customers...", "ប្រាប់យើងអំពីផលិតផល កាលបរិច្ឆេទផ្សព្វផ្សាយ និងអតិថិជនគោលដៅ...")}
           className="mt-2 w-full resize-none rounded-2xl border border-slate-300 px-4 py-3.5 outline-none transition focus:border-green-600 focus:ring-4 focus:ring-green-100"
         />
       </label>
@@ -1693,12 +1681,11 @@ ${message}
         type="submit"
         className="inline-flex w-full items-center justify-center rounded-full bg-gradient-to-r from-green-600 to-emerald-500 px-8 py-4 font-black text-white shadow-xl shadow-green-600/20 transition hover:-translate-y-1 hover:from-green-700 hover:to-emerald-600"
       >
-        Submit Promotion Request
+        {text("Submit Promotion Request", "ផ្ញើសំណើផ្សព្វផ្សាយ")}
       </button>
 
       <p className="text-center text-xs leading-5 text-slate-500">
-        Submitting this form will prepare an email to the official Sesan
-        sales team.
+        {text("Submitting this form will prepare an email to the official Sesan sales team.", "ការផ្ញើបែបបទនេះនឹងរៀបចំអ៊ីមែលទៅក្រុមផ្នែកលក់ផ្លូវការរបស់ Sesan។")}
       </p>
     </form>
   </div>
@@ -1707,14 +1694,14 @@ ${message}
     {/* Contact sales */}
     <div className="mt-12 text-center">
       <p className="text-slate-400">
-        Need a custom promotion package?
+        {text("Need a custom promotion package?", "ត្រូវការកញ្ចប់ផ្សព្វផ្សាយផ្ទាល់ខ្លួនមែនទេ?")}
       </p>
 
       <a
         href="mailto:info@sesanshop.com?subject=Custom%20Promotion%20Request"
         className="mt-3 inline-flex font-bold text-green-400 transition hover:text-green-300"
       >
-        Contact our sales team: info@sesanshop.com
+        {text("Contact our sales team", "ទាក់ទងក្រុមផ្នែកលក់របស់យើង")}: info@sesanshop.com
       </a>
     </div>
   </div>
@@ -1727,16 +1714,15 @@ ${message}
             <div className="grid gap-12 lg:grid-cols-[1fr_0.8fr]">
               <div>
                 <p className="text-sm font-bold uppercase tracking-[0.25em] text-green-100">
-                  Contact Sesan
+                  {text("Contact Sesan", "ទាក់ទង Sesan")}
                 </p>
 
                 <h2 className="mt-5 max-w-3xl text-4xl font-black leading-tight sm:text-5xl">
-                  Let&apos;s build a stronger agricultural future together.
+                  {text("Let's build a stronger agricultural future together.", "ចូលរួមកសាងអនាគតកសិកម្មដ៏រឹងមាំជាមួយគ្នា។")}
                 </h2>
 
                 <p className="mt-6 max-w-2xl text-lg leading-8 text-green-50">
-                  Contact Sesan for partnerships, business cooperation,
-                  agricultural services, media and community opportunities.
+                  {text("Contact Sesan for partnerships, business cooperation, agricultural services, media and community opportunities.", "ទាក់ទង Sesan សម្រាប់ភាពជាដៃគូ កិច្ចសហការអាជីវកម្ម សេវាកម្មកសិកម្ម ប្រព័ន្ធផ្សព្វផ្សាយ និងឱកាសសហគមន៍។")}
                 </p>
               </div>
 
@@ -1749,7 +1735,7 @@ ${message}
                 >
                   <GlobeIcon />
                   <span>
-                    <small>Marketplace</small>
+                    <small>{text("Marketplace", "ទីផ្សារ")}</small>
                     <strong>sesanshop.com</strong>
                   </span>
                 </a>
@@ -1757,7 +1743,7 @@ ${message}
                 <a href="mailto:info@sesanshop.com" className="contact-row">
                   <MailIcon />
                   <span>
-                    <small>Email</small>
+                    <small>{text("Email", "អ៊ីមែល")}</small>
                     <strong>info@sesanshop.com</strong>
                   </span>
                 </a>
@@ -1765,8 +1751,8 @@ ${message}
                 <div className="contact-row">
                   <LocationIcon />
                   <span>
-                    <small>Location</small>
-                    <strong>Phnom Penh, Cambodia</strong>
+                    <small>{text("Location", "ទីតាំង")}</small>
+                    <strong>{text("Phnom Penh, Cambodia", "រាជធានីភ្នំពេញ ប្រទេសកម្ពុជា")}</strong>
                   </span>
                 </div>
               </div>
@@ -1796,17 +1782,16 @@ ${message}
               </a>
 
               <p className="mt-5 max-w-xs leading-7 text-slate-500">
-                Connecting Cambodian agriculture through technology, markets,
-                knowledge and trusted services.
+                {text("Connecting Cambodian agriculture through technology, markets, knowledge and trusted services.", "ភ្ជាប់វិស័យកសិកម្មកម្ពុជាតាមរយៈបច្ចេកវិទ្យា ទីផ្សារ ចំណេះដឹង និងសេវាកម្មដែលអាចទុកចិត្តបាន។")}
               </p>
             </div>
 
             <div>
-              <h3 className="footer-title">Company</h3>
+              <h3 className="footer-title">{text("Company", "ក្រុមហ៊ុន")}</h3>
               <div className="footer-links">
-                <a href="#about">About</a>
-                <a href="#mission">Vision & Mission</a>
-                <a href="#contact">Contact</a>
+                <a href="#about">{text("About", "អំពីយើង")}</a>
+                <a href="#mission">{text("Vision & Mission", "ចក្ខុវិស័យ និងបេសកកម្ម")}</a>
+                <a href="#contact">{text("Contact", "ទំនាក់ទំនង")}</a>
               <a
   href="#download"
   onClick={() => setMobileMenuOpen(false)}
@@ -1831,7 +1816,7 @@ ${message}
             </div>
 
             <div>
-              <h3 className="footer-title">Ecosystem</h3>
+              <h3 className="footer-title">{text("Ecosystem", "ប្រព័ន្ធ Sesan")}</h3>
               <div className="footer-links">
                 <a href="#app">Sesan App</a>
                 <a href="#shop">Sesan Shop</a>
@@ -1843,7 +1828,7 @@ ${message}
             </div>
 
             <div>
-  <h3 className="footer-title">Follow Us</h3>
+  <h3 className="footer-title">{text("Follow Us", "តាមដានយើង")}</h3>
 
  <div className="relative z-40 mt-5 flex flex-wrap gap-3 pointer-events-auto">
     <a
@@ -1911,16 +1896,16 @@ ${message}
           </div>
 
           <div className="mt-14 flex flex-col gap-4 border-t border-slate-200 pt-7 text-sm text-slate-500 sm:flex-row sm:items-center sm:justify-between">
-            <p>© 2026 Sesan Group. All rights reserved.</p>
+            <p>{text("© 2026 Sesan Group. All rights reserved.", "© ២០២៦ Sesan Group។ រក្សាសិទ្ធិគ្រប់យ៉ាង។")}</p>
 
             <div className="flex gap-6">
-  <a href="/privacy" className="hover:text-green-700">
-    Privacy Policy
-  </a>
+  <Link href="/privacy" className="hover:text-green-700">
+    {text("Privacy Policy", "គោលការណ៍ឯកជនភាព")}
+  </Link>
 
-  <a href="/terms" className="hover:text-green-700">
-    Terms of Use
-  </a>
+  <Link href="/terms" className="hover:text-green-700">
+    {text("Terms of Use", "លក្ខខណ្ឌប្រើប្រាស់")}
+  </Link>
 </div>
                   </div>
       </footer>
