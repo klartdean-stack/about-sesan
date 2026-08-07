@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {FormEvent, useEffect, useState} from "react";
-import {BadgeCheck, BookOpen, Clock3, LogOut, ShieldAlert, WalletCards} from "lucide-react";
+import {BookOpen, Clock3, LogOut, ShieldAlert, WalletCards} from "lucide-react";
 import {
   AcademySession,
   CreatorApplication,
@@ -13,6 +13,7 @@ import {
   signInAcademyUser,
 } from "@/lib/academy-firebase-rest";
 import {MINIMUM_WITHDRAWAL_RIEL} from "@/lib/academy";
+import CourseManager from "./CourseManager";
 
 const SESSION_KEY = "sesan-academy-creator-session";
 
@@ -123,12 +124,8 @@ export default function CreatorDashboard({locale}: {locale: "km" | "en"}) {
         </aside>
 
         <section className="rounded-[30px] border border-slate-200 bg-white p-7 shadow-sm">
-          {approved ? (
-            <div className="flex min-h-[430px] flex-col items-center justify-center text-center">
-              <BadgeCheck className="h-16 w-16 text-green-600" />
-              <h2 className="mt-5 text-3xl font-black">{t("You are an approved Creator!", "អ្នកត្រូវបានអនុម័តជា Creator ហើយ!")}</h2>
-              <p className="mt-3 max-w-lg leading-7 text-slate-500">{t("Course upload and sales tools are the next phase. Your account is ready for them.", "មុខងារ Upload មេរៀន និងការលក់ ជាដំណាក់កាលបន្ទាប់។ គណនីអ្នករួចរាល់សម្រាប់ប្រើមុខងារទាំងនោះ។")}</p>
-            </div>
+          {approved && application ? (
+            <CourseManager session={session} application={application} locale={locale} />
           ) : (
             <>
               <h2 className="text-2xl font-black">{application ? t("Update creator application", "កែប្រែពាក្យស្នើសុំ Creator") : t("Creator application", "ពាក្យស្នើសុំ Creator")}</h2>
