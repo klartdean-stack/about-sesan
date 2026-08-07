@@ -10,6 +10,7 @@ import {
   Leaf,
   LineChart,
   Microscope,
+  Search,
   Sprout,
   Tractor,
 } from "lucide-react";
@@ -21,6 +22,10 @@ type Locale = (typeof locales)[number];
 type PageProps = {
   params: Promise<{
     locale: string;
+  }>;
+  searchParams?: Promise<{
+    q?: string;
+    category?: string;
   }>;
 };
 
@@ -265,8 +270,10 @@ export async function generateMetadata({
 
 export default async function KnowledgePage({
   params,
+  searchParams,
 }: PageProps) {
   const {locale} = await params;
+  const filters = (await searchParams) ?? {};
 
   if (!locales.includes(locale as Locale)) {
     notFound();
@@ -274,6 +281,21 @@ export default async function KnowledgePage({
 
   const pageContent = content[locale as Locale];
   const publishedArticles = await listPublishedKnowledgeArticles().catch(() => []);
+  const searchQuery = filters.q?.trim() ?? "";
+  const selectedCategory = filters.category?.trim() ?? "";
+  const normalizedSearch = searchQuery.toLocaleLowerCase();
+  const filteredPublishedArticles = publishedArticles.filter((article) => {
+    const localizedTitle = locale === "km" ? article.titleKm : article.titleEn;
+    const localizedSummary = locale === "km" ? article.summaryKm : article.summaryEn;
+    const localizedContent = locale === "km" ? article.contentKm : article.contentEn;
+    const matchesCategory = !selectedCategory || article.category === selectedCategory;
+    const matchesSearch = !normalizedSearch ||
+      localizedTitle.toLocaleLowerCase().includes(normalizedSearch) ||
+      localizedSummary.toLocaleLowerCase().includes(normalizedSearch) ||
+      localizedContent.toLocaleLowerCase().includes(normalizedSearch) ||
+      article.category.toLocaleLowerCase().includes(normalizedSearch);
+    return matchesCategory && matchesSearch;
+  });
   const featuredArticle =
     publishedArticles.find((article) => article.featured) ?? publishedArticles[0];
 
@@ -407,14 +429,51 @@ export default async function KnowledgePage({
             </p>
           </div>
 
+          <form action={`/${locale}/knowledge`} className="mt-10 flex flex-col gap-3 rounded-[24px] border border-slate-200 bg-white p-3 shadow-sm sm:flex-row">
+            <div className="relative flex-1">
+              <Search className="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-slate-400" />
+              <input
+                type="search"
+                name="q"
+                defaultValue={searchQuery}
+                placeholder={locale === "km" ? "ស្វែងរកអត្ថបទចំណេះដឹង..." : "Search knowledge articles..."}
+                className="w-full rounded-2xl border border-slate-200 bg-slate-50 py-4 pl-12 pr-4 text-base outline-none transition focus:border-green-500 focus:bg-white focus:ring-4 focus:ring-green-100"
+              />
+            </div>
+            {selectedCategory && <input type="hidden" name="category" value={selectedCategory} />}
+            <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-2xl bg-green-600 px-7 py-4 font-black text-white transition hover:bg-green-700">
+              <Search className="h-5 w-5" />{locale === "km" ? "ស្វែងរក" : "Search"}
+            </button>
+          </form>
+
+          <div className="mt-6 flex flex-wrap items-center gap-3">
+            <Link
+              href={`/${locale}/knowledge#articles`}
+              className={`rounded-full px-5 py-2.5 text-sm font-black transition ${!selectedCategory ? "bg-green-600 text-white" : "border border-slate-200 bg-white text-slate-600 hover:border-green-300 hover:text-green-700"}`}
+            >
+              {locale === "km" ? "ប្រភេទទាំងអស់" : "All categories"}
+            </Link>
+            {(searchQuery || selectedCategory) && (
+              <Link href={`/${locale}/knowledge#articles`} className="text-sm font-bold text-red-500 hover:text-red-600">
+                {locale === "km" ? "សម្អាតការស្វែងរក" : "Clear filters"}
+              </Link>
+            )}
+          </div>
+
           <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-            {pageContent.categories.map((category) => {
+            {pageContent.categories.map((category, index) => {
               const Icon = category.icon;
+              const categoryValue = content.km.categories[index].title;
+              const params = new URLSearchParams();
+              params.set("category", categoryValue);
+              if (searchQuery) params.set("q", searchQuery);
+              const isSelected = selectedCategory === categoryValue;
 
               return (
-                <article
+                <Link
                   key={category.title}
-                  className="group rounded-[28px] border border-slate-200 bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-2 hover:border-green-300 hover:shadow-xl"
+                  href={`/${locale}/knowledge?${params.toString()}#articles`}
+                  className={`group rounded-[28px] border bg-white p-7 shadow-sm transition duration-300 hover:-translate-y-2 hover:border-green-300 hover:shadow-xl ${isSelected ? "border-green-500 ring-4 ring-green-100" : "border-slate-200"}`}
                 >
                   <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-700 transition group-hover:bg-green-600 group-hover:text-white">
                     <Icon className="h-7 w-7" />
@@ -427,7 +486,7 @@ export default async function KnowledgePage({
                   <p className="mt-3 leading-7 text-slate-600">
                     {category.description}
                   </p>
-                </article>
+                </Link>
               );
             })}
           </div>
@@ -435,7 +494,7 @@ export default async function KnowledgePage({
       </section>
 
       {/* Latest articles */}
-      <section className="px-5 py-24 lg:px-8">
+      <section id="articles" className="scroll-mt-24 px-5 py-24 lg:px-8">
         <div className="mx-auto max-w-7xl">
           <div className="text-center">
             <p className="text-sm font-black uppercase tracking-[0.22em] text-green-700">
@@ -449,10 +508,17 @@ export default async function KnowledgePage({
             <p className="mx-auto mt-5 max-w-2xl text-lg leading-8 text-slate-600">
               {pageContent.latestDescription}
             </p>
+            {(searchQuery || selectedCategory) && (
+              <p className="mt-4 font-black text-green-700">
+                {locale === "km"
+                  ? `រកឃើញ ${filteredPublishedArticles.length} អត្ថបទ`
+                  : `${filteredPublishedArticles.length} article${filteredPublishedArticles.length === 1 ? "" : "s"} found`}
+              </p>
+            )}
           </div>
 
           <div className="mt-14 grid gap-7 lg:grid-cols-3">
-            {(publishedArticles.length ? publishedArticles : pageContent.articles).map((article) => {
+            {(publishedArticles.length ? filteredPublishedArticles : pageContent.articles).map((article) => {
               const isFirebaseArticle = "id" in article;
               const Icon = isFirebaseArticle ? BookOpen : article.icon;
               const title = isFirebaseArticle ? articleText(article).title : article.title;
@@ -490,6 +556,17 @@ export default async function KnowledgePage({
               );
             })}
           </div>
+
+          {publishedArticles.length > 0 && filteredPublishedArticles.length === 0 && (
+            <div className="mt-14 rounded-[30px] border border-slate-200 bg-slate-50 px-6 py-14 text-center">
+              <Search className="mx-auto h-10 w-10 text-slate-300" />
+              <h3 className="mt-4 text-xl font-black">{locale === "km" ? "រកមិនឃើញអត្ថបទ" : "No articles found"}</h3>
+              <p className="mt-2 text-slate-500">{locale === "km" ? "សូមសាកល្បងពាក្យ ឬប្រភេទផ្សេង។" : "Try another keyword or category."}</p>
+              <Link href={`/${locale}/knowledge#articles`} className="mt-6 inline-flex rounded-full bg-green-600 px-6 py-3 text-sm font-black text-white hover:bg-green-700">
+                {locale === "km" ? "មើលអត្ថបទទាំងអស់" : "View all articles"}
+              </Link>
+            </div>
+          )}
 
           <div className="mt-14 rounded-[30px] border border-green-200 bg-green-50 p-8 text-center sm:p-10">
             <BookOpen className="mx-auto h-10 w-10 text-green-700" />
