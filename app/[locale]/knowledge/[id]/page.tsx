@@ -2,6 +2,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
 import {getPublishedKnowledgeArticle} from "@/lib/firebase-rest";
+import ShareButtons from "./ShareButtons";
 
 type PageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -20,6 +21,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
   const date = new Intl.DateTimeFormat(locale === "km" ? "km-KH" : "en-GB", {
     day: "numeric", month: "long", year: "numeric",
   }).format(new Date(article.updatedAt));
+  const articleUrl = `https://about.sesanshop.com/${locale}/knowledge/${article.id}`;
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -44,6 +46,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
           </div>
           <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight sm:text-5xl">{title}</h1>
           {summary && <p className="mt-6 text-xl leading-9 text-slate-600">{summary}</p>}
+          <ShareButtons title={title} url={articleUrl} locale={locale} />
           <div className="my-9 h-px bg-slate-200" />
           {body ? (
             <div className="whitespace-pre-wrap text-lg leading-9 text-slate-700">{body}</div>
