@@ -1,4 +1,12 @@
-export type AcademyCategory = "ai-coding" | "ai-video" | "agriculture" | "business";
+export type AcademyCategory =
+  | "ai-coding"
+  | "ai-video"
+  | "agriculture"
+  | "food-production"
+  | "home-products"
+  | "phone-repair"
+  | "technical-repair"
+  | "business";
 
 export type AcademyCourse = {
   id: string;
@@ -100,5 +108,61 @@ export const academyCourses: AcademyCourse[] = [
     lessons: 5,
     students: 0,
     accent: "from-blue-700 via-sky-500 to-cyan-400",
+  },
+  {
+    id: "traditional-fish-sauce-production",
+    titleKm: "មូលដ្ឋានផលិតទឹកត្រីប្រកបដោយអនាម័យ",
+    titleEn: "Hygienic Fish Sauce Production Basics",
+    descriptionKm: "ស្វែងយល់ពីការជ្រើសវត្ថុធាតុដើម អនាម័យ ការផ្អាប់ និងការវេចខ្ចប់ផលិតផល។",
+    descriptionEn: "Learn ingredient selection, hygiene, fermentation and safe product packaging basics.",
+    category: "food-production",
+    creatorName: "Sesan Academy",
+    priceRiel: 5_000,
+    durationMinutes: 38,
+    lessons: 6,
+    students: 0,
+    accent: "from-amber-700 via-orange-500 to-yellow-400",
+  },
+  {
+    id: "liquid-soap-production",
+    titleKm: "មូលដ្ឋានផលិតសាប៊ូរាវសម្រាប់ប្រើប្រាស់",
+    titleEn: "Liquid Soap Production Fundamentals",
+    descriptionKm: "រៀនអំពីឧបករណ៍ សុវត្ថិភាព ការលាយ និងការគ្រប់គ្រងគុណភាពផលិតផល។",
+    descriptionEn: "Learn equipment, safe handling, mixing and basic product quality control.",
+    category: "home-products",
+    creatorName: "Sesan Academy",
+    priceRiel: 5_000,
+    durationMinutes: 45,
+    lessons: 7,
+    students: 0,
+    accent: "from-cyan-600 via-sky-500 to-blue-400",
+  },
+  {
+    id: "smartphone-repair-basics",
+    titleKm: "ជំនាញជួសជុលទូរស័ព្ទសម្រាប់អ្នកចាប់ផ្ដើម",
+    titleEn: "Smartphone Repair Skills for Beginners",
+    descriptionKm: "ស្គាល់ឧបករណ៍ រោគសញ្ញាខូច និងវិធីដោះដំឡើងផ្នែកមូលដ្ឋានដោយសុវត្ថិភាព។",
+    descriptionEn: "Learn tools, common faults and safe basic smartphone disassembly and repair.",
+    category: "phone-repair",
+    creatorName: "Sesan Academy",
+    priceRiel: 10_000,
+    durationMinutes: 58,
+    lessons: 8,
+    students: 0,
+    accent: "from-slate-800 via-blue-700 to-cyan-500",
+  },
+  {
+    id: "air-conditioner-maintenance",
+    titleKm: "មូលដ្ឋានថែទាំ និងពិនិត្យម៉ាស៊ីនត្រជាក់",
+    titleEn: "Air Conditioner Maintenance Basics",
+    descriptionKm: "រៀនសម្អាត ពិនិត្យរោគសញ្ញា និងគោលការណ៍សុវត្ថិភាពមុនការជួសជុល។",
+    descriptionEn: "Learn cleaning, fault checks and essential safety before air-conditioner repairs.",
+    category: "technical-repair",
+    creatorName: "Sesan Academy",
+    priceRiel: 10_000,
+    durationMinutes: 52,
+    lessons: 7,
+    students: 0,
+    accent: "from-blue-800 via-sky-600 to-teal-400",
   },
 ];
