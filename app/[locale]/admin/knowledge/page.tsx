@@ -5,6 +5,7 @@ import Image from "next/image";
 import {useParams} from "next/navigation";
 import {
   ArrowLeft,
+  BarChart3,
   BookOpen,
   Check,
   ChevronDown,
@@ -21,6 +22,7 @@ import {
   Search,
   Sparkles,
   Trash2,
+  TrendingUp,
   Upload,
   X,
 } from "lucide-react";
@@ -51,6 +53,7 @@ type KnowledgeArticle = {
   coverImage: string;
   status: ArticleStatus;
   featured: boolean;
+  views: number;
   updatedAt: string;
 };
 
@@ -77,6 +80,7 @@ const emptyArticle = (): KnowledgeArticle => ({
   coverImage: "",
   status: "draft",
   featured: false,
+  views: 0,
   updatedAt: new Date().toISOString(),
 });
 
@@ -175,6 +179,8 @@ export default function KnowledgeAdminPage() {
 
   const publishedCount = articles.filter((article) => article.status === "published").length;
   const draftCount = articles.length - publishedCount;
+  const totalViews = articles.reduce((total, article) => total + article.views, 0);
+  const popularArticles = [...articles].sort((a, b) => b.views - a.views).slice(0, 3);
 
   function openNewArticle() {
     setActiveLanguage("km");
@@ -390,11 +396,26 @@ export default function KnowledgeAdminPage() {
             <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">{errorMessage}</div>
           )}
 
-          <div className="mt-8 grid gap-4 sm:grid-cols-3">
+          <div className="mt-8 grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
             <StatCard label="អត្ថបទសរុប" value={articles.length} icon={<FileText className="h-6 w-6" />} color="slate" />
             <StatCard label="បានផ្សព្វផ្សាយ" value={publishedCount} icon={<Check className="h-6 w-6" />} color="green" />
             <StatCard label="ព្រាង" value={draftCount} icon={<Pencil className="h-6 w-6" />} color="amber" />
+            <StatCard label="អ្នកអានសរុប" value={totalViews} icon={<BarChart3 className="h-6 w-6" />} color="sky" />
           </div>
+
+          {popularArticles.length > 0 && (
+            <section className="mt-6 rounded-3xl border border-slate-200 bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3"><div className="rounded-xl bg-purple-100 p-2.5 text-purple-700"><TrendingUp className="h-5 w-5" /></div><div><h2 className="font-black">អត្ថបទពេញនិយម</h2><p className="text-xs text-slate-500">អត្ថបទដែលមានអ្នកអានច្រើនបំផុត</p></div></div>
+              <div className="mt-4 grid gap-3 lg:grid-cols-3">
+                {popularArticles.map((article, index) => (
+                  <button key={article.id} type="button" onClick={() => {setActiveLanguage("km"); setEditingArticle({...article});}} className="flex items-center gap-3 rounded-2xl border border-slate-100 bg-slate-50 p-4 text-left transition hover:border-green-200 hover:bg-green-50">
+                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-white text-sm font-black text-green-700 shadow-sm">#{index + 1}</span>
+                    <span className="min-w-0 flex-1"><span className="block truncate text-sm font-black">{article.titleKm}</span><span className="mt-1 block text-xs font-bold text-slate-500">{article.views.toLocaleString()} views</span></span>
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
 
           <div className="mt-6 overflow-hidden rounded-3xl border border-slate-200 bg-white shadow-sm">
             <div className="flex flex-col gap-3 border-b border-slate-200 p-4 sm:flex-row sm:items-center sm:justify-between sm:p-5">
@@ -447,6 +468,7 @@ export default function KnowledgeAdminPage() {
                           <h2 className="mt-2 truncate text-base font-black sm:text-lg">{article.titleKm}</h2>
                           <p className="mt-1 truncate text-sm text-slate-500">{article.titleEn}</p>
                           <p className="mt-2 text-xs text-slate-400">កែចុងក្រោយ៖ {formatDate(article.updatedAt)}</p>
+                          <p className="mt-1 inline-flex items-center gap-1.5 text-xs font-bold text-sky-600"><BarChart3 className="h-3.5 w-3.5" /> {article.views.toLocaleString()} views</p>
                         </div>
 
                         <div className="flex shrink-0 items-center gap-2">
@@ -595,11 +617,12 @@ function AdminGate({locale, children}: {locale: string; children: React.ReactNod
   );
 }
 
-function StatCard({label, value, icon, color}: {label: string; value: number; icon: React.ReactNode; color: "slate" | "green" | "amber"}) {
+function StatCard({label, value, icon, color}: {label: string; value: number; icon: React.ReactNode; color: "slate" | "green" | "amber" | "sky"}) {
   const colors = {
     slate: "bg-slate-100 text-slate-700",
     green: "bg-green-100 text-green-700",
     amber: "bg-amber-100 text-amber-700",
+    sky: "bg-sky-100 text-sky-700",
   };
 
   return (
