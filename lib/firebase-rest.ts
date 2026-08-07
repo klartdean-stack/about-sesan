@@ -17,6 +17,7 @@ export type KnowledgeArticleRecord = {
   coverImage: string;
   status: "draft" | "published";
   featured: boolean;
+  views: number;
   updatedAt: string;
 };
 
@@ -87,6 +88,7 @@ export async function signInAdmin(email: string, password: string) {
 type FirestoreValue =
   | {stringValue: string}
   | {booleanValue: boolean}
+  | {integerValue: string}
   | {timestampValue: string};
 
 type FirestoreDocument = {
@@ -111,6 +113,11 @@ function fieldTimestamp(fields: FirestoreDocument["fields"], name: string) {
     : new Date().toISOString();
 }
 
+function fieldInteger(fields: FirestoreDocument["fields"], name: string) {
+  const value = fields?.[name];
+  return value && "integerValue" in value ? Number(value.integerValue) || 0 : 0;
+}
+
 function fromDocument(document: FirestoreDocument): KnowledgeArticleRecord {
   const fields = document.fields;
   return {
@@ -125,6 +132,7 @@ function fromDocument(document: FirestoreDocument): KnowledgeArticleRecord {
     coverImage: fieldString(fields, "coverImage"),
     status: fieldString(fields, "status") === "published" ? "published" : "draft",
     featured: fieldBoolean(fields, "featured"),
+    views: fieldInteger(fields, "views"),
     updatedAt: fieldTimestamp(fields, "updatedAt"),
   };
 }
@@ -141,6 +149,7 @@ function articleFields(article: KnowledgeArticleRecord) {
     coverImage: {stringValue: article.coverImage},
     status: {stringValue: article.status},
     featured: {booleanValue: article.featured},
+    views: {integerValue: String(article.views)},
     updatedAt: {timestampValue: article.updatedAt},
   };
 }
@@ -175,6 +184,24 @@ export async function getPublishedKnowledgeArticle(id: string) {
   );
   const article = fromDocument(document);
   return article.status === "published" ? article : null;
+}
+
+export async function incrementKnowledgeArticleViews(id: string) {
+  await requestJson(
+    `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents:commit`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        writes: [{
+          transform: {
+            document: `projects/${projectId}/databases/(default)/documents/knowledgeArticles/${id}`,
+            fieldTransforms: [{fieldPath: "views", increment: {integerValue: "1"}}],
+          },
+        }],
+      }),
+    },
+  );
 }
 
 export async function saveKnowledgeArticle(
