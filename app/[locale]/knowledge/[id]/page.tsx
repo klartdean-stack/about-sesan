@@ -5,6 +5,7 @@ import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
 import {getPublishedKnowledgeArticle, listPublishedKnowledgeArticles} from "@/lib/firebase-rest";
 import ShareButtons from "./ShareButtons";
 import KnowledgeContent from "../KnowledgeContent";
+import ViewCounter from "./ViewCounter";
 
 type PageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -119,6 +120,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
           <div className="flex flex-wrap items-center gap-3 text-sm font-bold">
             <span className="rounded-full bg-green-100 px-4 py-2 text-green-700">{article.category}</span>
             <span className="inline-flex items-center gap-2 text-slate-400"><CalendarDays className="h-4 w-4" />{date}</span>
+            <ViewCounter articleId={article.id} initialViews={article.views} locale={locale} />
           </div>
           <h1 className="mt-6 text-4xl font-black leading-tight tracking-tight sm:text-5xl">{title}</h1>
           {summary && <p className="mt-6 text-xl leading-9 text-slate-600">{summary}</p>}
