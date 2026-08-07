@@ -4,7 +4,6 @@ export type AcademyCategory =
   | "agriculture"
   | "food-production"
   | "home-products"
-  | "phone-repair"
   | "technical-repair"
   | "business";
 
@@ -143,7 +142,7 @@ export const academyCourses: AcademyCourse[] = [
     titleEn: "Smartphone Repair Skills for Beginners",
     descriptionKm: "ស្គាល់ឧបករណ៍ រោគសញ្ញាខូច និងវិធីដោះដំឡើងផ្នែកមូលដ្ឋានដោយសុវត្ថិភាព។",
     descriptionEn: "Learn tools, common faults and safe basic smartphone disassembly and repair.",
-    category: "phone-repair",
+    category: "technical-repair",
     creatorName: "Sesan Academy",
     priceRiel: 10_000,
     durationMinutes: 58,
