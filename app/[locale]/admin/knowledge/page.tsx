@@ -35,6 +35,7 @@ import {
   signInAdmin,
   uploadKnowledgeCover,
 } from "@/lib/firebase-rest";
+import RichTextEditor from "./RichTextEditor";
 
 type ArticleStatus = "draft" | "published";
 
@@ -510,7 +511,7 @@ export default function KnowledgeAdminPage() {
                         <textarea value={editingArticle.summaryKm} onChange={(event) => updateEditingArticle("summaryKm", event.target.value)} className="admin-input min-h-24 resize-y" placeholder="សរសេរសេចក្ដីសង្ខេបខ្លី..." />
                       </Field>
                       <Field label="ខ្លឹមសារអត្ថបទ (ខ្មែរ)">
-                        <textarea value={editingArticle.contentKm} onChange={(event) => updateEditingArticle("contentKm", event.target.value)} className="admin-input min-h-64 resize-y" placeholder="សរសេរខ្លឹមសារអត្ថបទនៅទីនេះ..." />
+                        <RichTextEditor value={editingArticle.contentKm} onChange={(value) => updateEditingArticle("contentKm", value)} locale="km" placeholder="សរសេរខ្លឹមសារអត្ថបទនៅទីនេះ..." />
                       </Field>
                     </>
                   ) : (
@@ -522,7 +523,7 @@ export default function KnowledgeAdminPage() {
                         <textarea value={editingArticle.summaryEn} onChange={(event) => updateEditingArticle("summaryEn", event.target.value)} className="admin-input min-h-24 resize-y" placeholder="Write a short article summary..." />
                       </Field>
                       <Field label="Article content (English)">
-                        <textarea value={editingArticle.contentEn} onChange={(event) => updateEditingArticle("contentEn", event.target.value)} className="admin-input min-h-64 resize-y" placeholder="Write the full article here..." />
+                        <RichTextEditor value={editingArticle.contentEn} onChange={(value) => updateEditingArticle("contentEn", value)} locale="en" placeholder="Write the full article here..." />
                       </Field>
                     </>
                   )}
