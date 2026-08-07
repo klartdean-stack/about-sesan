@@ -12,15 +12,29 @@ import {
   FileText,
   Languages,
   LayoutDashboard,
+  LoaderCircle,
+  LockKeyhole,
+  LogOut,
   Pencil,
   Plus,
   Save,
   Search,
   Sparkles,
   Trash2,
+  Upload,
   X,
 } from "lucide-react";
 import {FormEvent, useEffect, useMemo, useState} from "react";
+import type {FirebaseSession} from "@/lib/firebase-rest";
+import {
+  deleteKnowledgeArticle,
+  firebaseIsConfigured,
+  listKnowledgeArticles,
+  readableFirebaseError,
+  saveKnowledgeArticle,
+  signInAdmin,
+  uploadKnowledgeCover,
+} from "@/lib/firebase-rest";
 
 type ArticleStatus = "draft" | "published";
 
@@ -39,7 +53,7 @@ type KnowledgeArticle = {
   updatedAt: string;
 };
 
-const STORAGE_KEY = "sesan-knowledge-admin-articles";
+const SESSION_KEY = "sesan-knowledge-admin-session";
 
 const categories = [
   "ដំណាំ និងបច្ចេកទេស",
@@ -48,57 +62,6 @@ const categories = [
   "ការចិញ្ចឹមសត្វ",
   "ទីផ្សារ និងអាជីវកម្ម",
   "បច្ចេកវិទ្យាកសិកម្ម",
-];
-
-const initialArticles: KnowledgeArticle[] = [
-  {
-    id: "prepare-soil-for-vegetables",
-    titleKm: "វិធីរៀបចំដីមុនពេលដាំបន្លែ",
-    titleEn: "How to prepare soil before planting vegetables",
-    summaryKm:
-      "ជំហានសំខាន់ៗក្នុងការរៀបចំដី ដែលជួយឫសដុះល្អ និងកាត់បន្ថយបញ្ហាទឹកជន់។",
-    summaryEn:
-      "Important soil preparation steps that help roots grow well and reduce waterlogging problems.",
-    contentKm: "",
-    contentEn: "",
-    category: "ដី និងជី",
-    coverImage: "",
-    status: "published",
-    featured: true,
-    updatedAt: "2026-08-07T09:00:00.000Z",
-  },
-  {
-    id: "common-leaf-diseases",
-    titleKm: "សញ្ញាដំបូងនៃជំងឺស្លឹកដំណាំ",
-    titleEn: "Early signs of common leaf diseases",
-    summaryKm:
-      "សម្គាល់ពណ៌ស្លឹក ស្នាមអុជ និងការខូចខាតមិនប្រក្រតី មុនជំងឺរីករាលដាលធ្ងន់ធ្ងរ។",
-    summaryEn:
-      "Recognize unusual leaf colors, spots and damage before the disease becomes severe.",
-    contentKm: "",
-    contentEn: "",
-    category: "ការពារដំណាំ",
-    coverImage: "",
-    status: "draft",
-    featured: false,
-    updatedAt: "2026-08-06T09:00:00.000Z",
-  },
-  {
-    id: "reduce-farming-costs",
-    titleKm: "គន្លឹះកាត់បន្ថយថ្លៃដើមកសិកម្ម",
-    titleEn: "Simple ways to reduce farming production costs",
-    summaryKm:
-      "រៀបចំសម្ភារៈ កម្លាំងពលកម្ម និងធាតុចូលកសិកម្មឱ្យបានត្រឹមត្រូវ ដើម្បីបង្កើនប្រាក់ចំណេញ។",
-    summaryEn:
-      "Plan materials, labor and farm inputs carefully to improve profitability.",
-    contentKm: "",
-    contentEn: "",
-    category: "ទីផ្សារ និងអាជីវកម្ម",
-    coverImage: "",
-    status: "published",
-    featured: false,
-    updatedAt: "2026-08-05T09:00:00.000Z",
-  },
 ];
 
 const emptyArticle = (): KnowledgeArticle => ({
@@ -119,25 +82,36 @@ const emptyArticle = (): KnowledgeArticle => ({
 export default function KnowledgeAdminPage() {
   const params = useParams<{locale: string}>();
   const locale = params.locale === "en" ? "en" : "km";
-  const [articles, setArticles] = useState<KnowledgeArticle[]>(initialArticles);
+  const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ArticleStatus>("all");
   const [editingArticle, setEditingArticle] = useState<KnowledgeArticle | null>(null);
   const [activeLanguage, setActiveLanguage] = useState<"km" | "en">("km");
   const [savedNotice, setSavedNotice] = useState(false);
-  const [ready, setReady] = useState(false);
+  const [session, setSession] = useState<FirebaseSession | null>(null);
+  const [authLoading, setAuthLoading] = useState(true);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [errorMessage, setErrorMessage] = useState("");
+  const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       try {
-        const savedArticles = window.localStorage.getItem(STORAGE_KEY);
-        if (savedArticles) {
-          setArticles(JSON.parse(savedArticles) as KnowledgeArticle[]);
+        const savedSession = window.sessionStorage.getItem(SESSION_KEY);
+        if (savedSession) {
+          const parsed = JSON.parse(savedSession) as FirebaseSession;
+          if (parsed.expiresAt > Date.now() + 30_000) {
+            setSession(parsed);
+          } else {
+            window.sessionStorage.removeItem(SESSION_KEY);
+          }
         }
       } catch {
-        setArticles(initialArticles);
+        window.sessionStorage.removeItem(SESSION_KEY);
       } finally {
-        setReady(true);
+        setAuthLoading(false);
       }
     });
 
@@ -145,10 +119,43 @@ export default function KnowledgeAdminPage() {
   }, []);
 
   useEffect(() => {
-    if (ready) {
-      window.localStorage.setItem(STORAGE_KEY, JSON.stringify(articles));
+    if (!session) return;
+
+    let active = true;
+    listKnowledgeArticles(session)
+      .then((records) => {
+        if (active) setArticles(records);
+      })
+      .catch((error) => {
+        if (active) setErrorMessage(readableFirebaseError(error));
+      });
+
+    return () => {
+      active = false;
+    };
+  }, [session]);
+
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthLoading(true);
+    setErrorMessage("");
+    try {
+      const nextSession = await signInAdmin(email.trim(), password);
+      window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
+      setSession(nextSession);
+      setPassword("");
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    } finally {
+      setAuthLoading(false);
     }
-  }, [articles, ready]);
+  }
+
+  function handleLogout() {
+    window.sessionStorage.removeItem(SESSION_KEY);
+    setSession(null);
+    setArticles([]);
+  }
 
   const filteredArticles = useMemo(() => {
     const query = searchQuery.trim().toLocaleLowerCase();
@@ -182,33 +189,63 @@ export default function KnowledgeAdminPage() {
     );
   }
 
-  function saveArticle(event: FormEvent<HTMLFormElement>) {
+  async function saveArticle(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    if (!editingArticle?.titleKm.trim() || !editingArticle.titleEn.trim()) return;
+    if (!editingArticle?.titleKm.trim() || !editingArticle.titleEn.trim() || !session) return;
 
     const savedArticle = {
       ...editingArticle,
       updatedAt: new Date().toISOString(),
     };
 
-    setArticles((current) => {
-      const exists = current.some((article) => article.id === savedArticle.id);
-      return exists
-        ? current.map((article) =>
-            article.id === savedArticle.id ? savedArticle : article,
-          )
-        : [savedArticle, ...current];
-    });
-
-    setEditingArticle(null);
-    setSavedNotice(true);
-    window.setTimeout(() => setSavedNotice(false), 2500);
+    setSaving(true);
+    setErrorMessage("");
+    try {
+      await saveKnowledgeArticle(session, savedArticle);
+      setArticles((current) => {
+        const exists = current.some((article) => article.id === savedArticle.id);
+        return exists
+          ? current.map((article) => article.id === savedArticle.id ? savedArticle : article)
+          : [savedArticle, ...current];
+      });
+      setEditingArticle(null);
+      setSavedNotice(true);
+      window.setTimeout(() => setSavedNotice(false), 2500);
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    } finally {
+      setSaving(false);
+    }
   }
 
-  function deleteArticle(article: KnowledgeArticle) {
+  async function deleteArticle(article: KnowledgeArticle) {
     const confirmed = window.confirm(`តើបងពិតជាចង់លុប “${article.titleKm}” មែនទេ?`);
-    if (!confirmed) return;
-    setArticles((current) => current.filter((item) => item.id !== article.id));
+    if (!confirmed || !session) return;
+    setErrorMessage("");
+    try {
+      await deleteKnowledgeArticle(session, article.id);
+      setArticles((current) => current.filter((item) => item.id !== article.id));
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    }
+  }
+
+  async function handleCoverUpload(file: File | undefined) {
+    if (!file || !session || !editingArticle) return;
+    if (!file.type.startsWith("image/") || file.size > 5 * 1024 * 1024) {
+      setErrorMessage("សូមជ្រើសរើសរូបភាពដែលមានទំហំតិចជាង 5MB។");
+      return;
+    }
+    setUploading(true);
+    setErrorMessage("");
+    try {
+      const url = await uploadKnowledgeCover(session, file);
+      updateEditingArticle("coverImage", url);
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    } finally {
+      setUploading(false);
+    }
   }
 
   function formatDate(date: string) {
@@ -217,6 +254,61 @@ export default function KnowledgeAdminPage() {
       month: "short",
       year: "numeric",
     }).format(new Date(date));
+  }
+
+  if (!firebaseIsConfigured()) {
+    return (
+      <AdminGate locale={locale}>
+        <div className="rounded-3xl border border-amber-200 bg-amber-50 p-7 text-center">
+          <LockKeyhole className="mx-auto h-10 w-10 text-amber-600" />
+          <h1 className="mt-4 text-2xl font-black">ត្រូវភ្ជាប់ Firebase ជាមុនសិន</h1>
+          <p className="mt-3 leading-7 text-slate-600">
+            បញ្ចូល Firebase API Key, Project ID និង Storage Bucket ក្នុង Vercel Environment Variables។
+          </p>
+        </div>
+      </AdminGate>
+    );
+  }
+
+  if (authLoading) {
+    return (
+      <AdminGate locale={locale}>
+        <LoaderCircle className="mx-auto h-10 w-10 animate-spin text-green-600" />
+        <p className="mt-4 text-center font-bold text-slate-500">កំពុងពិនិត្យការចូល...</p>
+      </AdminGate>
+    );
+  }
+
+  if (!session) {
+    return (
+      <AdminGate locale={locale}>
+        <div className="text-center">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-green-100 text-green-700">
+            <LockKeyhole className="h-7 w-7" />
+          </div>
+          <h1 className="mt-5 text-2xl font-black">ចូល Knowledge Admin</h1>
+          <p className="mt-2 text-sm leading-6 text-slate-500">មានតែគណនី Admin របស់ Sesan ប៉ុណ្ណោះដែលអាចចូលបាន។</p>
+        </div>
+
+        {errorMessage && (
+          <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{errorMessage}</p>
+        )}
+
+        <form onSubmit={handleLogin} className="mt-6 space-y-4">
+          <label className="block">
+            <span className="mb-2 block text-sm font-black text-slate-700">អ៊ីមែល Admin</span>
+            <input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="admin-input" placeholder="admin@sesanshop.com" />
+          </label>
+          <label className="block">
+            <span className="mb-2 block text-sm font-black text-slate-700">លេខសម្ងាត់</span>
+            <input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="admin-input" placeholder="••••••••" />
+          </label>
+          <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-700">
+            <LockKeyhole className="h-4 w-4" /> ចូលគ្រប់គ្រង
+          </button>
+        </form>
+      </AdminGate>
+    );
   }
 
   return (
@@ -238,13 +330,18 @@ export default function KnowledgeAdminPage() {
             </div>
           </div>
 
-          <Link
-            href={`/${locale}/knowledge`}
-            className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:border-green-300 hover:text-green-700 sm:px-4"
-          >
-            <Eye className="h-4 w-4" />
-            <span className="hidden sm:inline">មើល Knowledge</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              href={`/${locale}/knowledge`}
+              className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-700 transition hover:border-green-300 hover:text-green-700 sm:px-4"
+            >
+              <Eye className="h-4 w-4" />
+              <span className="hidden sm:inline">មើល Knowledge</span>
+            </Link>
+            <button onClick={handleLogout} className="inline-flex items-center gap-2 rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-bold text-slate-600 transition hover:border-red-200 hover:bg-red-50 hover:text-red-600">
+              <LogOut className="h-4 w-4" /><span className="hidden sm:inline">ចាកចេញ</span>
+            </button>
+          </div>
         </div>
       </header>
 
@@ -286,6 +383,10 @@ export default function KnowledgeAdminPage() {
             <div className="mt-5 flex items-center gap-3 rounded-2xl border border-green-200 bg-green-50 px-5 py-4 text-sm font-bold text-green-800">
               <Check className="h-5 w-5" /> បានរក្សាទុកអត្ថបទដោយជោគជ័យ។
             </div>
+          )}
+
+          {errorMessage && (
+            <div className="mt-5 rounded-2xl border border-red-200 bg-red-50 px-5 py-4 text-sm font-bold text-red-700">{errorMessage}</div>
           )}
 
           <div className="mt-8 grid gap-4 sm:grid-cols-3">
@@ -439,8 +540,18 @@ export default function KnowledgeAdminPage() {
                       <option value="published">ផ្សព្វផ្សាយ</option>
                     </select>
                   </Field>
-                  <Field label="តំណរូបភាពគម្រប">
-                    <input type="url" value={editingArticle.coverImage} onChange={(event) => updateEditingArticle("coverImage", event.target.value)} className="admin-input" placeholder="https://..." />
+                  <Field label="រូបភាពគម្រប">
+                    <label className="flex cursor-pointer items-center justify-center gap-2 rounded-xl border border-dashed border-green-300 bg-green-50 px-4 py-4 text-sm font-black text-green-700 transition hover:bg-green-100">
+                      {uploading ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+                      {uploading ? "កំពុង Upload..." : "ជ្រើសរើសរូបភាព"}
+                      <input type="file" accept="image/*" disabled={uploading} onChange={(event) => handleCoverUpload(event.target.files?.[0])} className="sr-only" />
+                    </label>
+                    {editingArticle.coverImage && (
+                      <div className="relative mt-3 overflow-hidden rounded-xl border border-slate-200">
+                        <Image src={editingArticle.coverImage} alt="រូបភាពគម្រប" width={300} height={170} unoptimized className="aspect-video w-full object-cover" />
+                        <button type="button" onClick={() => updateEditingArticle("coverImage", "")} className="absolute right-2 top-2 rounded-full bg-slate-950/75 p-1.5 text-white"><X className="h-4 w-4" /></button>
+                      </div>
+                    )}
                   </Field>
                   <label className="flex cursor-pointer items-start gap-3 rounded-2xl border border-slate-200 p-4 transition hover:border-purple-300 hover:bg-purple-50/50">
                     <input type="checkbox" checked={editingArticle.featured} onChange={(event) => updateEditingArticle("featured", event.target.checked)} className="mt-1 h-4 w-4 accent-purple-600" />
@@ -455,13 +566,30 @@ export default function KnowledgeAdminPage() {
 
             <div className="flex flex-col-reverse gap-3 border-t border-slate-200 bg-white px-5 py-4 sm:flex-row sm:justify-end sm:px-7">
               <button type="button" onClick={() => setEditingArticle(null)} className="rounded-xl border border-slate-200 px-5 py-3 text-sm font-black text-slate-600 transition hover:bg-slate-50">បោះបង់</button>
-              <button type="submit" className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-black text-white transition hover:bg-green-700">
-                <Save className="h-4 w-4" /> រក្សាទុកអត្ថបទ
+              <button type="submit" disabled={saving || uploading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3 text-sm font-black text-white transition hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-60">
+                {saving ? <LoaderCircle className="h-4 w-4 animate-spin" /> : <Save className="h-4 w-4" />} {saving ? "កំពុងរក្សាទុក..." : "រក្សាទុកអត្ថបទ"}
               </button>
             </div>
           </form>
         </div>
       )}
+    </main>
+  );
+}
+
+function AdminGate({locale, children}: {locale: string; children: React.ReactNode}) {
+  return (
+    <main className="flex min-h-screen items-center justify-center bg-gradient-to-br from-green-50 via-white to-amber-50 p-5 text-slate-950">
+      <div className="w-full max-w-md">
+        <Link href={`/${locale}`} className="mx-auto mb-6 flex w-fit items-center gap-3">
+          <Image src="/sesan-logo.png" alt="Sesan" width={48} height={48} className="h-12 w-12 object-contain" />
+          <div><p className="text-xl font-black text-green-700">SESAN</p><p className="text-[9px] font-black tracking-[0.32em] text-amber-500">GROUP</p></div>
+        </Link>
+        <section className="rounded-[28px] border border-slate-200 bg-white p-6 shadow-2xl shadow-slate-950/10 sm:p-8">
+          {children}
+        </section>
+        <Link href={`/${locale}`} className="mx-auto mt-5 flex w-fit items-center gap-2 text-sm font-bold text-slate-500 hover:text-green-700"><ArrowLeft className="h-4 w-4" /> ត្រឡប់ទៅ Website</Link>
+      </div>
     </main>
   );
 }
@@ -495,9 +623,9 @@ function LanguageTab({active, onClick, label}: {active: boolean; onClick: () => 
 
 function Field({label, required = false, children}: {label: string; required?: boolean; children: React.ReactNode}) {
   return (
-    <label className="block">
+    <div className="block">
       <span className="mb-2 block text-sm font-black text-slate-700">{label}{required && <span className="ml-1 text-red-500">*</span>}</span>
       {children}
-    </label>
+    </div>
   );
 }
