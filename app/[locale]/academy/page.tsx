@@ -1,7 +1,7 @@
 import type {Metadata} from "next";
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {ArrowLeft, ArrowRight, Bot, Check, Clock3, Code2, GraduationCap, Leaf, Play, Search, Sparkles, Users, Video} from "lucide-react";
+import {ArrowLeft, ArrowRight, Bot, Check, Clock3, Code2, GraduationCap, Leaf, PackageOpen, Play, Search, Smartphone, Sparkles, Users, Utensils, Video, Wrench} from "lucide-react";
 import {academyCourses, type AcademyCategory, CREATOR_SHARE_RATE, MINIMUM_WITHDRAWAL_RIEL} from "@/lib/academy";
 
 type PageProps = {
@@ -14,6 +14,10 @@ const categories: {id: AcademyCategory | "all"; km: string; en: string; icon: ty
   {id: "ai-coding", km: "AI Coding", en: "AI Coding", icon: Code2},
   {id: "ai-video", km: "AI Video", en: "AI Video", icon: Video},
   {id: "agriculture", km: "កសិកម្ម", en: "Agriculture", icon: Leaf},
+  {id: "food-production", km: "ផលិតអាហារ", en: "Food Production", icon: Utensils},
+  {id: "home-products", km: "ផលិតផលប្រើប្រាស់", en: "Home Products", icon: PackageOpen},
+  {id: "phone-repair", km: "ជួសជុលទូរស័ព្ទ", en: "Phone Repair", icon: Smartphone},
+  {id: "technical-repair", km: "ជំនាញជួសជុល", en: "Technical Repair", icon: Wrench},
   {id: "business", km: "អាជីវកម្ម", en: "Business", icon: Bot},
 ];
 
@@ -22,7 +26,7 @@ export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const km = locale === "km";
   return {
     title: km ? "Sesan Academy | រៀនជំនាញ និងលក់មេរៀនវីដេអូ" : "Sesan Academy | Learn Skills and Sell Video Lessons",
-    description: km ? "ទីផ្សារមេរៀនវីដេអូសម្រាប់ AI បច្ចេកវិទ្យា កសិកម្ម និងអាជីវកម្ម។" : "A video learning marketplace for AI, technology, agriculture and business.",
+    description: km ? "ទីផ្សារមេរៀនវីដេអូសម្រាប់ AI កសិកម្ម ផលិតកម្ម ជួសជុល និងជំនាញវិជ្ជាជីវៈ។" : "A video marketplace for AI, agriculture, production, repair and practical vocational skills.",
   };
 }
 
@@ -55,7 +59,7 @@ export default async function AcademyPage({params, searchParams}: PageProps) {
       <section className="relative overflow-hidden bg-slate-950 px-5 py-20 text-white lg:px-8 lg:py-28">
         <div className="absolute -left-24 top-0 h-80 w-80 rounded-full bg-green-500/20 blur-3xl" /><div className="absolute -right-24 bottom-0 h-80 w-80 rounded-full bg-violet-500/20 blur-3xl" />
         <div className="relative mx-auto grid max-w-7xl items-center gap-12 lg:grid-cols-[1.1fr_0.9fr]">
-          <div><div className="inline-flex items-center gap-2 rounded-full border border-green-400/30 bg-green-400/10 px-4 py-2 text-sm font-black text-green-300"><Sparkles className="h-4 w-4" />SESAN ACADEMY</div><h1 className="mt-6 text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl">{text("Learn practical skills.", "រៀនជំនាញដែលប្រើបានពិត។")}<span className="block bg-gradient-to-r from-green-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">{text("Earn from your knowledge.", "រកចំណូលពីចំណេះដឹងរបស់អ្នក។")}</span></h1><p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">{text("Short, affordable video lessons in AI, technology, agriculture and business—created for Cambodia.", "មេរៀនវីដេអូខ្លី តម្លៃសមរម្យ អំពី AI បច្ចេកវិទ្យា កសិកម្ម និងអាជីវកម្ម សម្រាប់ប្រជាជនកម្ពុជា។")}</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><a href="#courses" className="inline-flex items-center justify-center gap-2 rounded-full bg-green-500 px-7 py-4 font-black text-white hover:bg-green-400">{text("Explore courses", "មើលមេរៀន")}<ArrowRight className="h-5 w-5" /></a><Link href={`/${locale}/academy/creator`} className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 font-black text-white hover:bg-white/15">{text("Start teaching", "ចាប់ផ្ដើមបង្រៀន")}</Link></div></div>
+          <div><div className="inline-flex items-center gap-2 rounded-full border border-green-400/30 bg-green-400/10 px-4 py-2 text-sm font-black text-green-300"><Sparkles className="h-4 w-4" />SESAN ACADEMY</div><h1 className="mt-6 text-5xl font-black leading-[1.05] tracking-tight sm:text-6xl">{text("Learn practical skills.", "រៀនជំនាញដែលប្រើបានពិត។")}<span className="block bg-gradient-to-r from-green-400 via-cyan-400 to-violet-400 bg-clip-text text-transparent">{text("Earn from your knowledge.", "រកចំណូលពីចំណេះដឹងរបស់អ្នក។")}</span></h1><p className="mt-6 max-w-2xl text-lg leading-8 text-slate-300">{text("Affordable lessons in AI, agriculture, food production, household products, phone repair, technical trades and business—created for Cambodia.", "មេរៀនតម្លៃសមរម្យ អំពី AI កសិកម្ម ផលិតអាហារ ផលិតផលប្រើប្រាស់ ជួសជុលទូរស័ព្ទ ជំនាញបច្ចេកទេស និងអាជីវកម្ម សម្រាប់ប្រជាជនកម្ពុជា។")}</p><div className="mt-8 flex flex-col gap-3 sm:flex-row"><a href="#courses" className="inline-flex items-center justify-center gap-2 rounded-full bg-green-500 px-7 py-4 font-black text-white hover:bg-green-400">{text("Explore courses", "មើលមេរៀន")}<ArrowRight className="h-5 w-5" /></a><Link href={`/${locale}/academy/creator`} className="inline-flex items-center justify-center rounded-full border border-white/20 bg-white/10 px-7 py-4 font-black text-white hover:bg-white/15">{text("Start teaching", "ចាប់ផ្ដើមបង្រៀន")}</Link></div></div>
           <div className="grid gap-4 sm:grid-cols-2"><Stat value={`${Math.round(CREATOR_SHARE_RATE * 100)}%`} label={text("Creator earnings", "ចំណូល Creator")} color="green" /><Stat value="30%" label={text("Sesan commission", "កម្រៃ Sesan")} color="violet" /><Stat value={`${MINIMUM_WITHDRAWAL_RIEL.toLocaleString()}៛`} label={text("Minimum payout", "ដកប្រាក់អប្បបរមា")} color="amber" /><Stat value="7 days" label={text("Earning hold", "រយៈពេល Pending")} color="sky" /></div>
         </div>
       </section>
