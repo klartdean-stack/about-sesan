@@ -156,6 +156,27 @@ export async function listKnowledgeArticles(session: FirebaseSession) {
     .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
 }
 
+export async function listPublishedKnowledgeArticles() {
+  const data = await requestJson<{documents?: FirestoreDocument[]}>(
+    `${firestoreBase}/knowledgeArticles?pageSize=1000`,
+    {cache: "no-store"},
+  );
+
+  return (data.documents ?? [])
+    .map(fromDocument)
+    .filter((article) => article.status === "published")
+    .sort((a, b) => b.updatedAt.localeCompare(a.updatedAt));
+}
+
+export async function getPublishedKnowledgeArticle(id: string) {
+  const document = await requestJson<FirestoreDocument>(
+    `${firestoreBase}/knowledgeArticles/${encodeURIComponent(id)}`,
+    {cache: "no-store"},
+  );
+  const article = fromDocument(document);
+  return article.status === "published" ? article : null;
+}
+
 export async function saveKnowledgeArticle(
   session: FirebaseSession,
   article: KnowledgeArticleRecord,
