@@ -2,7 +2,7 @@ import Link from "next/link";
 import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
-import {getPublishedKnowledgeArticle} from "@/lib/firebase-rest";
+import {getPublishedKnowledgeArticle, listPublishedKnowledgeArticles} from "@/lib/firebase-rest";
 import ShareButtons from "./ShareButtons";
 
 type PageProps = {
@@ -57,7 +57,10 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
   const {locale: rawLocale, id} = await params;
   if (rawLocale !== "km" && rawLocale !== "en") notFound();
   const locale = rawLocale as "km" | "en";
-  const article = await getPublishedKnowledgeArticle(id).catch(() => null);
+  const [article, allArticles] = await Promise.all([
+    getPublishedKnowledgeArticle(id).catch(() => null),
+    listPublishedKnowledgeArticles().catch(() => []),
+  ]);
   if (!article) notFound();
 
   const title = locale === "km" ? article.titleKm : article.titleEn;
@@ -85,6 +88,11 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
       logo: {"@type": "ImageObject", url: "https://about.sesanshop.com/sesan-logo.png"},
     },
   };
+  const otherArticles = allArticles.filter((item) => item.id !== article.id);
+  const relatedArticles = [
+    ...otherArticles.filter((item) => item.category === article.category),
+    ...otherArticles.filter((item) => item.category !== article.category),
+  ].slice(0, 3);
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
@@ -122,6 +130,56 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
           )}
         </div>
       </article>
+
+      {relatedArticles.length > 0 && (
+        <section className="border-t border-slate-200 bg-white px-5 py-16 sm:py-20">
+          <div className="mx-auto max-w-5xl">
+            <div className="flex items-end justify-between gap-5">
+              <div>
+                <p className="text-sm font-black uppercase tracking-[0.2em] text-green-700">
+                  {locale === "km" ? "SESAN KNOWLEDGE" : "SESAN KNOWLEDGE"}
+                </p>
+                <h2 className="mt-3 text-3xl font-black tracking-tight sm:text-4xl">
+                  {locale === "km" ? "អត្ថបទពាក់ព័ន្ធ" : "Related articles"}
+                </h2>
+              </div>
+              <Link href={`/${locale}/knowledge`} className="hidden text-sm font-black text-green-700 hover:text-green-600 sm:block">
+                {locale === "km" ? "មើលទាំងអស់ →" : "View all →"}
+              </Link>
+            </div>
+
+            <div className="mt-9 grid gap-6 md:grid-cols-3">
+              {relatedArticles.map((related) => {
+                const relatedTitle = locale === "km" ? related.titleKm : related.titleEn;
+                const relatedSummary = locale === "km" ? related.summaryKm : related.summaryEn;
+                return (
+                  <Link
+                    key={related.id}
+                    href={`/${locale}/knowledge/${related.id}`}
+                    className="group overflow-hidden rounded-[24px] border border-slate-200 bg-white shadow-sm transition duration-300 hover:-translate-y-1.5 hover:border-green-300 hover:shadow-xl"
+                  >
+                    {related.coverImage ? (
+                      <img src={related.coverImage} alt={relatedTitle} className="aspect-video w-full object-cover transition duration-500 group-hover:scale-105" />
+                    ) : (
+                      <div className="flex aspect-video items-center justify-center bg-green-50 text-green-700"><BookOpen className="h-10 w-10" /></div>
+                    )}
+                    <div className="p-5">
+                      <p className="text-xs font-black uppercase tracking-[0.12em] text-green-700">{related.category}</p>
+                      <h3 className="mt-2 line-clamp-2 text-lg font-black leading-snug group-hover:text-green-700">{relatedTitle}</h3>
+                      <p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{relatedSummary}</p>
+                      <p className="mt-5 text-sm font-black text-green-700">{locale === "km" ? "អានអត្ថបទ →" : "Read article →"}</p>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+
+            <Link href={`/${locale}/knowledge`} className="mt-7 inline-flex text-sm font-black text-green-700 sm:hidden">
+              {locale === "km" ? "មើលអត្ថបទទាំងអស់ →" : "View all articles →"}
+            </Link>
+          </div>
+        </section>
+      )}
 
       <section className="border-t border-green-100 bg-gradient-to-br from-green-50 via-white to-sky-50 px-5 py-16 sm:py-20">
         <div className="mx-auto max-w-5xl overflow-hidden rounded-[32px] bg-slate-950 px-6 py-10 text-white shadow-2xl sm:px-10 lg:flex lg:items-center lg:justify-between lg:gap-10 lg:px-14">
