@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type {Metadata} from "next";
 import {notFound} from "next/navigation";
 import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
 import {getPublishedKnowledgeArticle} from "@/lib/firebase-rest";
@@ -7,6 +8,50 @@ import ShareButtons from "./ShareButtons";
 type PageProps = {
   params: Promise<{locale: string; id: string}>;
 };
+
+export async function generateMetadata({params}: PageProps): Promise<Metadata> {
+  const {locale: rawLocale, id} = await params;
+  if (rawLocale !== "km" && rawLocale !== "en") return {};
+  const locale = rawLocale as "km" | "en";
+  const article = await getPublishedKnowledgeArticle(id).catch(() => null);
+  if (!article) return {};
+
+  const title = locale === "km" ? article.titleKm : article.titleEn;
+  const description = (locale === "km" ? article.summaryKm : article.summaryEn).slice(0, 180);
+  const canonical = `https://about.sesanshop.com/${locale}/knowledge/${article.id}`;
+  const image = article.coverImage || "https://about.sesanshop.com/og-image.png";
+
+  return {
+    title: `${title} | Sesan Knowledge`,
+    description,
+    keywords: [title, article.category, "Sesan", "Sesan App", "Cambodia agriculture", "ចំណេះដឹងកសិកម្ម"],
+    alternates: {
+      canonical,
+      languages: {
+        km: `https://about.sesanshop.com/km/knowledge/${article.id}`,
+        en: `https://about.sesanshop.com/en/knowledge/${article.id}`,
+      },
+    },
+    openGraph: {
+      type: "article",
+      locale: locale === "km" ? "km_KH" : "en_US",
+      url: canonical,
+      siteName: "Sesan Group",
+      title,
+      description,
+      publishedTime: article.updatedAt,
+      modifiedTime: article.updatedAt,
+      section: article.category,
+      images: [{url: image, width: 1200, height: 675, alt: title}],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title,
+      description,
+      images: [image],
+    },
+  };
+}
 
 export default async function KnowledgeArticlePage({params}: PageProps) {
   const {locale: rawLocale, id} = await params;
@@ -22,9 +67,31 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
     day: "numeric", month: "long", year: "numeric",
   }).format(new Date(article.updatedAt));
   const articleUrl = `https://about.sesanshop.com/${locale}/knowledge/${article.id}`;
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: title,
+    description: summary,
+    image: article.coverImage ? [article.coverImage] : undefined,
+    datePublished: article.updatedAt,
+    dateModified: article.updatedAt,
+    inLanguage: locale === "km" ? "km-KH" : "en",
+    articleSection: article.category,
+    mainEntityOfPage: articleUrl,
+    author: {"@type": "Organization", name: "Sesan Group"},
+    publisher: {
+      "@type": "Organization",
+      name: "Sesan Group",
+      logo: {"@type": "ImageObject", url: "https://about.sesanshop.com/sesan-logo.png"},
+    },
+  };
 
   return (
     <main className="min-h-screen bg-slate-50 text-slate-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{__html: JSON.stringify(structuredData).replace(/</g, "\\u003c")}}
+      />
       <header className="border-b border-slate-200 bg-white">
         <div className="mx-auto flex max-w-5xl items-center justify-between px-5 py-4">
           <Link href={`/${locale}`} className="flex items-center gap-3">
