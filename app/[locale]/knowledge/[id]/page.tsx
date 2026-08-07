@@ -4,6 +4,7 @@ import {notFound} from "next/navigation";
 import {ArrowLeft, BookOpen, CalendarDays, Monitor} from "lucide-react";
 import {getPublishedKnowledgeArticle, listPublishedKnowledgeArticles} from "@/lib/firebase-rest";
 import ShareButtons from "./ShareButtons";
+import KnowledgeContent from "../KnowledgeContent";
 
 type PageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -124,7 +125,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
           <ShareButtons title={title} url={articleUrl} locale={locale} />
           <div className="my-9 h-px bg-slate-200" />
           {body ? (
-            <div className="whitespace-pre-wrap text-lg leading-9 text-slate-700">{body}</div>
+            <KnowledgeContent content={body} />
           ) : (
             <div className="rounded-2xl bg-green-50 p-6 text-center text-green-800"><BookOpen className="mx-auto h-7 w-7" /><p className="mt-3 font-bold">{locale === "km" ? "ខ្លឹមសារកំពុងរៀបចំ" : "Content is being prepared"}</p></div>
           )}
