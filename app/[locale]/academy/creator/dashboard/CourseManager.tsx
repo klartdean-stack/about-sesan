@@ -1,8 +1,8 @@
 "use client";
 
 import {FormEvent, useEffect, useState} from "react";
-import {BookOpen, CheckCircle2, Clock3, Plus, Upload, Video, XCircle} from "lucide-react";
-import {AcademySession, AcademyCourseRecord, CreatorApplication, listCreatorCourses, readableAcademyError, submitAcademyCourse, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
+import {BookOpen, CheckCircle2, Clock3, Play, Plus, Upload, Video, XCircle} from "lucide-react";
+import {AcademySession, AcademyCourseRecord, CreatorApplication, getAcademyVideoBlobUrl, listCreatorCourses, readableAcademyError, submitAcademyCourse, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
 
 const categories = [
   ["ai-coding", "AI Coding"], ["ai-video", "AI Video"],
@@ -17,6 +17,7 @@ export default function CourseManager({session, application, locale}: {session: 
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [preview, setPreview] = useState<{courseId: string; url: string} | null>(null);
 
   useEffect(() => {listCreatorCourses(session).then(setCourses).catch(error => setMessage(readableAcademyError(error))).finally(() => setLoading(false));}, [session]);
 
@@ -52,6 +53,16 @@ export default function CourseManager({session, application, locale}: {session: 
     } catch (error) {setMessage(readableAcademyError(error));} finally {setLoading(false);}
   }
 
+  async function previewVideo(course: AcademyCourseRecord) {
+    if (preview?.courseId === course.id) {URL.revokeObjectURL(preview.url); setPreview(null); return;}
+    setLoading(true); setMessage(t("Preparing video…", "កំពុងរៀបចំវីដេអូ…"));
+    try {
+      const url = await getAcademyVideoBlobUrl(session, course.videoPath);
+      if (preview) URL.revokeObjectURL(preview.url);
+      setPreview({courseId: course.id, url}); setMessage("");
+    } catch (error) {setMessage(readableAcademyError(error));} finally {setLoading(false);}
+  }
+
   return <div>
     <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-3xl font-black">{t("My courses", "មេរៀនរបស់ខ្ញុំ")}</h2><p className="mt-2 text-sm text-slate-500">{t("Upload a course and send it to Academy Admin for review.", "Upload មេរៀន ហើយផ្ញើទៅ Academy Admin ពិនិត្យ។")}</p></div><button onClick={() => setShowForm(value => !value)} className="inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-3 font-black text-white"><Plus className="h-5 w-5" />{t("Add course", "បន្ថែមមេរៀន")}</button></div>
     {message && <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-800">{message}</p>}
@@ -64,7 +75,7 @@ export default function CourseManager({session, application, locale}: {session: 
       <FileField name="video" accept="video/*" icon={Video} label={t("Lesson video (max 500MB)", "វីដេអូមេរៀន (អតិបរមា 500MB)")} />
       <button disabled={loading} className="md:col-span-2 rounded-2xl bg-slate-950 px-5 py-4 font-black text-white disabled:opacity-50">{loading ? t("Uploading…", "កំពុង Upload…") : t("Submit for review", "ផ្ញើឱ្យ Admin ពិនិត្យ")}</button>
     </form>}
-    <div className="mt-6 grid gap-4 md:grid-cols-2">{courses.map(course => <article key={course.id} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white"><img src={course.coverImage} alt="" className="h-36 w-full object-cover" /><div className="p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-black">{locale === "km" ? course.titleKm : course.titleEn}</h3><CourseStatus status={course.status} /></div><p className="mt-3 text-lg font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p>{course.adminNote && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">Admin: {course.adminNote}</p>}</div></article>)}{!loading && courses.length === 0 && <div className="md:col-span-2 rounded-[24px] border border-dashed border-slate-300 py-14 text-center text-slate-400"><BookOpen className="mx-auto h-10 w-10" /><p className="mt-3 font-bold">{t("No courses yet.", "មិនទាន់មានមេរៀន។")}</p></div>}</div>
+    <div className="mt-6 grid gap-4 md:grid-cols-2">{courses.map(course => <article key={course.id} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white"><img src={course.coverImage} alt="" className="h-36 w-full object-cover" /><div className="p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-black">{locale === "km" ? course.titleKm : course.titleEn}</h3><CourseStatus status={course.status} /></div><p className="mt-3 text-lg font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p><button disabled={loading} onClick={() => previewVideo(course)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white"><Play className="h-4 w-4" />{preview?.courseId === course.id ? t("Close video", "បិទវីដេអូ") : t("Watch my video", "មើលវីដេអូរបស់ខ្ញុំ")}</button>{preview?.courseId === course.id && <video src={preview.url} controls playsInline className="mt-3 w-full rounded-xl bg-black" />}{course.adminNote && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">Admin: {course.adminNote}</p>}</div></article>)}{!loading && courses.length === 0 && <div className="md:col-span-2 rounded-[24px] border border-dashed border-slate-300 py-14 text-center text-slate-400"><BookOpen className="mx-auto h-10 w-10" /><p className="mt-3 font-bold">{t("No courses yet.", "មិនទាន់មានមេរៀន។")}</p></div>}</div>
   </div>;
 }
 
