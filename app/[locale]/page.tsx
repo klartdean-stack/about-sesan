@@ -1324,12 +1324,12 @@ ${message}
           key={plan.name}
           className={`relative flex flex-col rounded-[32px] border p-8 transition duration-300 hover:-translate-y-2 ${
             plan.popular
-              ? "border-green-400 bg-white text-slate-950 shadow-2xl shadow-green-500/20"
+              ? "border-green-400 bg-white !pt-16 text-slate-950 shadow-2xl shadow-green-500/20"
               : "border-white/10 bg-white/5 text-white hover:bg-white/10"
           }`}
         >
           {plan.popular && (
-            <div className="absolute -top-4 left-1/2 -translate-x-1/2 rounded-full bg-green-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg">
+            <div className="absolute left-1/2 top-4 -translate-x-1/2 whitespace-nowrap rounded-full bg-green-500 px-5 py-2 text-xs font-black uppercase tracking-wider text-white shadow-lg">
               {text("Most Popular", "ពេញនិយមបំផុត")}
             </div>
           )}
