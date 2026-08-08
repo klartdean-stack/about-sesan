@@ -38,8 +38,8 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
       });
       document.body.appendChild(form); form.submit();
     } catch (error) {
-      setMessage(error instanceof Error && error.message === "PAYWAY_NOT_CONFIGURED"
-        ? (km ? "PayWay មិនទាន់រៀបចំបានពេញលេញទេ។" : "PayWay is not fully configured yet.")
+      setMessage(error instanceof Error && error.message.startsWith("MISSING_")
+        ? `${km ? "ខ្វះ Variable" : "Missing variable"}: ${error.message.replace("MISSING_", "")}`
         : (km ? "មិនអាចបើកការទូទាត់បានទេ។ សូមសាកល្បងម្ដងទៀត។" : "Could not open payment. Please try again."));
       setLoading(false);
     }
@@ -63,4 +63,3 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
     {open && <div className="fixed inset-0 z-[100] flex items-center justify-center bg-slate-950/70 p-5 backdrop-blur-sm"><div className="relative w-full max-w-md rounded-[28px] bg-white p-7 text-left shadow-2xl"><button onClick={() => setOpen(false)} className="absolute right-5 top-5 rounded-full bg-slate-100 p-2"><X className="h-5 w-5" /></button><span className="inline-flex rounded-2xl bg-green-100 p-3 text-green-700"><LockKeyhole className="h-6 w-6" /></span><h3 className="mt-4 text-2xl font-black">{register ? (km ? "បង្កើតគណនីអ្នករៀន" : "Create learner account") : (km ? "ចូលគណនីដើម្បីទិញ" : "Login to purchase")}</h3><p className="mt-2 text-sm leading-6 text-slate-500">{km ? "គណនីនេះប្រើសម្រាប់រក្សាទុកមេរៀនដែលអ្នកបានទិញ។" : "This account keeps your purchased courses accessible."}</p><form onSubmit={authenticate} className="mt-6 space-y-4"><input required type="email" name="email" placeholder={km ? "អ៊ីមែល" : "Email"} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500" /><input required minLength={6} type="password" name="password" placeholder={km ? "លេខសម្ងាត់ (យ៉ាងតិច 6 តួ)" : "Password (6+ characters)"} className="w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500" />{message && <p className="rounded-xl bg-red-50 p-3 text-sm font-bold text-red-700">{message}</p>}<button disabled={loading} className="w-full rounded-2xl bg-green-600 px-5 py-3.5 font-black text-white disabled:opacity-60">{loading ? "Loading…" : register ? (km ? "បង្កើត និងបន្តទូទាត់" : "Create and continue") : (km ? "ចូល និងបន្តទូទាត់" : "Login and continue")}</button></form><button onClick={() => {setRegister(!register); setMessage("");}} className="mt-4 w-full text-sm font-bold text-green-700">{register ? (km ? "មានគណនីរួចហើយ? ចូលគណនី" : "Already registered? Login") : (km ? "មិនទាន់មានគណនី? បង្កើតទីនេះ" : "No account? Create one")}</button></div></div>}
   </>;
 }
-
