@@ -33,7 +33,8 @@ export function createPayWayCheckout(input: PayWayCheckoutInput) {
   const reqTime = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
   const amount = String(Math.round(input.amountRiel));
   const items = base64([{name: input.courseTitle, quantity: 1, price: input.amountRiel}]);
-  const shipping = "";
+  // PayWay expects a numeric shipping price even for digital products.
+  const shipping = "0.00";
   const firstname = "Sesan";
   const lastname = "Learner";
   const email = input.buyerEmail;
