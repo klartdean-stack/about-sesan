@@ -36,6 +36,10 @@ export type AcademyCourseRecord = {
   coverPath: string;
   videoPath: string;
   videoFileName: string;
+  previewVideoUrl: string;
+  previewVideoPath: string;
+  previewVideoFileName: string;
+  previewDurationSeconds: number;
   durationSeconds: number;
   ratingAverage: number;
   ratingCount: number;
@@ -164,6 +168,10 @@ function courseFromDocument(document: FirestoreDocument): AcademyCourseRecord {
     coverPath: fieldString(fields, "coverPath"),
     videoPath: fieldString(fields, "videoPath"),
     videoFileName: fieldString(fields, "videoFileName"),
+    previewVideoUrl: fieldString(fields, "previewVideoUrl"),
+    previewVideoPath: fieldString(fields, "previewVideoPath"),
+    previewVideoFileName: fieldString(fields, "previewVideoFileName"),
+    previewDurationSeconds: fieldInteger(fields, "previewDurationSeconds"),
     durationSeconds: fieldInteger(fields, "durationSeconds"),
     ratingAverage: fieldInteger(fields, "ratingAverage") / 100,
     ratingCount: fieldInteger(fields, "ratingCount"),
@@ -188,6 +196,10 @@ function courseFields(course: AcademyCourseRecord) {
     coverPath: {stringValue: course.coverPath},
     videoPath: {stringValue: course.videoPath},
     videoFileName: {stringValue: course.videoFileName},
+    previewVideoUrl: {stringValue: course.previewVideoUrl},
+    previewVideoPath: {stringValue: course.previewVideoPath},
+    previewVideoFileName: {stringValue: course.previewVideoFileName},
+    previewDurationSeconds: {integerValue: String(course.previewDurationSeconds)},
     durationSeconds: {integerValue: String(course.durationSeconds)},
     ratingAverage: {integerValue: String(Math.round(course.ratingAverage * 100))},
     ratingCount: {integerValue: String(course.ratingCount)},
@@ -356,9 +368,10 @@ function safeFileName(name: string) {
 export async function uploadAcademyCourseFile(
   session: AcademySession,
   file: File,
-  kind: "cover" | "video",
+  kind: "cover" | "video" | "preview",
 ) {
-  const folder = kind === "cover" ? "academy-course-covers" : "academy-course-videos";
+  // Preview clips share the public cover folder while full lessons remain private.
+  const folder = kind === "video" ? "academy-course-videos" : "academy-course-covers";
   const path = `${folder}/${session.uid}/${Date.now()}-${safeFileName(file.name)}`;
   const uploaded = await requestJson<{name: string}>(
     `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o?uploadType=media&name=${encodeURIComponent(path)}`,
@@ -373,7 +386,7 @@ export async function uploadAcademyCourseFile(
   );
   return {
     path: uploaded.name,
-    publicUrl: kind === "cover"
+    publicUrl: kind !== "video"
       ? `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o/${encodeURIComponent(uploaded.name)}?alt=media`
       : "",
   };
