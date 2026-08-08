@@ -4,6 +4,7 @@ import {notFound} from "next/navigation";
 import {ArrowLeft, ArrowRight, Bot, CalendarDays, Check, Clock3, Code2, GraduationCap, Leaf, PackageOpen, Play, Search, Sparkles, Star, UserRound, Users, Utensils, Video, Wrench} from "lucide-react";
 import {academyCourses, type AcademyCategory, CREATOR_SHARE_RATE, MINIMUM_WITHDRAWAL_RIEL} from "@/lib/academy";
 import {AcademyCourseRecord, listPublishedAcademyCourses} from "@/lib/academy-firebase-rest";
+import PayWayBuyButton from "./PayWayBuyButton";
 
 type PageProps = {
   params: Promise<{locale: string}>;
@@ -102,7 +103,7 @@ function PublicCourseCardDetails({course, locale}: {course: AcademyCourseRecord;
     <div className="p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-green-700">{categories.find(item => item.id === course.category)?.[locale] ?? course.category}</p><h3 className="mt-3 line-clamp-2 text-xl font-black leading-snug">{title}</h3><p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold text-slate-500"><span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-green-600" />{date}</span><span className="inline-flex items-center gap-1.5"><UserRound className="h-4 w-4 text-green-600" />{course.creatorName}</span></div>
       <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4"><div className="inline-flex items-center gap-2"><Star className={`h-5 w-5 ${course.ratingCount > 0 ? "fill-amber-400 text-amber-400" : "text-slate-300"}`} /><span className="text-sm font-black text-slate-700">{course.ratingCount > 0 ? `${course.ratingAverage.toFixed(1)} (${course.ratingCount})` : km ? "មិនទាន់មាន Rating" : "No ratings yet"}</span></div><p className="text-xl font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p></div>
-      <button disabled className="mt-5 inline-flex w-full cursor-not-allowed items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white opacity-80">{km ? "ទិញមេរៀន — មកដល់ឆាប់ៗ" : "Buy course — Coming soon"}<ArrowRight className="h-4 w-4" /></button>
+      <PayWayBuyButton courseId={course.id} locale={locale} />
     </div>
   </article>;
 }
