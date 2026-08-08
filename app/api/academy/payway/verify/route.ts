@@ -1,11 +1,8 @@
 import {checkPayWayTransaction} from "@/lib/payway";
+import {academyAdminFetch, academyFirestoreBase} from "@/lib/firebase-admin";
 
 const firebaseApiKey = process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_API_KEY ?? "AIzaSyAn2AB1Lx0z2zf1GGkfdq2SCa7hC8nzJgM";
 const projectId = process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_PROJECT_ID ?? "sesan-academy";
-const firestoreBase = `https://firestore.googleapis.com/v1/projects/${projectId}/databases/(default)/documents`;
-
-type Value = {stringValue?: string; integerValue?: string};
-type Document = {fields?: Record<string, Value>};
 
 export async function POST(request: Request) {
   try {
@@ -19,15 +16,14 @@ export async function POST(request: Request) {
     const buyerUid = auth.users?.[0]?.localId;
     if (!authResponse.ok || !buyerUid) return Response.json({error: "LOGIN_REQUIRED"}, {status: 401});
 
-    const headers = {Authorization: `Bearer ${input.idToken}`, "Content-Type": "application/json"};
-    const orderUrl = `${firestoreBase}/academyPaymentTransactions/${encodeURIComponent(input.transactionId)}`;
-    const orderResponse = await fetch(orderUrl, {headers, cache: "no-store"});
-    const order = await orderResponse.json() as Document;
+    const orderUrl = `${academyFirestoreBase}/academyPaymentTransactions/${encodeURIComponent(input.transactionId)}`;
+    const orderResponse = await academyAdminFetch(orderUrl);
+    const order = await orderResponse.json() as {fields?: Record<string, {stringValue?: string; integerValue?: string}>};
     if (!orderResponse.ok || order.fields?.buyerUid?.stringValue !== buyerUid) {
       return Response.json({error: "PAYMENT_NOT_FOUND"}, {status: 404});
     }
-    const courseId = order.fields.courseId?.stringValue || "";
-    const expectedAmount = Number(order.fields.amountRiel?.integerValue || 0);
+    const courseId = order.fields?.courseId?.stringValue || "";
+    const expectedAmount = Number(order.fields?.amountRiel?.integerValue || 0);
     const result = await checkPayWayTransaction(input.transactionId);
     const approved = result.status?.code === "00"
       && result.data?.payment_status === "APPROVED"
@@ -37,19 +33,20 @@ export async function POST(request: Request) {
 
     const now = new Date().toISOString();
     const purchaseId = `${buyerUid}_${courseId}`;
-    const purchaseResponse = await fetch(`${firestoreBase}/academyPurchases/${encodeURIComponent(purchaseId)}`, {
-      method: "PATCH", headers, cache: "no-store",
-      body: JSON.stringify({fields: {
-        buyerUid: {stringValue: buyerUid}, courseId: {stringValue: courseId}, transactionId: {stringValue: input.transactionId},
-        amountRiel: {integerValue: String(expectedAmount)}, currency: {stringValue: "KHR"}, status: {stringValue: "paid"},
-        purchasedAt: {stringValue: now}, updatedAt: {stringValue: now},
-      }}),
+    const commitResponse = await academyAdminFetch(`${academyFirestoreBase}:commit`, {
+      method: "POST",
+      body: JSON.stringify({writes: [
+        {update: {name: `projects/${projectId}/databases/(default)/documents/academyPurchases/${purchaseId}`, fields: {
+          buyerUid: {stringValue: buyerUid}, courseId: {stringValue: courseId}, transactionId: {stringValue: input.transactionId},
+          amountRiel: {integerValue: String(expectedAmount)}, currency: {stringValue: "KHR"}, status: {stringValue: "paid"},
+          purchasedAt: {stringValue: now}, updatedAt: {stringValue: now},
+        }}},
+        {update: {name: `projects/${projectId}/databases/(default)/documents/academyPaymentTransactions/${input.transactionId}`, fields: {
+          ...order.fields, status: {stringValue: "paid"}, updatedAt: {stringValue: now},
+        }}},
+      ]}),
     });
-    if (!purchaseResponse.ok) return Response.json({error: "PURCHASE_RECORD_DENIED"}, {status: 403});
-    await fetch(orderUrl, {
-      method: "PATCH", headers, cache: "no-store",
-      body: JSON.stringify({fields: {...order.fields, status: {stringValue: "paid"}, updatedAt: {stringValue: now}}}),
-    });
+    if (!commitResponse.ok) throw new Error("PURCHASE_RECORD_FAILED");
     return Response.json({status: "paid", courseId});
   } catch (error) {
     console.error("PayWay verification failed", error);
