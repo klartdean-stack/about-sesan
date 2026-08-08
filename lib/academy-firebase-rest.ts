@@ -35,6 +35,9 @@ export type AcademyCourseRecord = {
   coverPath: string;
   videoPath: string;
   videoFileName: string;
+  durationSeconds: number;
+  ratingAverage: number;
+  ratingCount: number;
   status: "pending" | "published" | "rejected";
   adminNote: string;
   createdAt: string;
@@ -143,6 +146,9 @@ function courseFromDocument(document: FirestoreDocument): AcademyCourseRecord {
     coverPath: fieldString(fields, "coverPath"),
     videoPath: fieldString(fields, "videoPath"),
     videoFileName: fieldString(fields, "videoFileName"),
+    durationSeconds: fieldInteger(fields, "durationSeconds"),
+    ratingAverage: fieldInteger(fields, "ratingAverage") / 100,
+    ratingCount: fieldInteger(fields, "ratingCount"),
     status: status === "published" || status === "rejected" ? status : "pending",
     adminNote: fieldString(fields, "adminNote"),
     createdAt: fieldString(fields, "createdAt"),
@@ -164,6 +170,9 @@ function courseFields(course: AcademyCourseRecord) {
     coverPath: {stringValue: course.coverPath},
     videoPath: {stringValue: course.videoPath},
     videoFileName: {stringValue: course.videoFileName},
+    durationSeconds: {integerValue: String(course.durationSeconds)},
+    ratingAverage: {integerValue: String(Math.round(course.ratingAverage * 100))},
+    ratingCount: {integerValue: String(course.ratingCount)},
     status: {stringValue: course.status},
     adminNote: {stringValue: course.adminNote},
     createdAt: {stringValue: course.createdAt},
@@ -438,6 +447,23 @@ export async function reviewAcademyCourse(
   adminNote: string,
 ) {
   const updated = {...course, status, adminNote, updatedAt: new Date().toISOString()};
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${session.idToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({fields: courseFields(updated)}),
+  });
+  return updated;
+}
+
+export async function updateAcademyCourseDuration(
+  session: AcademySession,
+  course: AcademyCourseRecord,
+  durationSeconds: number,
+) {
+  const updated = {...course, durationSeconds, updatedAt: new Date().toISOString()};
   await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
     method: "PATCH",
     headers: {
