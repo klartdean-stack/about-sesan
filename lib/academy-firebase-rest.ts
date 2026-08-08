@@ -506,6 +506,27 @@ export async function updateAcademyCourseDuration(
   return updated;
 }
 
+export async function updateAcademyCoursePreview(
+  session: AcademySession,
+  course: AcademyCourseRecord,
+  preview: {url: string; path: string; fileName: string; durationSeconds: number},
+) {
+  const updated = {
+    ...course,
+    previewVideoUrl: preview.url,
+    previewVideoPath: preview.path,
+    previewVideoFileName: preview.fileName,
+    previewDurationSeconds: preview.durationSeconds,
+    updatedAt: new Date().toISOString(),
+  };
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
+    method: "PATCH",
+    headers: {Authorization: `Bearer ${session.idToken}`, "Content-Type": "application/json"},
+    body: JSON.stringify({fields: courseFields(updated)}),
+  });
+  return updated;
+}
+
 export async function getAcademyVideoBlobUrl(
   session: AcademySession,
   videoPath: string,
