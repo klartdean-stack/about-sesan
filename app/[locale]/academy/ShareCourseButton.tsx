@@ -8,7 +8,7 @@ export default function ShareCourseButton({courseId, title, locale}: {courseId: 
   const [copied, setCopied] = useState(false);
 
   async function share() {
-    const url = `${window.location.origin}/${locale}/academy#course-${courseId}`;
+    const url = `${window.location.origin}/${locale}/academy?shared=${encodeURIComponent(courseId)}#courses`;
     try {
       if (navigator.share) {
         await navigator.share({title, text: km ? `មើលមេរៀន «${title}» នៅ Sesan Academy` : `Watch “${title}” on Sesan Academy`, url});
