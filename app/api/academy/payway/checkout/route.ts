@@ -1,5 +1,6 @@
 import {randomBytes} from "node:crypto";
 import {createPayWayCheckout} from "@/lib/payway";
+import {academyAdminFetch, academyFirestoreBase} from "@/lib/firebase-admin";
 
 const firebaseApiKey = process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_API_KEY ?? "AIzaSyAn2AB1Lx0z2zf1GGkfdq2SCa7hC8nzJgM";
 const projectId = process.env.NEXT_PUBLIC_ACADEMY_FIREBASE_PROJECT_ID ?? "sesan-academy";
@@ -34,9 +35,8 @@ export async function POST(request: Request) {
     const transactionId = `SA${Date.now()}${randomBytes(3).toString("hex")}`.slice(0, 20);
     const origin = new URL(request.url).origin;
     const now = new Date().toISOString();
-    const orderResponse = await fetch(`${firestoreBase}/academyPaymentTransactions/${encodeURIComponent(transactionId)}`, {
+    const orderResponse = await academyAdminFetch(`${academyFirestoreBase}/academyPaymentTransactions/${encodeURIComponent(transactionId)}`, {
       method: "PATCH",
-      headers: {Authorization: `Bearer ${input.idToken}`, "Content-Type": "application/json"},
       body: JSON.stringify({fields: {
         transactionId: {stringValue: transactionId},
         buyerUid: {stringValue: buyer.localId},
@@ -48,12 +48,8 @@ export async function POST(request: Request) {
         createdAt: {stringValue: now},
         updatedAt: {stringValue: now},
       }}),
-      cache: "no-store",
     });
-    if (!orderResponse.ok) {
-      console.error("Could not save pending Academy payment", await orderResponse.text());
-      return Response.json({error: "PAYMENT_RECORD_DENIED"}, {status: 403});
-    }
+    if (!orderResponse.ok) throw new Error("PAYMENT_RECORD_FAILED");
     return Response.json(createPayWayCheckout({
       origin,
       locale,
