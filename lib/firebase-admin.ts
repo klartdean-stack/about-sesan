@@ -24,7 +24,7 @@ export async function academyAdminAccessToken() {
   const header = base64Url(JSON.stringify({alg: "RS256", typ: "JWT"}));
   const payload = base64Url(JSON.stringify({
     iss: account.clientEmail,
-    scope: "https://www.googleapis.com/auth/datastore",
+    scope: "https://www.googleapis.com/auth/datastore https://www.googleapis.com/auth/devstorage.read_only",
     aud: "https://oauth2.googleapis.com/token",
     iat: now,
     exp: now + 3600,
