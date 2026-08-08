@@ -1,5 +1,6 @@
 export type AcademySession = {
   idToken: string;
+  refreshToken: string;
   uid: string;
   email: string;
   expiresAt: number;
@@ -76,12 +77,14 @@ async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
 
 function sessionFromAuth(auth: {
   idToken: string;
+  refreshToken: string;
   localId: string;
   email: string;
   expiresIn: string;
 }): AcademySession {
   return {
     idToken: auth.idToken,
+    refreshToken: auth.refreshToken,
     uid: auth.localId,
     email: auth.email,
     expiresAt: Date.now() + Number(auth.expiresIn) * 1000,
@@ -91,6 +94,7 @@ function sessionFromAuth(auth: {
 export async function registerAcademyUser(email: string, password: string) {
   const auth = await requestJson<{
     idToken: string;
+    refreshToken: string;
     localId: string;
     email: string;
     expiresIn: string;
@@ -105,6 +109,7 @@ export async function registerAcademyUser(email: string, password: string) {
 export async function signInAcademyUser(email: string, password: string) {
   const auth = await requestJson<{
     idToken: string;
+    refreshToken: string;
     localId: string;
     email: string;
     expiresIn: string;
@@ -117,6 +122,19 @@ export async function signInAcademyUser(email: string, password: string) {
     },
   );
   return sessionFromAuth(auth);
+}
+
+export async function refreshAcademySession(session: AcademySession) {
+  if (!session.refreshToken) throw new Error("LOGIN_REQUIRED");
+  const data = await requestJson<{id_token: string; refresh_token: string; user_id: string; expires_in: string}>(
+    `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: new URLSearchParams({grant_type: "refresh_token", refresh_token: session.refreshToken}),
+    },
+  );
+  return {...session, idToken: data.id_token, refreshToken: data.refresh_token, uid: data.user_id, expiresAt: Date.now() + Number(data.expires_in) * 1000};
 }
 
 function fieldString(fields: FirestoreDocument["fields"], name: string) {
