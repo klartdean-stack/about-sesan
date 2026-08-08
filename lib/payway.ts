@@ -1,5 +1,3 @@
-import "server-only";
-
 import {createHmac} from "node:crypto";
 
 type PayWayCheckoutInput = {
@@ -92,4 +90,3 @@ export function createPayWayCheckout(input: PayWayCheckoutInput) {
     },
   };
 }
-
