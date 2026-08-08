@@ -46,7 +46,6 @@ export async function POST(request: Request) {
   } catch (error) {
     const message = error instanceof Error ? error.message : "CHECKOUT_FAILED";
     console.error("PayWay checkout failed", message);
-    return Response.json({error: message.startsWith("MISSING_") ? "PAYWAY_NOT_CONFIGURED" : "CHECKOUT_FAILED"}, {status: 500});
+    return Response.json({error: message.startsWith("MISSING_") ? message : "CHECKOUT_FAILED"}, {status: 500});
   }
 }
-
