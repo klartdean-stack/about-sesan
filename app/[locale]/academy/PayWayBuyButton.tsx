@@ -1,7 +1,8 @@
 "use client";
 
-import {FormEvent, useState} from "react";
-import {ArrowRight, LockKeyhole, X} from "lucide-react";
+import {FormEvent, useEffect, useState} from "react";
+import Link from "next/link";
+import {ArrowRight, CheckCircle2, LockKeyhole, X} from "lucide-react";
 import {AcademySession, readableAcademyError, registerAcademyUser, signInAcademyUser} from "@/lib/academy-firebase-rest";
 
 const BUYER_SESSION_KEY = "sesan-academy-buyer-session";
@@ -19,6 +20,13 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
   const [register, setRegister] = useState(false);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState("");
+  const [owned, setOwned] = useState(false);
+
+  useEffect(() => {
+    if (!session?.idToken) return;
+    fetch("/api/academy/course-access", {method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify({idToken: session.idToken, courseId})})
+      .then((response) => response.json()).then((data: {owned?: boolean}) => setOwned(Boolean(data.owned))).catch(() => {});
+  }, [session, courseId]);
 
   async function beginCheckout(active: AcademySession) {
     setLoading(true); setMessage("");
@@ -56,6 +64,8 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
       await beginCheckout(next);
     } catch (error) { setMessage(readableAcademyError(error)); setLoading(false); }
   }
+
+  if (owned) return <Link href={`/${locale}/academy/watch/${courseId}`} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-700"><CheckCircle2 className="h-5 w-5 text-green-400" />{km ? "បានទិញរួច • មើលវីដេអូ" : "Purchased • Watch lesson"}<ArrowRight className="h-4 w-4" /></Link>;
 
   return <>
     <button onClick={() => session ? beginCheckout(session) : setOpen(true)} disabled={loading} className="mt-5 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-500 disabled:opacity-60">{loading ? (km ? "កំពុងបើក ABA…" : "Opening ABA…") : (km ? "ទិញមេរៀនតាម ABA" : "Buy with ABA PayWay")}<ArrowRight className="h-4 w-4" /></button>
