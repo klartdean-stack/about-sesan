@@ -33,6 +33,27 @@ export async function POST(request: Request) {
       || course.fields?.titleKm?.stringValue || "Sesan Academy course";
     const transactionId = `SA${Date.now()}${randomBytes(3).toString("hex")}`.slice(0, 20);
     const origin = new URL(request.url).origin;
+    const now = new Date().toISOString();
+    const orderResponse = await fetch(`${firestoreBase}/academyPaymentTransactions/${encodeURIComponent(transactionId)}`, {
+      method: "PATCH",
+      headers: {Authorization: `Bearer ${input.idToken}`, "Content-Type": "application/json"},
+      body: JSON.stringify({fields: {
+        transactionId: {stringValue: transactionId},
+        buyerUid: {stringValue: buyer.localId},
+        buyerEmail: {stringValue: buyer.email || ""},
+        courseId: {stringValue: input.courseId},
+        amountRiel: {integerValue: String(amountRiel)},
+        currency: {stringValue: "KHR"},
+        status: {stringValue: "pending"},
+        createdAt: {stringValue: now},
+        updatedAt: {stringValue: now},
+      }}),
+      cache: "no-store",
+    });
+    if (!orderResponse.ok) {
+      console.error("Could not save pending Academy payment", await orderResponse.text());
+      return Response.json({error: "PAYMENT_RECORD_DENIED"}, {status: 403});
+    }
     return Response.json(createPayWayCheckout({
       origin,
       locale,
