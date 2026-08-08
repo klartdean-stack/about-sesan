@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import {FormEvent, useEffect, useState} from "react";
-import {BookOpen, Clock3, LogOut, ShieldAlert, WalletCards} from "lucide-react";
+import {BookOpen, Clock3, Eye, EyeOff, LogOut, ShieldAlert, WalletCards} from "lucide-react";
 import {
   AcademySession,
   CreatorApplication,
@@ -25,6 +25,7 @@ export default function CreatorDashboard({locale}: {locale: "km" | "en"}) {
   const [mode, setMode] = useState<"login" | "register">("login");
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const raw = localStorage.getItem(SESSION_KEY);
@@ -50,13 +51,16 @@ export default function CreatorDashboard({locale}: {locale: "km" | "en"}) {
     try {
       const email = String(data.get("email") || "").trim();
       const password = String(data.get("password") || "");
+      if (mode === "register" && password !== String(data.get("confirmPassword") || "")) {
+        throw new Error("PASSWORD_MISMATCH");
+      }
       const next = mode === "register"
         ? await registerAcademyUser(email, password)
         : await signInAcademyUser(email, password);
       localStorage.setItem(SESSION_KEY, JSON.stringify(next));
       setSession(next);
       setApplication(await getCreatorApplication(next));
-    } catch (error) { setMessage(readableAcademyError(error)); }
+    } catch (error) { setMessage(error instanceof Error && error.message === "PASSWORD_MISMATCH" ? t("The passwords do not match.", "លេខសម្ងាត់ទាំងពីរមិនដូចគ្នាទេ។") : readableAcademyError(error)); }
     finally { setLoading(false); }
   }
 
@@ -92,10 +96,12 @@ export default function CreatorDashboard({locale}: {locale: "km" | "en"}) {
       <div className="mx-auto max-w-md rounded-[30px] border border-slate-200 bg-white p-7 shadow-xl shadow-slate-200/50">
         <p className="text-sm font-black uppercase tracking-[0.18em] text-green-700">CREATOR ACCOUNT</p>
         <h1 className="mt-3 text-3xl font-black">{mode === "login" ? t("Creator Login", "ចូលគណនី Creator") : t("Create Creator Account", "បង្កើតគណនី Creator")}</h1>
-        <p className="mt-2 text-sm leading-6 text-slate-500">{t("Use your email and password to manage your creator application and courses.", "ប្រើអ៊ីមែល និងលេខសម្ងាត់ ដើម្បីគ្រប់គ្រងពាក្យស្នើសុំ និងមេរៀនរបស់អ្នក។")}</p>
+        <p className="mt-2 text-sm leading-6 text-slate-500">{mode === "register" ? t("Create a password with at least 6 characters. Uppercase and lowercase letters are different.", "បង្កើត Password យ៉ាងតិច 6 តួ។ អក្សរធំ និងតូចត្រូវបានចាត់ទុកខុសគ្នា។") : t("Use the same email and password you created before.", "ប្រើអ៊ីមែល និង Password ដដែលដែលអ្នកបានបង្កើតពីមុន។")}</p>
         <form onSubmit={authenticate} className="mt-7 space-y-4">
           <Field name="email" type="email" label={t("Email", "អ៊ីមែល")} required />
-          <Field name="password" type="password" label={t("Password", "លេខសម្ងាត់")} minLength={6} required />
+          <PasswordField name="password" label={t("Password", "លេខសម្ងាត់")} show={showPassword} setShow={setShowPassword} />
+          {mode === "register" && <PasswordField name="confirmPassword" label={t("Confirm password", "បញ្ជាក់លេខសម្ងាត់") } show={showPassword} setShow={setShowPassword} />}
+          {mode === "register" && <div className="rounded-2xl bg-green-50 p-4 text-xs font-bold leading-6 text-green-800"><p>✓ {t("At least 6 characters", "យ៉ាងតិច 6 តួ")}</p><p>✓ {t("Letters, numbers and symbols are allowed", "អាចប្រើអក្សរ លេខ និងសញ្ញា")}</p><p>✓ {t("Both password fields must match", "ប្រអប់ទាំងពីរត្រូវតែដូចគ្នា")}</p></div>}
           {message && <Alert text={message} />}
           <button disabled={loading} className="w-full rounded-2xl bg-green-600 px-5 py-3.5 font-black text-white hover:bg-green-500 disabled:opacity-60">{loading ? "Loading…" : mode === "login" ? t("Login", "ចូលគណនី") : t("Create account", "បង្កើតគណនី")}</button>
         </form>
@@ -153,6 +159,7 @@ function Shell({locale, children, onLogout}: {locale: "km" | "en"; children: Rea
 }
 
 function Field(props: React.InputHTMLAttributes<HTMLInputElement> & {label: string}) {const {label, ...input} = props; return <label className="block text-sm font-bold text-slate-700">{label}<input {...input} className="mt-2 w-full rounded-2xl border border-slate-200 px-4 py-3 outline-none focus:border-green-500" /></label>;}
+function PasswordField({name, label, show, setShow}: {name: string; label: string; show: boolean; setShow: (show: boolean) => void}) {return <label className="block text-sm font-bold text-slate-700">{label}<span className="relative mt-2 block"><input required minLength={6} name={name} type={show ? "text" : "password"} className="w-full rounded-2xl border border-slate-200 py-3 pl-4 pr-12 outline-none focus:border-green-500" /><button type="button" onClick={() => setShow(!show)} aria-label={show ? "Hide password" : "Show password"} className="absolute right-3 top-1/2 -translate-y-1/2 rounded-lg p-2 text-slate-500 hover:bg-slate-100">{show ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}</button></span></label>;}
 function Alert({text}: {text: string}) {return <p className="flex gap-2 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-800"><ShieldAlert className="h-5 w-5 shrink-0" />{text}</p>;}
 function Status({status, locale}: {status?: CreatorApplication["status"]; locale: "km" | "en"}) {const value = status ?? "not-submitted"; const labels = locale === "km" ? {"not-submitted": "មិនទាន់ដាក់ស្នើ", pending: "កំពុងរង់ចាំពិនិត្យ", approved: "បានអនុម័ត", rejected: "មិនបានអនុម័ត"} : {"not-submitted": "Not submitted", pending: "Pending review", approved: "Approved", rejected: "Rejected"}; return <p className={`mt-2 flex items-center gap-2 text-lg font-black ${value === "approved" ? "text-green-400" : value === "rejected" ? "text-red-300" : "text-amber-300"}`}><Clock3 className="h-5 w-5" />{labels[value]}</p>;}
 function Stat({icon: Icon, value, label}: {icon: typeof BookOpen; value: string; label: string}) {return <div className="rounded-2xl bg-white/10 p-4"><Icon className="h-5 w-5 text-green-400" /><p className="mt-3 text-xl font-black">{value}</p><p className="text-xs text-slate-400">{label}</p></div>;}
