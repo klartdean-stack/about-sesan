@@ -91,3 +91,28 @@ export function createPayWayCheckout(input: PayWayCheckoutInput) {
     },
   };
 }
+
+export async function checkPayWayTransaction(transactionId: string) {
+  const merchantId = requiredEnvironment("ABA_PAYWAY_MERCHANT_ID");
+  const configuredUrl = requiredEnvironment("ABA_PAYWAY_API_URL");
+  const reqTime = new Date().toISOString().replace(/[-:TZ.]/g, "").slice(0, 14);
+  const url = new URL(configuredUrl);
+  url.pathname = url.pathname.replace(/\/purchase\/?$/, "/check-transaction-2");
+  const response = await fetch(url, {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({
+      req_time: reqTime,
+      merchant_id: merchantId,
+      tran_id: transactionId,
+      hash: payWayHash(reqTime + merchantId + transactionId),
+    }),
+    cache: "no-store",
+  });
+  const result = await response.json().catch(() => ({})) as {
+    data?: {payment_status?: string; payment_status_code?: number; payment_amount?: number; payment_currency?: string};
+    status?: {code?: string; message?: string; tran_id?: string};
+  };
+  if (!response.ok) throw new Error(result.status?.message || "PAYWAY_STATUS_FAILED");
+  return result;
+}
