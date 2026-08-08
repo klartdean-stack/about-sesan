@@ -17,7 +17,7 @@ function serviceAccount() {
   return {clientEmail: parsed.client_email, privateKey: parsed.private_key.replace(/\\n/g, "\n")};
 }
 
-async function adminAccessToken() {
+export async function academyAdminAccessToken() {
   if (cachedToken && cachedToken.expiresAt > Date.now() + 60_000) return cachedToken.value;
   const account = serviceAccount();
   const now = Math.floor(Date.now() / 1000);
@@ -47,7 +47,7 @@ async function adminAccessToken() {
 }
 
 export async function academyAdminFetch(url: string, init: RequestInit = {}) {
-  const token = await adminAccessToken();
+  const token = await academyAdminAccessToken();
   return fetch(url, {
     ...init,
     headers: {Authorization: `Bearer ${token}`, "Content-Type": "application/json", ...init.headers},
