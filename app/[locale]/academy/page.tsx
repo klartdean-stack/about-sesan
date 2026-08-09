@@ -104,7 +104,7 @@ function PublicCourseCardDetails({course, locale}: {course: AcademyCourseRecord;
     <div className="p-6"><p className="text-xs font-black uppercase tracking-[0.14em] text-green-700">{categories.find(item => item.id === course.category)?.[locale] ?? course.category}</p><h3 className="mt-3 line-clamp-2 text-xl font-black leading-snug">{title}</h3><p className="mt-3 line-clamp-2 text-sm leading-6 text-slate-500">{description}</p>
       <div className="mt-4 flex flex-wrap gap-x-4 gap-y-2 text-xs font-bold text-slate-500"><span className="inline-flex items-center gap-1.5"><CalendarDays className="h-4 w-4 text-green-600" />{date}</span><Link href={`/${locale}/academy/creator/${encodeURIComponent(course.creatorId)}`} className="inline-flex items-center gap-1.5 rounded-full font-black text-green-700 transition hover:text-green-500"><UserRound className="h-4 w-4 text-green-600" />{course.creatorName}</Link></div>
       <div className="mt-4 flex items-center justify-between border-t border-slate-100 pt-4"><div className="inline-flex items-center gap-2"><Star className={`h-5 w-5 ${course.ratingCount > 0 ? "fill-amber-400 text-amber-400" : "text-slate-300"}`} /><span className="text-sm font-black text-slate-700">{course.ratingCount > 0 ? `${course.ratingAverage.toFixed(1)} (${course.ratingCount})` : km ? "មិនទាន់មាន Rating" : "No ratings yet"}</span></div><p className="text-xl font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p></div>
-      <PayWayBuyButton courseId={course.id} locale={locale} />
+      <PayWayBuyButton courseId={course.id} priceRiel={course.priceRiel} locale={locale} />
     </div>
   </article>;
 }

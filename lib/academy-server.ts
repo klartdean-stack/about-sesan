@@ -11,6 +11,16 @@ export async function academyBuyer(idToken?: string) {
   return response.ok ? data.users?.[0] ?? null : null;
 }
 
+export async function academyAdministrator(idToken?: string) {
+  const user = await academyBuyer(idToken);
+  if (!user) return null;
+  const response = await academyAdminFetch(
+    `${academyFirestoreBase}/academyAdmins/${encodeURIComponent(user.localId)}`,
+  );
+  const document = await response.json() as {fields?: Record<string, {booleanValue?: boolean}>};
+  return response.ok && document.fields?.active?.booleanValue === true ? user : null;
+}
+
 export async function paidAcademyPurchase(uid: string, courseId: string) {
   const id = `${uid}_${courseId}`;
   const response = await academyAdminFetch(`${academyFirestoreBase}/academyPurchases/${encodeURIComponent(id)}`);
