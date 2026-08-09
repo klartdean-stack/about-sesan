@@ -25,8 +25,8 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    const current = session;
-    if (!current?.refreshToken) return;
+    if (!session?.refreshToken) return;
+    const current: AcademySession = session;
     let cancelled = false;
     async function checkAccess() {
       try {
