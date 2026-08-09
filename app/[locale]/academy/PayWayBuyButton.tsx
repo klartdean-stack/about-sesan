@@ -25,11 +25,12 @@ export default function PayWayBuyButton({courseId, locale}: {courseId: string; l
   const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
-    if (!session?.refreshToken) return;
+    const current = session;
+    if (!current?.refreshToken) return;
     let cancelled = false;
     async function checkAccess() {
       try {
-        let active = session;
+        let active = current;
         if (active.expiresAt <= Date.now() + 60_000) {
           active = await refreshAcademySession(active);
           localStorage.setItem(BUYER_SESSION_KEY, JSON.stringify(active));
