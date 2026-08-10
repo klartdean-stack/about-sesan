@@ -71,11 +71,19 @@ type FirestoreDocument = {
 };
 
 async function requestJson<T>(url: string, init?: RequestInit): Promise<T> {
-  const response = await fetch(url, init);
+  let response: Response;
+  try {
+    response = await fetch(url, init);
+  } catch (error) {
+    const detail = error instanceof Error ? error.message : "network request failed";
+    throw new Error(`ACADEMY_NETWORK_ERROR: ${detail}`);
+  }
   const data = (await response.json().catch(() => ({}))) as T & {
     error?: {message?: string};
   };
-  if (!response.ok) throw new Error(data.error?.message || "ACADEMY_FIREBASE_ERROR");
+  if (!response.ok) {
+    throw new Error(`ACADEMY_FIREBASE_${response.status}: ${data.error?.message || response.statusText || "request failed"}`);
+  }
   return data;
 }
 
@@ -379,7 +387,7 @@ export async function uploadAcademyCourseFile(
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.idToken}`,
-        "Content-Type": file.type,
+        "Content-Type": file.type || (kind === "cover" ? "image/jpeg" : "video/mp4"),
       },
       body: file,
     },
@@ -547,10 +555,14 @@ export function readableAcademyError(error: unknown) {
   if (message.includes("EMAIL_EXISTS")) return "អ៊ីមែលនេះបានចុះឈ្មោះរួចហើយ។";
   if (message.includes("INVALID_LOGIN_CREDENTIALS")) return "អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ។";
   if (message.includes("WEAK_PASSWORD")) return "លេខសម្ងាត់ត្រូវមានយ៉ាងតិច 6 តួ។";
+  if (message.includes("TOKEN_EXPIRED") || message.includes("INVALID_ID_TOKEN") || message.includes("ACADEMY_FIREBASE_401")) return "ការចូលគណនីបានផុតកំណត់។ សូម Login ឡើងវិញ ហើយសាក Upload ម្ដងទៀត។";
   if (message.includes("PERMISSION_DENIED")) return "Firebase Rules មិនទាន់អនុញ្ញាតមុខងារនេះទេ។";
   if (message.includes("NOT_ACADEMY_ADMIN")) return "គណនីនេះមិនមែនជា Academy Admin ទេ។";
   if (message.includes("storage/unauthorized")) return "អ្នកមិនមានសិទ្ធិ Upload ឯកសារនេះទេ។";
   if (message.includes("VIDEO_PREVIEW_FAILED_403")) return "Storage បានបដិសេធសិទ្ធិមើលវីដេអូ។ សូមពិនិត្យ Storage Rules។";
   if (message.includes("VIDEO_PREVIEW_FAILED")) return "Browser មិនអាចទាញវីដេអូពី Storage បានទេ។ សូមពិនិត្យ CORS។";
+  if (message.includes("ACADEMY_NETWORK_ERROR")) return "Browser មិនអាចភ្ជាប់ទៅ Firebase Storage បានទេ។ សូមពិនិត្យ Internet និង Storage CORS រួចសាកម្ដងទៀត។";
+  if (message.includes("ACADEMY_FIREBASE_403")) return "Firebase Storage ឬ Firestore បានបដិសេធសិទ្ធិ។ សូមពិនិត្យ Rules សម្រាប់ Creator ដែលបានអនុម័ត។";
+  if (message.includes("ACADEMY_FIREBASE_413")) return "ឯកសារធំពេកសម្រាប់វិធី Upload នេះ។ សូមបង្រួមវីដេអូ ហើយសាកម្ដងទៀត។";
   return "មានបញ្ហាក្នុងការភ្ជាប់ Sesan Academy។ សូមសាកល្បងម្ដងទៀត។";
 }

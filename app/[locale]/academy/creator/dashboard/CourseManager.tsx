@@ -2,7 +2,9 @@
 
 import {FormEvent, useEffect, useState} from "react";
 import {BookOpen, CheckCircle2, Clock3, Play, Plus, Upload, Video, XCircle} from "lucide-react";
-import {AcademySession, AcademyCourseRecord, CreatorApplication, getAcademyVideoBlobUrl, listCreatorCourses, readableAcademyError, submitAcademyCourse, updateAcademyCourseDuration, updateAcademyCoursePreview, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
+import {AcademySession, AcademyCourseRecord, CreatorApplication, getAcademyVideoBlobUrl, listCreatorCourses, readableAcademyError, refreshAcademySession, submitAcademyCourse, updateAcademyCourseDuration, updateAcademyCoursePreview, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
+
+const CREATOR_SESSION_KEY = "sesan-academy-creator-session";
 
 const categories = [
   ["ai-coding", "AI Coding"], ["ai-video", "AI Video"],
@@ -14,6 +16,7 @@ const categories = [
 export default function CourseManager({session, application, locale}: {session: AcademySession; application: CreatorApplication; locale: "km" | "en"}) {
   const t = (en: string, km: string) => locale === "km" ? km : en;
   const [courses, setCourses] = useState<AcademyCourseRecord[]>([]);
+  const [activeSession, setActiveSession] = useState(session);
   const [showForm, setShowForm] = useState(false);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
@@ -25,6 +28,24 @@ export default function CourseManager({session, application, locale}: {session: 
   const [draftPreviewDuration, setDraftPreviewDuration] = useState(0);
 
   useEffect(() => {listCreatorCourses(session).then(setCourses).catch(error => setMessage(readableAcademyError(error))).finally(() => setLoading(false));}, [session]);
+
+  async function validSession(current = activeSession) {
+    if (current.expiresAt > Date.now() + 10 * 60 * 1000) return current;
+    const refreshed = await refreshAcademySession(current);
+    localStorage.setItem(CREATOR_SESSION_KEY, JSON.stringify(refreshed));
+    setActiveSession(refreshed);
+    return refreshed;
+  }
+
+  async function uploadAtStage(file: File, kind: "cover" | "video" | "preview", label: string, current: AcademySession) {
+    try {
+      const next = await validSession(current);
+      return {uploaded: await uploadAcademyCourseFile(next, file, kind), session: next};
+    } catch (error) {
+      const detail = readableAcademyError(error);
+      throw new Error(`UPLOAD_STAGE:${label}:${detail}`);
+    }
+  }
 
   async function submit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault(); setLoading(true); setMessage("");
@@ -41,16 +62,25 @@ export default function CourseManager({session, application, locale}: {session: 
       const durationSeconds = await readVideoDuration(video);
       const previewDurationSeconds = publicPreview?.size ? await readVideoDuration(publicPreview) : 0;
       if (previewDurationSeconds > 120) {setMessage(t("Preview video must be 2 minutes or shorter.", "វីដេអូគំរូត្រូវមានរយៈពេល 2 នាទី ឬខ្លីជាងនេះ។")); setLoading(false); return;}
+      let current = await validSession();
       setMessage(t("Uploading cover…", "កំពុង Upload រូបគម្រប…"));
-      const uploadedCover = await uploadAcademyCourseFile(session, cover, "cover");
+      const coverResult = await uploadAtStage(cover, "cover", t("cover image", "រូបគម្រប"), current);
+      const uploadedCover = coverResult.uploaded;
+      current = coverResult.session;
       setMessage(t("Uploading video… Please keep this page open.", "កំពុង Upload វីដេអូ… សូមកុំបិទទំព័រនេះ។"));
-      const uploadedVideo = await uploadAcademyCourseFile(session, video, "video");
+      const videoResult = await uploadAtStage(video, "video", t("lesson video", "វីដេអូមេរៀន"), current);
+      const uploadedVideo = videoResult.uploaded;
+      current = videoResult.session;
       let uploadedPreview = {path: "", publicUrl: ""};
       if (publicPreview?.size) {
         setMessage(t("Uploading public preview…", "កំពុង Upload វីដេអូគំរូសាធារណៈ…"));
-        uploadedPreview = await uploadAcademyCourseFile(session, publicPreview, "preview");
+        const previewResult = await uploadAtStage(publicPreview, "preview", t("preview video", "វីដេអូគំរូ"), current);
+        uploadedPreview = previewResult.uploaded;
+        current = previewResult.session;
       }
-      const course = await submitAcademyCourse(session, {
+      setMessage(t("Saving course information…", "កំពុងរក្សាទុកព័ត៌មានមេរៀន…"));
+      current = await validSession(current);
+      const course = await submitAcademyCourse(current, {
         creatorName: application.fullName,
         titleKm: String(data.get("titleKm") || "").trim(),
         titleEn: String(data.get("titleEn") || "").trim(),
@@ -76,7 +106,15 @@ export default function CourseManager({session, application, locale}: {session: 
       if (draftPublicPreview) URL.revokeObjectURL(draftPublicPreview);
       setDraftCover(""); setDraftVideo(""); setDraftDuration(0); setDraftPublicPreview(""); setDraftPreviewDuration(0);
       setMessage(t("Course submitted for admin review.", "បានផ្ញើមេរៀនទៅ Admin ពិនិត្យរួចរាល់។"));
-    } catch (error) {setMessage(readableAcademyError(error));} finally {setLoading(false);}
+    } catch (error) {
+      const raw = error instanceof Error ? error.message : "";
+      if (raw.startsWith("UPLOAD_STAGE:")) {
+        const [, stage, ...detail] = raw.split(":");
+        setMessage(t(`Could not upload ${stage}. ${detail.join(":")}`, `Upload ${stage} មិនបាន។ ${detail.join(":")}`));
+      } else {
+        setMessage(t(`Could not save the course. ${readableAcademyError(error)}`, `រក្សាទុកមេរៀនមិនបាន។ ${readableAcademyError(error)}`));
+      }
+    } finally {setLoading(false);}
   }
 
   async function previewVideo(course: AcademyCourseRecord) {
