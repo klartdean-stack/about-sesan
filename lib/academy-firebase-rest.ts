@@ -378,8 +378,13 @@ export async function uploadAcademyCourseFile(
   file: File,
   kind: "cover" | "video" | "preview",
 ) {
-  // Preview clips share the public cover folder while full lessons remain private.
-  const folder = kind === "video" ? "academy-course-videos" : "academy-course-covers";
+  // Keep each media type in its own folder so Storage Rules can validate the
+  // correct MIME type and size without treating a preview video as an image.
+  const folder = kind === "video"
+    ? "academy-course-videos"
+    : kind === "preview"
+      ? "academy-course-previews"
+      : "academy-course-covers";
   const path = `${folder}/${session.uid}/${Date.now()}-${safeFileName(file.name)}`;
   const uploaded = await requestJson<{name: string}>(
     `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o?uploadType=media&name=${encodeURIComponent(path)}`,
