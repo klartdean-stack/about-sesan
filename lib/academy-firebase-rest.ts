@@ -540,6 +540,43 @@ export async function updateAcademyCoursePreview(
   return updated;
 }
 
+export async function updateCreatorAcademyCourse(
+  session: AcademySession,
+  course: AcademyCourseRecord,
+  changes: Pick<AcademyCourseRecord, "titleKm" | "titleEn" | "descriptionKm" | "descriptionEn" | "category" | "priceRiel">,
+) {
+  if (course.creatorId !== session.uid) throw new Error("CREATOR_NOT_OWNER");
+  const updated = {...course, ...changes, updatedAt: new Date().toISOString()};
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
+    method: "PATCH",
+    headers: {Authorization: `Bearer ${session.idToken}`, "Content-Type": "application/json"},
+    body: JSON.stringify({fields: courseFields(updated)}),
+  });
+  return updated;
+}
+
+export async function deleteCreatorAcademyCourse(
+  session: AcademySession,
+  course: AcademyCourseRecord,
+) {
+  if (course.creatorId !== session.uid) throw new Error("CREATOR_NOT_OWNER");
+  await requestJson(`${firestoreBase}/academyCourses/${encodeURIComponent(course.id)}`, {
+    method: "DELETE",
+    headers: {Authorization: `Bearer ${session.idToken}`},
+  });
+
+  // Media cleanup is best-effort: the course must disappear even if an older
+  // Storage Rule does not permit deleting one of its files.
+  await Promise.allSettled(
+    [course.coverPath, course.videoPath, course.previewVideoPath]
+      .filter(Boolean)
+      .map(path => fetch(
+        `https://firebasestorage.googleapis.com/v0/b/${storageBucket}/o/${encodeURIComponent(path)}`,
+        {method: "DELETE", headers: {Authorization: `Bearer ${session.idToken}`}},
+      )),
+  );
+}
+
 export async function getAcademyVideoBlobUrl(
   session: AcademySession,
   videoPath: string,

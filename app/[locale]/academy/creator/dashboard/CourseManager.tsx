@@ -1,8 +1,8 @@
 "use client";
 
 import {FormEvent, useEffect, useState} from "react";
-import {BookOpen, CheckCircle2, Clock3, Play, Plus, Upload, Video, XCircle} from "lucide-react";
-import {AcademySession, AcademyCourseRecord, CreatorApplication, getAcademyVideoBlobUrl, listCreatorCourses, readableAcademyError, refreshAcademySession, submitAcademyCourse, updateAcademyCourseDuration, updateAcademyCoursePreview, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
+import {BookOpen, CheckCircle2, Clock3, Pencil, Play, Plus, Save, Trash2, Upload, Video, XCircle} from "lucide-react";
+import {AcademySession, AcademyCourseRecord, CreatorApplication, deleteCreatorAcademyCourse, getAcademyVideoBlobUrl, listCreatorCourses, readableAcademyError, refreshAcademySession, submitAcademyCourse, updateAcademyCourseDuration, updateAcademyCoursePreview, updateCreatorAcademyCourse, uploadAcademyCourseFile} from "@/lib/academy-firebase-rest";
 
 const CREATOR_SESSION_KEY = "sesan-academy-creator-session";
 
@@ -26,6 +26,7 @@ export default function CourseManager({session, application, locale}: {session: 
   const [draftDuration, setDraftDuration] = useState(0);
   const [draftPublicPreview, setDraftPublicPreview] = useState("");
   const [draftPreviewDuration, setDraftPreviewDuration] = useState(0);
+  const [editingCourseId, setEditingCourseId] = useState("");
 
   useEffect(() => {listCreatorCourses(session).then(setCourses).catch(error => setMessage(readableAcademyError(error))).finally(() => setLoading(false));}, [session]);
 
@@ -172,6 +173,39 @@ export default function CourseManager({session, application, locale}: {session: 
     } finally {setLoading(false);}
   }
 
+  async function saveCourse(event: FormEvent<HTMLFormElement>, course: AcademyCourseRecord) {
+    event.preventDefault(); setLoading(true); setMessage("");
+    const data = new FormData(event.currentTarget);
+    try {
+      const current = await validSession();
+      const updated = await updateCreatorAcademyCourse(current, course, {
+        titleKm: String(data.get("titleKm") || "").trim(),
+        titleEn: String(data.get("titleEn") || "").trim(),
+        descriptionKm: String(data.get("descriptionKm") || "").trim(),
+        descriptionEn: String(data.get("descriptionEn") || "").trim(),
+        category: String(data.get("category") || ""),
+        priceRiel: Number(data.get("priceRiel")) || 0,
+      });
+      setCourses(items => items.map(item => item.id === updated.id ? updated : item));
+      setEditingCourseId("");
+      setMessage(t("Course updated successfully.", "បានកែប្រែមេរៀនរួចរាល់។"));
+    } catch (error) {setMessage(readableAcademyError(error));} finally {setLoading(false);}
+  }
+
+  async function removeCourse(course: AcademyCourseRecord) {
+    const title = locale === "km" ? course.titleKm : course.titleEn;
+    if (!window.confirm(t(`Delete “${title}”? This cannot be undone.`, `លុបមេរៀន «${title}» មែនទេ? ការលុបនេះមិនអាចត្រឡប់វិញបានទេ។`))) return;
+    setLoading(true); setMessage("");
+    try {
+      const current = await validSession();
+      await deleteCreatorAcademyCourse(current, course);
+      if (preview?.courseId === course.id) {URL.revokeObjectURL(preview.url); setPreview(null);}
+      setCourses(items => items.filter(item => item.id !== course.id));
+      setEditingCourseId("");
+      setMessage(t("Course deleted.", "បានលុបមេរៀនរួចរាល់។"));
+    } catch (error) {setMessage(readableAcademyError(error));} finally {setLoading(false);}
+  }
+
   return <div>
     <div className="flex flex-wrap items-center justify-between gap-4"><div><h2 className="text-3xl font-black">{t("My courses", "មេរៀនរបស់ខ្ញុំ")}</h2><p className="mt-2 text-sm text-slate-500">{t("Upload a course and send it to Academy Admin for review.", "Upload មេរៀន ហើយផ្ញើទៅ Academy Admin ពិនិត្យ។")}</p></div><button onClick={() => setShowForm(value => !value)} className="inline-flex items-center gap-2 rounded-full bg-green-600 px-5 py-3 font-black text-white"><Plus className="h-5 w-5" />{t("Add course", "បន្ថែមមេរៀន")}</button></div>
     {message && <p className="mt-5 rounded-2xl bg-amber-50 p-4 text-sm font-bold text-amber-800">{message}</p>}
@@ -187,13 +221,15 @@ export default function CourseManager({session, application, locale}: {session: 
       {draftPublicPreview && <div className="md:col-span-2 rounded-[22px] border-2 border-green-200 bg-green-50 p-4"><p className="mb-2 flex items-center justify-between text-sm font-black text-green-800"><span>{t("Public preview — viewers can watch this before buying", "វីដេអូគំរូសាធារណៈ — អ្នកមើលអាចមើលមុនទិញ")}</span><span className="rounded-full bg-white px-3 py-1 text-xs">{formatDuration(draftPreviewDuration)}</span></p><video src={draftPublicPreview} controls playsInline className="mx-auto aspect-video w-full max-w-2xl rounded-xl bg-black" /></div>}
       <button disabled={loading} className="md:col-span-2 rounded-2xl bg-slate-950 px-5 py-4 font-black text-white disabled:opacity-50">{loading ? t("Uploading…", "កំពុង Upload…") : t("Submit for review", "ផ្ញើឱ្យ Admin ពិនិត្យ")}</button>
     </form>}
-    <div className="mt-6 grid gap-4 md:grid-cols-2">{courses.map(course => <article key={course.id} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white"><img src={course.coverImage} alt="" className="h-36 w-full object-cover" /><div className="p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-black">{locale === "km" ? course.titleKm : course.titleEn}</h3><CourseStatus status={course.status} /></div><p className="mt-3 text-lg font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p><button disabled={loading} onClick={() => previewVideo(course)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white"><Play className="h-4 w-4" />{preview?.courseId === course.id ? t("Close video", "បិទវីដេអូ") : t("Watch my video", "មើលវីដេអូរបស់ខ្ញុំ")}</button>{preview?.courseId === course.id && <video src={preview.url} controls playsInline onLoadedMetadata={event => rememberDuration(course, event.currentTarget.duration)} className="mt-3 w-full rounded-xl bg-black" />}<label className="mt-3 block cursor-pointer rounded-xl border border-dashed border-green-300 bg-green-50 p-3 text-center text-xs font-black text-green-800"><Upload className="mr-1 inline h-4 w-4" />{course.previewVideoUrl ? t("Replace free preview", "ប្ដូរវីដេអូគំរូ") : t("Add free preview", "បន្ថែមវីដេអូគំរូ")}<input type="file" accept="video/*" disabled={loading} onChange={event => {replacePublicPreview(course, event.target.files?.[0]); event.currentTarget.value = "";}} className="hidden" /></label>{course.previewVideoUrl && <p className="mt-2 text-center text-xs font-bold text-green-700">✓ {t(`Public preview: ${formatDuration(course.previewDurationSeconds)}`, `មានវីដេអូគំរូ៖ ${formatDuration(course.previewDurationSeconds)}`)}</p>}{course.adminNote && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">Admin: {course.adminNote}</p>}</div></article>)}{!loading && courses.length === 0 && <div className="md:col-span-2 rounded-[24px] border border-dashed border-slate-300 py-14 text-center text-slate-400"><BookOpen className="mx-auto h-10 w-10" /><p className="mt-3 font-bold">{t("No courses yet.", "មិនទាន់មានមេរៀន។")}</p></div>}</div>
+    <div className="mt-6 grid gap-4 md:grid-cols-2">{courses.map(course => <article key={course.id} className="overflow-hidden rounded-[24px] border border-slate-200 bg-white"><img src={course.coverImage} alt="" className="h-36 w-full object-cover" /><div className="p-5"><div className="flex items-start justify-between gap-3"><h3 className="font-black">{locale === "km" ? course.titleKm : course.titleEn}</h3><CourseStatus status={course.status} /></div><p className="mt-3 text-lg font-black text-green-700">{course.priceRiel.toLocaleString()}៛</p><div className="mt-4 grid grid-cols-2 gap-2"><button disabled={loading} onClick={() => setEditingCourseId(editingCourseId === course.id ? "" : course.id)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-200 px-3 py-2.5 text-sm font-black text-slate-700"><Pencil className="h-4 w-4" />{t("Edit", "កែប្រែ")}</button><button disabled={loading} onClick={() => removeCourse(course)} className="inline-flex items-center justify-center gap-2 rounded-xl border border-red-200 bg-red-50 px-3 py-2.5 text-sm font-black text-red-700"><Trash2 className="h-4 w-4" />{t("Delete", "លុប")}</button></div>{editingCourseId === course.id && <EditCourseForm course={course} loading={loading} locale={locale} onSubmit={event => saveCourse(event, course)} onCancel={() => setEditingCourseId("")} />}<button disabled={loading} onClick={() => previewVideo(course)} className="mt-4 inline-flex w-full items-center justify-center gap-2 rounded-xl bg-slate-950 px-4 py-3 text-sm font-black text-white"><Play className="h-4 w-4" />{preview?.courseId === course.id ? t("Close video", "បិទវីដេអូ") : t("Watch my video", "មើលវីដេអូរបស់ខ្ញុំ")}</button>{preview?.courseId === course.id && <video src={preview.url} controls playsInline onLoadedMetadata={event => rememberDuration(course, event.currentTarget.duration)} className="mt-3 w-full rounded-xl bg-black" />}<label className="mt-3 block cursor-pointer rounded-xl border border-dashed border-green-300 bg-green-50 p-3 text-center text-xs font-black text-green-800"><Upload className="mr-1 inline h-4 w-4" />{course.previewVideoUrl ? t("Replace free preview", "ប្ដូរវីដេអូគំរូ") : t("Add free preview", "បន្ថែមវីដេអូគំរូ")}<input type="file" accept="video/*" disabled={loading} onChange={event => {replacePublicPreview(course, event.target.files?.[0]); event.currentTarget.value = "";}} className="hidden" /></label>{course.previewVideoUrl && <p className="mt-2 text-center text-xs font-bold text-green-700">✓ {t(`Public preview: ${formatDuration(course.previewDurationSeconds)}`, `មានវីដេអូគំរូ៖ ${formatDuration(course.previewDurationSeconds)}`)}</p>}{course.adminNote && <p className="mt-3 rounded-xl bg-red-50 p-3 text-sm text-red-700">Admin: {course.adminNote}</p>}</div></article>)}{!loading && courses.length === 0 && <div className="md:col-span-2 rounded-[24px] border border-dashed border-slate-300 py-14 text-center text-slate-400"><BookOpen className="mx-auto h-10 w-10" /><p className="mt-3 font-bold">{t("No courses yet.", "មិនទាន់មានមេរៀន។")}</p></div>}</div>
   </div>;
 }
 
 function Field(props: React.InputHTMLAttributes<HTMLInputElement> & {label: string}) {const {label, ...input} = props; return <label className="text-sm font-bold text-slate-700">{label}<input {...input} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-green-500" /></label>;}
 function TextArea({name, label, required}: {name: string; label: string; required?: boolean}) {return <label className="text-sm font-bold text-slate-700">{label}<textarea name={name} required={required} rows={4} className="mt-2 w-full rounded-2xl border border-slate-200 bg-white px-4 py-3 outline-none focus:border-green-500" /></label>;}
 function FileField({name, accept, icon: Icon, label, onChange, required = true}: {name: string; accept: string; icon: typeof Upload; label: string; onChange: React.ChangeEventHandler<HTMLInputElement>; required?: boolean}) {return <label className="block rounded-2xl border border-dashed border-green-300 bg-green-50 p-4 text-sm font-black text-green-800"><Icon className="mb-2 h-6 w-6" />{label}<input name={name} type="file" accept={accept} required={required} onChange={onChange} className="mt-3 block w-full text-xs" /></label>;}
+function EditCourseForm({course, loading, locale, onSubmit, onCancel}: {course: AcademyCourseRecord; loading: boolean; locale: "km" | "en"; onSubmit: React.FormEventHandler<HTMLFormElement>; onCancel: () => void}) {const t = (en: string, km: string) => locale === "km" ? km : en; return <form onSubmit={onSubmit} className="mt-4 grid gap-3 rounded-2xl border border-green-200 bg-green-50 p-4"><Field name="titleKm" label="ចំណងជើងខ្មែរ" defaultValue={course.titleKm} required /><Field name="titleEn" label="English title" defaultValue={course.titleEn} required /><TextAreaDefault name="descriptionKm" label="សេចក្ដីពិពណ៌នាខ្មែរ" defaultValue={course.descriptionKm} /><TextAreaDefault name="descriptionEn" label="English description" defaultValue={course.descriptionEn} /><label className="text-sm font-bold text-slate-700">{t("Category", "ប្រភេទ")}<select name="category" defaultValue={course.category} required className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5">{categories.map(([value, label]) => <option key={value} value={value}>{label}</option>)}</select></label><Field name="priceRiel" type="number" min="1000" step="500" label={t("Price (Riel)", "តម្លៃ (រៀល)")} defaultValue={course.priceRiel} required /><div className="grid grid-cols-2 gap-2"><button type="button" onClick={onCancel} className="rounded-xl border border-slate-200 bg-white px-3 py-2.5 text-sm font-black">{t("Cancel", "បោះបង់")}</button><button disabled={loading} className="inline-flex items-center justify-center gap-2 rounded-xl bg-green-600 px-3 py-2.5 text-sm font-black text-white"><Save className="h-4 w-4" />{t("Save", "រក្សាទុក")}</button></div></form>;}
+function TextAreaDefault({name, label, defaultValue}: {name: string; label: string; defaultValue: string}) {return <label className="text-sm font-bold text-slate-700">{label}<textarea name={name} defaultValue={defaultValue} required rows={3} className="mt-2 w-full rounded-xl border border-slate-200 bg-white px-3 py-2.5 outline-none focus:border-green-500" /></label>;}
 function CourseStatus({status}: {status: AcademyCourseRecord["status"]}) {const Icon = status === "published" ? CheckCircle2 : status === "rejected" ? XCircle : Clock3; const style = status === "published" ? "bg-green-100 text-green-700" : status === "rejected" ? "bg-red-100 text-red-700" : "bg-amber-100 text-amber-700"; return <span className={`inline-flex shrink-0 items-center gap-1 rounded-full px-2.5 py-1 text-xs font-black ${style}`}><Icon className="h-3.5 w-3.5" />{status}</span>;}
 function formatDuration(seconds: number) {const minutes = Math.floor(seconds / 60); const rest = Math.round(seconds % 60); return `${minutes}:${String(rest).padStart(2, "0")}`;}
 function readVideoDuration(file: File) {return new Promise<number>((resolve) => {const url = URL.createObjectURL(file); const video = document.createElement("video"); video.preload = "metadata"; video.onloadedmetadata = () => {const duration = Math.max(0, Math.round(video.duration || 0)); URL.revokeObjectURL(url); resolve(duration);}; video.onerror = () => {URL.revokeObjectURL(url); resolve(0);}; video.src = url;});}
