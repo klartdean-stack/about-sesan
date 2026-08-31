@@ -1,36 +1,91 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Sesan Website
 
-## Getting Started
+Official web platform for **Sesan App**, focused on Cambodia's agriculture community, knowledge sharing, and digital learning.
 
-First, run the development server:
+Production website: https://about.sesanshop.com
+
+## Main Features
+
+- Sesan public information and landing pages
+- Khmer and English localization
+- Agriculture Knowledge articles
+- Knowledge Admin publishing tools
+- Sesan Academy course marketplace
+- Creator application and dashboard
+- Course review and administration
+- My Learning and protected lesson access
+- Course ratings
+- ABA PayWay checkout integration
+- Manual payment review flow
+- Privacy Policy and Terms pages
+
+## Technology
+
+- Next.js 16
+- React 19
+- TypeScript
+- Tailwind CSS 4
+- next-intl
+- Firebase / Firestore
+- ABA PayWay integration
+
+## Project Structure
+
+```text
+app/
+  [locale]/
+    academy/      # Academy, creator, learning and lesson pages
+    admin/        # Admin tools
+    knowledge/    # Public knowledge content
+    privacy/      # Privacy Policy
+    terms/        # Terms
+  api/
+    academy/      # Academy access, payment and rating APIs
+lib/              # Firebase, Academy and PayWay helpers
+i18n/             # Localization configuration
+public/           # Static assets
+```
+
+## Development
+
+Install dependencies:
+
+```bash
+npm install
+```
+
+Start the development server:
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Production build:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+npm run build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Lint:
 
-## Learn More
+```bash
+npm run lint
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Environment Configuration
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+The website uses environment variables for Firebase, Academy services, and ABA PayWay. Keep credentials and private keys in the deployment environment and never commit secrets to this repository.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Deployment
 
-## Deploy on Vercel
+The production site is deployed from the `main` branch. Before deployment, verify that the production environment variables are configured and run the build and lint checks.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+## Repository
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Repository: `klartdean-stack/about-sesan`
+
+Default branch: `main`
+
+---
+
+© Sesan. All rights reserved.
