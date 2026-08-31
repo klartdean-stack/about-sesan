@@ -1,0 +1,32 @@
+/* Responsive header fix for Sesan Group.
+   Keep the full desktop navigation only when there is enough horizontal space.
+   Between 1024px and 1599px, use the existing hamburger/mobile menu instead
+   so navigation items, language selector and download button never overlap. */
+
+@media (min-width: 1024px) and (max-width: 1599px) {
+  .site-home .premium-header > div:first-child > nav {
+    display: none !important;
+  }
+
+  .site-home .premium-header > div:first-child > div {
+    display: none !important;
+  }
+
+  .site-home .premium-header > div:first-child > button {
+    display: flex !important;
+  }
+
+  .site-home .premium-header > div.border-t {
+    display: block !important;
+  }
+}
+
+@media (min-width: 1600px) {
+  .site-home .premium-header > div:first-child {
+    max-width: 1500px !important;
+  }
+
+  .site-home .premium-header > div:first-child > nav {
+    gap: 1.15rem;
+  }
+}
