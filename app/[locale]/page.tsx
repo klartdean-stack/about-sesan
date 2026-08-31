@@ -1200,7 +1200,7 @@ ${message}
             <div className="relative rotate-3 rounded-[50px] bg-slate-950 p-2 shadow-2xl transition duration-500 hover:rotate-0">
               <div className="overflow-hidden rounded-[43px] bg-white">
                 <img
-                  src="/app-preview.jpg"
+                  src="/app-preview-2.jpg"
                   alt="Download Sesan App"
                   className="h-[590px] w-[290px] object-cover object-top"
                 />
