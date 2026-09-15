@@ -1052,18 +1052,17 @@ ${message}
 
       <div className="rounded-3xl bg-white p-8 shadow-sm border border-slate-200">
 
-        <p className="text-sm font-bold text-orange-600">
-          {text("Coming Soon", "នឹងមកដល់ឆាប់ៗ")}
-        </p>
+       <p className="text-sm font-bold text-green-700">
+  {text("September 2026", "ខែកញ្ញា ឆ្នាំ២០២៦")}
+</p>
 
-        <h3 className="mt-2 text-2xl font-black">
-          {text("📱 Sesan App for iPhone", "📱 Sesan App សម្រាប់ iPhone")}
-        </h3>
+<h3 className="mt-2 text-2xl font-black">
+  {text("📱 Sesan App Now Available on the App Store", "📱 Sesan App ឥឡូវនេះមាននៅលើ App Store ហើយ")}
+</h3>
 
-        <p className="mt-4 leading-8 text-slate-600">
-          {text("The iOS version of Sesan App will be available soon on the App Store.", "Sesan App ជំនាន់ iOS នឹងមាននៅលើ App Store ក្នុងពេលឆាប់ៗនេះ។")}
-        </p>
-
+<p className="mt-4 leading-8 text-slate-600">
+  {text("Sesan App is now officially available on the Apple App Store.", "Sesan App ឥឡូវនេះមានជាផ្លូវការនៅលើ Apple App Store ហើយ។")}
+</p>
       </div>
 
     </div>
@@ -1098,10 +1097,16 @@ ${message}
         q: text("Is Sesan App free?", "តើ Sesan App ប្រើឥតគិតថ្លៃមែនទេ?"),
         a: text("Yes. Sesan App is free to download and use.", "មែនហើយ។ Sesan App អាចទាញយក និងប្រើប្រាស់ដោយឥតគិតថ្លៃ។")
       },
-      {
-        q: text("Where can I download Sesan App?", "តើខ្ញុំអាចទាញយក Sesan App នៅឯណា?"),
-        a: text("Google Play is available now. App Store is coming soon.", "ឥឡូវនេះមាននៅលើ Google Play ហើយ App Store នឹងមកដល់ឆាប់ៗ។")
-      },
+    {
+  q: text(
+    "Where can I download Sesan App?",
+    "តើខ្ញុំអាចទាញយក Sesan App នៅឯណា?"
+  ),
+  a: text(
+    "Sesan App is available on both Google Play and the Apple App Store.",
+    "Sesan App ឥឡូវនេះមានទាំងនៅលើ Google Play និង Apple App Store។"
+  )
+},
       {
         q: text("How can I contact Sesan Group?", "តើខ្ញុំអាចទាក់ទង Sesan Group ដោយរបៀបណា?"),
         a: text("Email: info@sesanshop.com", "អ៊ីមែល៖ info@sesanshop.com")
@@ -1164,17 +1169,18 @@ ${message}
             </p>
 
             <div className="mt-9 flex flex-col gap-4 sm:flex-row">
-             <button
-  disabled
-  className="store-button bg-slate-950 text-white opacity-60 cursor-not-allowed"
+<a
+  href="https://apps.apple.com/kh/app/sesan-app/id6789862316"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="store-button bg-slate-950 text-white"
 >
   <span className="text-2xl"></span>
   <span>
-    <small>{text("Coming Soon", "នឹងមកដល់ឆាប់ៗ")}</small>
+    <small>{text("DOWNLOAD ON THE", "ទាញយកពី")}</small>
     <strong>App Store</strong>
   </span>
-</button>
-
+</a>
              <a
   href="https://play.google.com/store/apps/details?id=com.sesan.app"
   target="_blank"

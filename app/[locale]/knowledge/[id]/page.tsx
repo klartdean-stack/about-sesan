@@ -219,10 +219,20 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
               <span className="text-xl">▶</span>
               <span><small className="block text-[10px] font-bold uppercase opacity-80">{locale === "km" ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
             </a>
-            <button disabled className="inline-flex min-w-48 cursor-not-allowed items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white/60">
-              <span className="text-2xl"></span>
-              <span><small className="block text-[10px] font-bold uppercase">{locale === "km" ? "នឹងមកដល់ឆាប់ៗ" : "Coming soon"}</small>App Store</span>
-            </button>
+            <a
+  href="https://apps.apple.com/kh/app/sesan-app/id6789862316"
+  target="_blank"
+  rel="noopener noreferrer"
+  className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-white/20"
+>
+  <span className="text-2xl"></span>
+  <span>
+    <small className="block text-[10px] font-bold uppercase opacity-80">
+      {locale === "km" ? "ទាញយកពី" : "Download on the"}
+    </small>
+    App Store
+  </span>
+</a>
           </div>
         </div>
       </section>
