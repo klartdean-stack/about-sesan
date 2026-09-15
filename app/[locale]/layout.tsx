@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages, setRequestLocale } from "next-intl/server";
 import { notFound } from "next/navigation";
+import HomepageNewsIntegration from "./HomepageNewsIntegration";
 import "../header-responsive-fix.css";
 
 const locales = ["en", "km"] as const;
@@ -60,6 +61,7 @@ export default async function LocaleLayout({
   return (
     <NextIntlClientProvider messages={messages}>
       {children}
+      <HomepageNewsIntegration />
     </NextIntlClientProvider>
   );
 }
