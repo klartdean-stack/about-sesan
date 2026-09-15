@@ -7,11 +7,11 @@ import KnowledgeContent from "../../knowledge/KnowledgeContent";
 type Props = {
   value: string;
   onChange: (value: string) => void;
-  locale: "km" | "en";
-  placeholder: string;
+  locale?: "km" | "en";
+  placeholder?: string;
 };
 
-export default function RichTextEditor({value, onChange, locale, placeholder}: Props) {
+export default function RichTextEditor({value, onChange, locale = "km", placeholder = "សរសេរខ្លឹមសារនៅទីនេះ..."}: Props) {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [preview, setPreview] = useState(false);
 
