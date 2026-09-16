@@ -711,7 +711,12 @@ ${message}
 </p>
             </div>
 
-            <div className="phone-shadow relative rounded-[56px] bg-[#101010] p-[9px]">
+<div className="relative">
+  <img
+    src="/app-preview.jpg"
+    alt="Sesan App marketplace screen"
+    className="h-auto w-[300px] object-contain sm:w-[330px]"
+  />
               <div className="relative overflow-hidden rounded-[47px] bg-white">
                 <div className="absolute left-1/2 top-3 z-20 h-7 w-28 -translate-x-1/2 rounded-full bg-black" />
 
