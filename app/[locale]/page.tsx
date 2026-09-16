@@ -348,7 +348,7 @@ export default function Home() {
   {label: t("nav.about"), href: "#about"},
   {label: t("nav.services"), href: "#ecosystem"},
   {label: t("nav.vision"), href: "#mission"},
-  {label: text("News", "ព័ត៌មាន"), href: "#news"},
+  {label: text("News", "ព័ត៌មាន"), href: `/${locale}/news`},
   {
     label: locale === "km" ? "ចំណេះដឹង" : "Knowledge",
     href: `/${locale}/knowledge`,
