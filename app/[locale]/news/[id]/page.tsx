@@ -2,14 +2,17 @@ import type {Metadata} from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {ArrowLeft, CalendarDays, Eye, Monitor} from "lucide-react";
+import {ArrowLeft, CalendarDays, Eye, Monitor, Smartphone} from "lucide-react";
 import {getPublishedNewsArticle, incrementNewsViews} from "@/lib/news-firebase";
 import KnowledgeContent from "../../knowledge/KnowledgeContent";
 import ShareButtons from "../../knowledge/[id]/ShareButtons";
-import {AppleStoreIcon, GooglePlayIcon} from "../../StoreIcons";
 
 type PageProps = {params: Promise<{locale: string; id: string}>};
 const categoryKm: Record<string, string> = {"Company News":"ព័ត៌មានក្រុមហ៊ុន","Sesan App Updates":"បច្ចុប្បន្នភាព Sesan App","Events & Programs":"ព្រឹត្តិការណ៍ និងកម្មវិធី",Partnerships:"ដៃគូសហការ",Milestones:"សមិទ្ធផលសំខាន់ៗ",Announcements:"សេចក្តីជូនដំណឹង"};
+
+function PlayStoreIcon() {
+  return <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true"><path fill="currentColor" d="M4 3.5v17l14-8.5L4 3.5z" /></svg>;
+}
 
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const {locale, id} = await params;
@@ -55,11 +58,11 @@ export default async function NewsDetailPage({params}: PageProps) {
             <span><small className="block text-[10px] font-bold uppercase text-slate-500">{km ? "ប្រើលើកុំព្យូទ័រ" : "Use on computer"}</small>Sesan Shop Web</span>
           </a>
           <a href="https://play.google.com/store/apps/details?id=com.sesan.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-green-500 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-green-400">
-            <GooglePlayIcon className="h-7 w-7" />
+            <PlayStoreIcon />
             <span><small className="block text-[10px] font-bold uppercase opacity-80">{km ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
           </a>
           <a href="https://apps.apple.com/kh/app/sesan-app/id6789862316" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-white/20">
-            <AppleStoreIcon className="h-7 w-7" />
+            <Smartphone className="h-7 w-7" />
             <span><small className="block text-[10px] font-bold uppercase opacity-80">{km ? "ទាញយកពី" : "Download on the"}</small>App Store</span>
           </a>
         </div>
