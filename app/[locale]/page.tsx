@@ -711,7 +711,7 @@ ${message}
 </p>
             </div>
 
-<div className="relative">
+<div className="phone-shadow relative">
   <img
     src="/app-preview.jpg"
     alt="Sesan App marketplace screen"
