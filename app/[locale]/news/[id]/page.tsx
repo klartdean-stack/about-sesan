@@ -2,7 +2,7 @@ import type {Metadata} from "next";
 import Image from "next/image";
 import Link from "next/link";
 import {notFound} from "next/navigation";
-import {ArrowLeft, CalendarDays, Eye, Monitor, Smartphone} from "lucide-react";
+import {ArrowLeft, CalendarDays, Eye, Monitor} from "lucide-react";
 import {getPublishedNewsArticle, incrementNewsViews} from "@/lib/news-firebase";
 import KnowledgeContent from "../../knowledge/KnowledgeContent";
 import ShareButtons from "../../knowledge/[id]/ShareButtons";
@@ -11,7 +11,18 @@ type PageProps = {params: Promise<{locale: string; id: string}>};
 const categoryKm: Record<string, string> = {"Company News":"ព័ត៌មានក្រុមហ៊ុន","Sesan App Updates":"បច្ចុប្បន្នភាព Sesan App","Events & Programs":"ព្រឹត្តិការណ៍ និងកម្មវិធី",Partnerships:"ដៃគូសហការ",Milestones:"សមិទ្ធផលសំខាន់ៗ",Announcements:"សេចក្តីជូនដំណឹង"};
 
 function PlayStoreIcon() {
-  return <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true"><path fill="currentColor" d="M4 3.5v17l14-8.5L4 3.5z" /></svg>;
+  return <svg viewBox="0 0 32 36" className="h-8 w-8 shrink-0" aria-hidden="true">
+    <path fill="#00D7FE" d="M1.8 2.2c-.5.7-.8 1.7-.8 2.9v25.8c0 1.2.3 2.2.8 2.9l.1.1 14.5-15.7v-.4L1.9 2.1l-.1.1z" />
+    <path fill="#FFCE00" d="M21.2 23.4l-4.8-5.2v-.4l4.8-5.2.1.1 5.7 3.3c1.6.9 1.6 2.4 0 3.3l-5.7 3.3-.1.8z" />
+    <path fill="#FF3A44" d="M21.3 23.3l-4.9-5.3L1.8 33.8c.9 1 2.3 1.1 3.9.2l15.6-9z" />
+    <path fill="#00F076" d="M21.3 12.7l-15.6-9c-1.6-.9-3-.8-3.9.2L16.4 18l4.9-5.3z" />
+  </svg>;
+}
+
+function AppStoreIcon() {
+  return <svg viewBox="0 0 24 24" className="h-8 w-8 shrink-0" aria-hidden="true" fill="currentColor">
+    <path d="M17.05 20.28c-.98.95-2.05.8-3.08.35-1.09-.46-2.09-.48-3.24 0-1.44.62-2.2.44-3.06-.35C2.79 15.25 3.51 7.59 9.05 7.31c1.35.07 2.29.74 3.08.79 1.18-.24 2.31-.93 3.57-.84 1.51.12 2.65.72 3.4 1.8-3.12 1.87-2.38 5.98.48 7.13-.57 1.5-1.31 2.99-2.53 4.1v-.01zM12.03 7.25C11.88 5.02 13.69 3.18 15.77 3c.29 2.58-2.34 4.5-3.74 4.25z" />
+  </svg>;
 }
 
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
@@ -57,13 +68,13 @@ export default async function NewsDetailPage({params}: PageProps) {
             <Monitor className="h-6 w-6 text-sky-600" />
             <span><small className="block text-[10px] font-bold uppercase text-slate-500">{km ? "ប្រើលើកុំព្យូទ័រ" : "Use on computer"}</small>Sesan Shop Web</span>
           </a>
-          <a href="https://play.google.com/store/apps/details?id=com.sesan.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-green-500 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-green-400">
+          <a href="https://play.google.com/store/apps/details?id=com.sesan.app" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 font-black text-slate-950 shadow-sm transition hover:-translate-y-1 hover:bg-slate-100">
             <PlayStoreIcon />
-            <span><small className="block text-[10px] font-bold uppercase opacity-80">{km ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
+            <span><small className="block text-[10px] font-bold uppercase text-slate-500">{km ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
           </a>
-          <a href="https://apps.apple.com/kh/app/sesan-app/id6789862316" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-white/20">
-            <Smartphone className="h-7 w-7" />
-            <span><small className="block text-[10px] font-bold uppercase opacity-80">{km ? "ទាញយកពី" : "Download on the"}</small>App Store</span>
+          <a href="https://apps.apple.com/kh/app/sesan-app/id6789862316" target="_blank" rel="noopener noreferrer" className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-white px-6 py-4 font-black text-slate-950 shadow-sm transition hover:-translate-y-1 hover:bg-slate-100">
+            <AppStoreIcon />
+            <span><small className="block text-[10px] font-bold uppercase text-slate-500">{km ? "ទាញយកពី" : "Download on the"}</small>App Store</span>
           </a>
         </div>
       </div>
