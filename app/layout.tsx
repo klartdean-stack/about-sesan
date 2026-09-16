@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { GoogleAnalytics } from "@next/third-parties/google";
 import "./globals.css";
+import "./store-icons.css";
 import Script from "next/script";
 
 export const metadata: Metadata = {
