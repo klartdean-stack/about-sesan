@@ -713,7 +713,7 @@ ${message}
 
 <div className="phone-shadow relative">
   <img
-    src="/app-preview.jpg"
+src="/app-preview-transparent.png"
     alt="Sesan App marketplace screen"
     className="h-auto w-[300px] object-contain sm:w-[330px]"
   />
