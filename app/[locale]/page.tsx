@@ -711,19 +711,13 @@ ${message}
 </p>
             </div>
 
-            <div className="phone-shadow relative rounded-[56px] bg-[#101010] p-[9px]">
-              <div className="relative overflow-hidden rounded-[47px] bg-white">
-                <div className="absolute left-1/2 top-3 z-20 h-7 w-28 -translate-x-1/2 rounded-full bg-black" />
-
-                <img
-                  src="/app-preview.jpg"
-                  alt="Sesan App marketplace screen"
-                  className="h-[620px] w-[300px] object-cover object-top sm:h-[680px] sm:w-[330px]"
-                />
-
-                <div className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-transparent via-white/5 to-white/20" />
-              </div>
-            </div>
+<div className="relative">
+  <img
+    src="/app-preview.jpg"
+    alt="Sesan App marketplace screen"
+    className="h-auto w-[300px] object-contain sm:w-[330px]"
+  />
+  </div>
           </div>
         </div>
       </section>
