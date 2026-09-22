@@ -5,6 +5,7 @@ import {ArrowLeft, ArrowRight, Bot, CalendarDays, Check, Clock3, Code2, Graduati
 import {academyCourses, type AcademyCategory, CREATOR_SHARE_RATE, MINIMUM_WITHDRAWAL_RIEL} from "@/lib/academy";
 import {AcademyCourseRecord, listPublishedAcademyCourses} from "@/lib/academy-firebase-rest";
 import PayWayBuyButton from "./PayWayBuyButton";
+import LanguageSwitcher from "@/app/LanguageSwitcher";
 
 type PageProps = {
   params: Promise<{locale: string}>;
@@ -57,6 +58,7 @@ export default async function AcademyPage({params, searchParams}: PageProps) {
         <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4 lg:px-8">
           <Link href={`/${locale}`} className="flex items-center gap-3"><img src="/sesan-logo.png" alt="Sesan" className="h-11 w-11 object-contain" /><div><p className="text-lg font-black text-green-700">SESAN</p><p className="text-[8px] font-black tracking-[0.3em] text-amber-500">ACADEMY</p></div></Link>
           <div className="flex items-center gap-2">
+            <LanguageSwitcher locale={locale} />
             <Link href={`/${locale}/academy/my-learning`} className="hidden rounded-full border border-green-200 bg-green-50 px-5 py-3 text-sm font-black text-green-700 sm:inline-flex">{text("My lessons", "មេរៀនរបស់ខ្ញុំ")}</Link>
             <Link href={`/${locale}/academy/creator`} className="hidden rounded-full bg-slate-950 px-5 py-3 text-sm font-black text-white transition hover:bg-green-700 sm:inline-flex">{text("Become a creator", "ក្លាយជា Creator")}</Link>
             <Link href={`/${locale}`} className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-3 text-sm font-bold text-slate-600 hover:text-green-700"><ArrowLeft className="h-4 w-4" /><span className="hidden sm:inline">{text("Home", "ទំព័រដើម")}</span></Link>
