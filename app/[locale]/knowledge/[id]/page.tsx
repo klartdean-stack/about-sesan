@@ -11,6 +11,28 @@ type PageProps = {
   params: Promise<{locale: string; id: string}>;
 };
 
+function AppleLogoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-7 w-7" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M16.37 12.12c.02 2.22 1.95 2.96 1.97 2.97-.02.05-.31 1.06-1.01 2.1-.61.9-1.24 1.8-2.23 1.82-.97.02-1.29-.58-2.4-.58-1.12 0-1.47.56-2.39.6-.95.04-1.68-.96-2.29-1.85-1.24-1.8-2.19-5.08-.92-7.29.63-1.1 1.75-1.8 2.97-1.82.93-.02 1.8.63 2.4.63.59 0 1.7-.78 2.87-.67.49.02 1.86.2 2.74 1.49-.07.04-1.64.96-1.71 2.6ZM14.58 6.8c.51-.62.86-1.49.76-2.35-.74.03-1.64.5-2.17 1.12-.47.55-.89 1.43-.77 2.27.83.06 1.67-.42 2.18-1.04Z"
+      />
+    </svg>
+  );
+}
+
+function PlayStoreIcon() {
+  return (
+    <svg viewBox="0 0 48 48" className="h-7 w-7" aria-hidden="true">
+      <path fill="#00d6a3" d="M6 4.8c-.7.8-1 1.9-1 3.2v32c0 1.3.3 2.4 1 3.2L27.8 24 6 4.8Z" />
+      <path fill="#ffce00" d="M35 17.6 28 24 6 4.8c.8-.5 1.8-.4 2.9.2L35 17.6Z" />
+      <path fill="#ff3a44" d="M35 30.4 8.9 43c-1.1.6-2.1.7-2.9.2L28 24l7 6.4Z" />
+      <path fill="#00a8f3" d="M43 21.5c1.4.8 1.4 4.2 0 5L35 30.4 28 24l7-6.4 8 3.9Z" />
+    </svg>
+  );
+}
+
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const {locale: rawLocale, id} = await params;
   if (rawLocale !== "km" && rawLocale !== "en") return {};
@@ -216,7 +238,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
               rel="noopener noreferrer"
               className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl bg-green-500 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-green-400"
             >
-              <span className="text-xl">▶</span>
+              <PlayStoreIcon />
               <span><small className="block text-[10px] font-bold uppercase opacity-80">{locale === "km" ? "ទាញយកពី" : "Get it on"}</small>Google Play</span>
             </a>
             <a
@@ -225,7 +247,7 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
   rel="noopener noreferrer"
   className="inline-flex min-w-48 items-center justify-center gap-3 rounded-2xl border border-white/20 bg-white/10 px-6 py-4 font-black text-white transition hover:-translate-y-1 hover:bg-white/20"
 >
-  <span className="text-2xl"></span>
+  <AppleLogoIcon />
   <span>
     <small className="block text-[10px] font-bold uppercase opacity-80">
       {locale === "km" ? "ទាញយកពី" : "Download on the"}
