@@ -332,10 +332,10 @@ export default async function KnowledgePage({
 
           <Link
             href={`/${locale}`}
-            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-3 text-sm font-bold text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-green-500 hover:text-green-700"
+            className="inline-flex max-w-[180px] items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-green-500 hover:text-green-700 sm:max-w-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
           >
-            <ArrowLeft className="h-4 w-4" />
-            {pageContent.backHome}
+            <ArrowLeft className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+            <span className="line-clamp-2 sm:line-clamp-1">{pageContent.backHome}</span>
           </Link>
         </div>
       </header>
