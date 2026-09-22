@@ -6,6 +6,7 @@ import {getPublishedKnowledgeArticle, listPublishedKnowledgeArticles} from "@/li
 import ShareButtons from "./ShareButtons";
 import KnowledgeContent from "../KnowledgeContent";
 import ViewCounter from "./ViewCounter";
+import LanguageSwitcher from "@/app/LanguageSwitcher";
 
 type PageProps = {
   params: Promise<{locale: string; id: string}>;
@@ -130,9 +131,12 @@ export default async function KnowledgeArticlePage({params}: PageProps) {
             <img src="/sesan-logo.png" alt="Sesan Group" className="h-10 w-10 object-contain" />
             <div><p className="font-black text-green-700">SESAN</p><p className="text-[8px] font-black tracking-[0.3em] text-amber-500">GROUP</p></div>
           </Link>
-          <Link href={`/${locale}/knowledge`} className="inline-flex items-center gap-2 rounded-full border border-slate-200 px-4 py-2.5 text-sm font-bold text-slate-600 hover:text-green-700">
-            <ArrowLeft className="h-4 w-4" />{locale === "km" ? "ចំណេះដឹង" : "Knowledge"}
-          </Link>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher locale={locale} />
+            <Link href={`/${locale}/knowledge`} className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 px-3 py-2 text-xs font-bold text-slate-600 hover:text-green-700 sm:gap-2 sm:px-4 sm:py-2.5 sm:text-sm">
+              <ArrowLeft className="h-3.5 w-3.5 sm:h-4 sm:w-4" /><span>{locale === "km" ? "ចំណេះដឹង" : "Knowledge"}</span>
+            </Link>
+          </div>
         </div>
       </header>
 
