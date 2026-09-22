@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import LanguageSwitcher from "@/app/LanguageSwitcher";
 
 export const metadata: Metadata = {
   title: "Privacy Policy | Sesan Group",
@@ -230,13 +231,16 @@ function LegalHeader() {
           </div>
         </Link>
 
-        <Link
-          href="/"
-          className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-5 py-2.5 text-sm font-bold text-slate-700 transition hover:border-green-600 hover:text-green-700"
-        >
-          <ArrowLeftIcon />
-          Back to Home
-        </Link>
+        <div className="flex items-center gap-2">
+          <LanguageSwitcher locale="en" hrefEn="/privacy" hrefKm="/km/privacy" />
+          <Link
+            href="/"
+            className="inline-flex items-center gap-2 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-bold text-slate-700 transition hover:border-green-600 hover:text-green-700 sm:px-5 sm:py-2.5 sm:text-sm"
+          >
+            <ArrowLeftIcon />
+            <span className="hidden sm:inline">Back to Home</span>
+          </Link>
+        </div>
       </div>
     </header>
   );
