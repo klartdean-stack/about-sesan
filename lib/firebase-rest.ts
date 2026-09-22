@@ -85,6 +85,17 @@ export async function signInAdmin(email: string, password: string) {
   return session;
 }
 
+export async function sendAdminPasswordReset(email: string) {
+  await requestJson(
+    `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({requestType: "PASSWORD_RESET", email}),
+    },
+  );
+}
+
 type FirestoreValue =
   | {stringValue: string}
   | {booleanValue: boolean}
@@ -259,6 +270,9 @@ export async function uploadKnowledgeCover(
 export function readableFirebaseError(error: unknown) {
   const message = error instanceof Error ? error.message : "UNKNOWN_ERROR";
   if (message.includes("INVALID_LOGIN_CREDENTIALS")) return "អ៊ីមែល ឬលេខសម្ងាត់មិនត្រឹមត្រូវ។";
+  if (message.includes("INVALID_PASSWORD")) return "លេខសម្ងាត់មិនត្រឹមត្រូវ។ សូមចុច «ភ្លេចលេខសម្ងាត់?» ដើម្បីកំណត់ថ្មី។";
+  if (message.includes("EMAIL_NOT_FOUND")) return "រកមិនឃើញគណនីដែលប្រើអ៊ីមែលនេះទេ។";
+  if (message.includes("INVALID_EMAIL")) return "ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ។";
   if (message.includes("TOO_MANY_ATTEMPTS")) return "បានសាកល្បងច្រើនដងពេក។ សូមរង់ចាំបន្តិច។";
   if (message.includes("PERMISSION_DENIED")) return "គណនីនេះមិនមានសិទ្ធិជា Admin ទេ។";
   if (message.includes("NOT_KNOWLEDGE_ADMIN")) return "គណនីនេះមិនមានសិទ្ធិជា Knowledge Admin ទេ។";

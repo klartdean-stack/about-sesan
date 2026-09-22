@@ -34,6 +34,7 @@ import {
   listKnowledgeArticles,
   readableFirebaseError,
   saveKnowledgeArticle,
+  sendAdminPasswordReset,
   signInAdmin,
   uploadKnowledgeCover,
 } from "@/lib/firebase-rest";
@@ -99,7 +100,9 @@ export default function KnowledgeAdminPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const [saving, setSaving] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [autoSaveNotice, setAutoSaveNotice] = useState(false);
   const [recoverableDraft, setRecoverableDraft] = useState<KnowledgeArticle | null>(null);
@@ -172,6 +175,27 @@ export default function KnowledgeAdminPage() {
       setErrorMessage(readableFirebaseError(error));
     } finally {
       setAuthLoading(false);
+    }
+  }
+
+  async function handleForgotPassword() {
+    const adminEmail = email.trim();
+    setErrorMessage("");
+    setResetMessage("");
+
+    if (!adminEmail) {
+      setErrorMessage("សូមបញ្ចូលអ៊ីមែល Admin ជាមុនសិន។");
+      return;
+    }
+
+    setResetLoading(true);
+    try {
+      await sendAdminPasswordReset(adminEmail);
+      setResetMessage("បានផ្ញើតំណកំណត់លេខសម្ងាត់ថ្មីទៅអ៊ីមែលរបស់បងហើយ។ សូមពិនិត្យ Inbox ឬ Spam។");
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    } finally {
+      setResetLoading(false);
     }
   }
 
@@ -322,6 +346,10 @@ export default function KnowledgeAdminPage() {
           <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{errorMessage}</p>
         )}
 
+        {resetMessage && (
+          <p className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-700">{resetMessage}</p>
+        )}
+
         <form onSubmit={handleLogin} className="mt-6 space-y-4">
           <label className="block">
             <span className="mb-2 block text-sm font-black text-slate-700">អ៊ីមែល Admin</span>
@@ -331,6 +359,16 @@ export default function KnowledgeAdminPage() {
             <span className="mb-2 block text-sm font-black text-slate-700">លេខសម្ងាត់</span>
             <input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="admin-input" placeholder="••••••••" />
           </label>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetLoading || authLoading}
+              className="text-sm font-black text-green-700 transition hover:text-green-800 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resetLoading ? "កំពុងផ្ញើ..." : "ភ្លេចលេខសម្ងាត់?"}
+            </button>
+          </div>
           <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-700">
             <LockKeyhole className="h-4 w-4" /> ចូលគ្រប់គ្រង
           </button>
