@@ -15,6 +15,7 @@ import {
   Tractor,
 } from "lucide-react";
 import {listPublishedKnowledgeArticles} from "@/lib/firebase-rest";
+import LanguageSwitcher from "@/app/LanguageSwitcher";
 
 const locales = ["en", "km"] as const;
 type Locale = (typeof locales)[number];
@@ -330,13 +331,16 @@ export default async function KnowledgePage({
             </div>
           </Link>
 
-          <Link
-            href={`/${locale}`}
-            className="inline-flex max-w-[180px] items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-green-500 hover:text-green-700 sm:max-w-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
-          >
-            <ArrowLeft className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
-            <span className="line-clamp-2 sm:line-clamp-1">{pageContent.backHome}</span>
-          </Link>
+          <div className="flex items-center gap-2">
+            <LanguageSwitcher locale={locale} />
+            <Link
+              href={`/${locale}`}
+              className="inline-flex max-w-[150px] items-center gap-1.5 rounded-full border border-slate-300 bg-white px-3 py-2 text-xs font-bold leading-5 text-slate-700 shadow-sm transition hover:-translate-y-0.5 hover:border-green-500 hover:text-green-700 sm:max-w-none sm:gap-2 sm:px-5 sm:py-3 sm:text-sm"
+            >
+              <ArrowLeft className="h-3.5 w-3.5 shrink-0 sm:h-4 sm:w-4" />
+              <span className="line-clamp-1">{pageContent.backHome}</span>
+            </Link>
+          </div>
         </div>
       </header>
 
