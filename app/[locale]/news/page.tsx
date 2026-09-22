@@ -4,6 +4,7 @@ import Link from "next/link";
 import {notFound} from "next/navigation";
 import {ArrowLeft, ArrowRight, CalendarDays, Newspaper} from "lucide-react";
 import {listPublishedNewsArticles} from "@/lib/news-firebase";
+import LanguageSwitcher from "@/app/LanguageSwitcher";
 
 const locales = ["en", "km"] as const;
 type PageProps = {params: Promise<{locale: string}>; searchParams?: Promise<{category?: string}>};
@@ -33,7 +34,10 @@ export default async function NewsPage({params, searchParams}: PageProps) {
   return <main className="min-h-screen bg-slate-50 text-slate-950">
     <section className="bg-slate-950 text-white">
       <div className="mx-auto max-w-7xl px-5 py-16 sm:px-8 lg:py-20">
-        <Link href={`/${locale}`} className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white"><ArrowLeft className="h-4 w-4" />{km ? "ត្រឡប់ទៅទំព័រដើម" : "Back to Home"}</Link>
+        <div className="flex items-center justify-between gap-3">
+          <Link href={`/${locale}`} className="inline-flex items-center gap-2 text-sm font-bold text-slate-300 hover:text-white"><ArrowLeft className="h-4 w-4" />{km ? "ត្រឡប់ទៅទំព័រដើម" : "Back to Home"}</Link>
+          <LanguageSwitcher locale={locale} />
+        </div>
         <div className="mt-10 max-w-3xl"><div className="inline-flex items-center gap-2 rounded-full bg-green-500/15 px-4 py-2 text-sm font-black text-green-300"><Newspaper className="h-4 w-4" />{km ? "SESAN NEWSROOM" : "SESAN NEWSROOM"}</div>
           <h1 className="mt-5 text-4xl font-black tracking-tight sm:text-6xl">{km ? "ព័ត៌មាន និងបច្ចុប្បន្នភាព" : "News & Updates"}</h1>
           <p className="mt-5 text-lg leading-8 text-slate-300">{km ? "តាមដានព័ត៌មានក្រុមហ៊ុន Sesan App ព្រឹត្តិការណ៍ ភាពជាដៃគូ សមិទ្ធផល និងសេចក្តីជូនដំណឹងថ្មីៗ។" : "Follow Sesan Group company news, app updates, events, partnerships, milestones and announcements."}</p>
