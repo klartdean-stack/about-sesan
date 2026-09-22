@@ -95,6 +95,17 @@ function PhoneIcon() {
   );
 }
 
+function AppleLogoIcon() {
+  return (
+    <svg viewBox="0 0 24 24" className="h-8 w-8 shrink-0" aria-hidden="true">
+      <path
+        fill="currentColor"
+        d="M16.37 12.12c.02 2.22 1.95 2.96 1.97 2.97-.02.05-.31 1.06-1.01 2.1-.61.9-1.24 1.8-2.23 1.82-.97.02-1.29-.58-2.4-.58-1.12 0-1.47.56-2.39.6-.95.04-1.68-.96-2.29-1.85-1.24-1.8-2.19-5.08-.92-7.29.63-1.1 1.75-1.8 2.97-1.82.93-.02 1.8.63 2.4.63.59 0 1.7-.78 2.87-.67.49.02 1.86.2 2.74 1.49-.07.04-1.64.96-1.71 2.6ZM14.58 6.8c.51-.62.86-1.49.76-2.35-.74.03-1.64.5-2.17 1.12-.47.55-.89 1.43-.77 2.27.83.06 1.67-.42 2.18-1.04Z"
+      />
+    </svg>
+  );
+}
+
 function ShopIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8">
@@ -1169,7 +1180,7 @@ src="/app-preview-transparent.png"
   rel="noopener noreferrer"
   className="store-button bg-slate-950 text-white"
 >
-  <span className="text-2xl"></span>
+  <AppleLogoIcon />
   <span>
     <small>{text("DOWNLOAD ON THE", "ទាញយកពី")}</small>
     <strong>App Store</strong>
