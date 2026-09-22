@@ -565,14 +565,14 @@ ${message}
             <details className="group relative">
               <summary
                 aria-label={text("Change language", "ប្ដូរភាសា")}
-                className="flex h-11 cursor-pointer list-none items-center gap-2 rounded-full border border-slate-200 bg-white px-3.5 text-sm font-black text-slate-700 shadow-sm transition hover:border-green-500 hover:text-green-700"
+                className="flex h-9 cursor-pointer list-none items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 text-[13px] font-black text-slate-700 shadow-sm transition hover:border-green-500 hover:text-green-700"
               >
-                <Globe className="h-4 w-4 text-green-600" />
+                <Globe className="h-3.5 w-3.5 text-green-600" />
                 <span>{locale === "km" ? "ខ្មែរ" : "EN"}</span>
                 <svg
                   viewBox="0 0 24 24"
                   fill="none"
-                  className="h-3.5 w-3.5 transition group-open:rotate-180"
+                  className="h-3 w-3 transition group-open:rotate-180"
                   aria-hidden="true"
                 >
                   <path
