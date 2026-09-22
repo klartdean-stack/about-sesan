@@ -95,37 +95,6 @@ function PhoneIcon() {
   );
 }
 
-function MonitorIcon() {
-  return (
-    <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="13" rx="2" stroke="currentColor" strokeWidth="1.8" />
-      <path d="M8 21h8M12 17v4" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
-    </svg>
-  );
-}
-
-function AppleLogoIcon() {
-  return (
-    <svg viewBox="0 0 24 24" className="h-8 w-8" aria-hidden="true">
-      <path
-        fill="currentColor"
-        d="M16.37 12.12c.02 2.22 1.95 2.96 1.97 2.97-.02.05-.31 1.06-1.01 2.1-.61.9-1.24 1.8-2.23 1.82-.97.02-1.29-.58-2.4-.58-1.12 0-1.47.56-2.39.6-.95.04-1.68-.96-2.29-1.85-1.24-1.8-2.19-5.08-.92-7.29.63-1.1 1.75-1.8 2.97-1.82.93-.02 1.8.63 2.4.63.59 0 1.7-.78 2.87-.67.49.02 1.86.2 2.74 1.49-.07.04-1.64.96-1.71 2.6ZM14.58 6.8c.51-.62.86-1.49.76-2.35-.74.03-1.64.5-2.17 1.12-.47.55-.89 1.43-.77 2.27.83.06 1.67-.42 2.18-1.04Z"
-      />
-    </svg>
-  );
-}
-
-function PlayStoreIcon() {
-  return (
-    <svg viewBox="0 0 48 48" className="h-8 w-8" aria-hidden="true">
-      <path fill="#00d6a3" d="M6 4.8c-.7.8-1 1.9-1 3.2v32c0 1.3.3 2.4 1 3.2L27.8 24 6 4.8Z" />
-      <path fill="#ffce00" d="M35 17.6 28 24 6 4.8c.8-.5 1.8-.4 2.9.2L35 17.6Z" />
-      <path fill="#ff3a44" d="M35 30.4 8.9 43c-1.1.6-2.1.7-2.9.2L28 24l7 6.4Z" />
-      <path fill="#00a8f3" d="M43 21.5c1.4.8 1.4 4.2 0 5L35 30.4 28 24l7-6.4 8 3.9Z" />
-    </svg>
-  );
-}
-
 function ShopIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" className="h-8 w-8">
@@ -1225,72 +1194,16 @@ src="/app-preview-transparent.png"
             </p>
           </div>
 
-          <div className="relative mx-auto w-full max-w-[360px]">
+          <div className="relative mx-auto">
             <div className="absolute inset-0 scale-90 rounded-full bg-green-300/30 blur-3xl" />
 
-            <div className="relative rotate-2 rounded-[46px] bg-slate-950 p-3 shadow-2xl transition duration-500 hover:rotate-0">
-              <div className="rounded-[36px] bg-slate-950 px-6 py-8 text-white">
-                <p className="text-xs font-black uppercase tracking-[0.3em] text-emerald-400">
-                  SESAN APP
-                </p>
-
-                <h3 className="mt-5 text-3xl font-black leading-tight">
-                  {text("Sesan Shop on Web or App", "ប្រើ Sesan Shop តាម Web ឬ App")}
-                </h3>
-
-                <p className="mt-4 text-sm leading-7 text-slate-300">
-                  {text(
-                    "Choose the easiest way to browse products, connect with sellers and use Sesan services.",
-                    "ជ្រើសរើសវិធីដែលងាយស្រួលបំផុតសម្រាប់មើលផលិតផល ទាក់ទងអ្នកលក់ និងប្រើសេវា Sesan។"
-                  )}
-                </p>
-
-                <div className="mt-7 space-y-3">
-                  <a
-                    href="https://sesanshop.com"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 rounded-2xl bg-white px-5 py-4 text-slate-950 shadow-sm transition hover:-translate-y-0.5"
-                  >
-                    <span className="text-sky-500"><MonitorIcon /></span>
-                    <span className="min-w-0">
-                      <small className="block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-500">
-                        {text("OPEN IN BROWSER", "បើកតាមកម្មវិធីរុករក")}
-                      </small>
-                      <strong className="mt-0.5 block text-lg font-black">Sesan Shop Web</strong>
-                    </span>
-                  </a>
-
-                  <a
-                    href="https://play.google.com/store/apps/details?id=com.sesan.app"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 rounded-2xl bg-emerald-500 px-5 py-4 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-emerald-600"
-                  >
-                    <PlayStoreIcon />
-                    <span className="min-w-0">
-                      <small className="block text-[10px] font-bold uppercase tracking-[0.16em] text-emerald-50">
-                        {text("GET IT ON", "ទាញយកពី")}
-                      </small>
-                      <strong className="mt-0.5 block text-lg font-black">Google Play</strong>
-                    </span>
-                  </a>
-
-                  <a
-                    href="https://apps.apple.com/kh/app/sesan-app/id6789862316"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-4 rounded-2xl border border-white/15 bg-white/10 px-5 py-4 text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-white/15"
-                  >
-                    <AppleLogoIcon />
-                    <span className="min-w-0">
-                      <small className="block text-[10px] font-bold uppercase tracking-[0.16em] text-slate-300">
-                        {text("DOWNLOAD ON THE", "ទាញយកពី")}
-                      </small>
-                      <strong className="mt-0.5 block text-lg font-black">App Store</strong>
-                    </span>
-                  </a>
-                </div>
+            <div className="relative rotate-3 rounded-[50px] bg-slate-950 p-2 shadow-2xl transition duration-500 hover:rotate-0">
+              <div className="overflow-hidden rounded-[43px] bg-white">
+                <img
+                  src="/app-preview-2.jpg"
+                  alt="Download Sesan App"
+                  className="h-[590px] w-[290px] object-cover object-top"
+                />
               </div>
             </div>
           </div>
