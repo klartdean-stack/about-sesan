@@ -1,21 +1,25 @@
 /* Responsive header fix for Sesan Group.
    Keep the full desktop navigation only when there is enough horizontal space.
-   Between 1024px and 1599px, use the existing hamburger/mobile menu instead
-   so navigation items, language selector and download button never overlap. */
+   Between 1024px and 1599px, switch to the compact language + hamburger controls
+   so navigation items never overlap. */
 
 @media (min-width: 1024px) and (max-width: 1599px) {
+  /* Hide the full desktop nav. */
   .site-home .premium-header > div:first-child > nav {
     display: none !important;
   }
 
-  .site-home .premium-header > div:first-child > div {
+  /* Hide desktop language + download controls only. */
+  .site-home .premium-header > div:first-child > div:nth-of-type(1) {
     display: none !important;
   }
 
-  .site-home .premium-header > div:first-child > button {
+  /* Show the compact language switcher + hamburger controls. */
+  .site-home .premium-header > div:first-child > div:nth-of-type(2) {
     display: flex !important;
   }
 
+  /* When the hamburger menu is open, override Tailwind's lg:hidden. */
   .site-home .premium-header > div.border-t {
     display: block !important;
   }
