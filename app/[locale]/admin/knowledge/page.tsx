@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import {useParams, useSearchParams} from "next/navigation";
+import {useParams} from "next/navigation";
 import {
   ArrowLeft,
   BarChart3,
@@ -90,7 +90,6 @@ const emptyArticle = (): KnowledgeArticle => ({
 export default function KnowledgeAdminPage() {
   const params = useParams<{locale: string}>();
   const locale = params.locale === "en" ? "en" : "km";
-  const searchParams = useSearchParams();
   const [articles, setArticles] = useState<KnowledgeArticle[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ArticleStatus>("all");
@@ -145,9 +144,11 @@ export default function KnowledgeAdminPage() {
   }, []);
 
   useEffect(() => {
-    const oobCode = searchParams.get("oobCode");
-    const mode = searchParams.get("mode");
-    if (!oobCode || mode !== "signIn" || session) return;
+    if (session) return;
+    const params = new URLSearchParams(window.location.search);
+    const oobCode = params.get("oobCode");
+    const mode = params.get("mode");
+    if (!oobCode || mode !== "signIn") return;
     const savedEmail = window.localStorage.getItem("sesan-admin-email") || email.trim();
     if (!savedEmail) {
       setErrorMessage("រកអ៊ីមែល Admin មិនឃើញ។ សូមស្នើ Link ចូលថ្មី។");
@@ -163,7 +164,7 @@ export default function KnowledgeAdminPage() {
       })
       .catch((error) => setErrorMessage(readableFirebaseError(error)))
       .finally(() => setAuthLoading(false));
-  }, [searchParams, session, email, locale]);
+  }, [session, email, locale]);
 
   useEffect(() => {
     if (!session) return;
