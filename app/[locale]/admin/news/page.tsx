@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import {useParams, useSearchParams} from "next/navigation";
+import {useParams} from "next/navigation";
 import {FormEvent, useEffect, useMemo, useState} from "react";
 import {ArrowLeft, Check, Eye, FileText, LoaderCircle, LockKeyhole, LogOut, Pencil, Plus, Save, Search, Trash2, Upload, X} from "lucide-react";
 import type {FirebaseSession} from "@/lib/firebase-rest";
@@ -18,14 +18,14 @@ const categoryKm: Record<string,string> = {"Company News":"ព័ត៌មាន
 function emptyArticle(): NewsArticleRecord { const now = new Date().toISOString(); return {id: crypto.randomUUID(),titleKm:"",titleEn:"",summaryKm:"",summaryEn:"",contentKm:"",contentEn:"",category:categories[0],coverImage:"",status:"draft",featured:false,views:0,publishedAt:"",updatedAt:now}; }
 
 export default function NewsAdminPage() {
-  const params = useParams<{locale:string}>(); const locale = params.locale === "en" ? "en" : "km"; const searchParams=useSearchParams();
+  const params = useParams<{locale:string}>(); const locale = params.locale === "en" ? "en" : "km";
   const [session,setSession] = useState<FirebaseSession|null>(null); const [authLoading,setAuthLoading]=useState(true);
   const [email,setEmail]=useState(""); const [error,setError]=useState(""); const [linkMessage,setLinkMessage]=useState(""); const [linkLoading,setLinkLoading]=useState(false);
   const [articles,setArticles]=useState<NewsArticleRecord[]>([]); const [editing,setEditing]=useState<NewsArticleRecord|null>(null);
   const [language,setLanguage]=useState<"km"|"en">("km"); const [query,setQuery]=useState(""); const [saving,setSaving]=useState(false); const [uploading,setUploading]=useState(false); const [notice,setNotice]=useState(false);
 
   useEffect(()=>{let active=true;(async()=>{try{const savedEmail=localStorage.getItem("sesan-admin-email");if(savedEmail)setEmail(savedEmail);const raw=localStorage.getItem(SESSION_KEY);if(raw){const parsed=JSON.parse(raw) as FirebaseSession;if(parsed.expiresAt>Date.now()+30000){if(active)setSession(parsed);}else{const refreshed=await refreshAdminSession(parsed);if(refreshed){localStorage.setItem(SESSION_KEY,JSON.stringify(refreshed));if(active)setSession(refreshed);}else{localStorage.removeItem(SESSION_KEY);}}}}catch{localStorage.removeItem(SESSION_KEY);}finally{if(active)setAuthLoading(false);}})();return()=>{active=false};},[]);
-  useEffect(()=>{const oobCode=searchParams.get("oobCode");const mode=searchParams.get("mode");if(!oobCode||mode!=="signIn"||session)return;const savedEmail=localStorage.getItem("sesan-admin-email")||email.trim();if(!savedEmail){setError("រកអ៊ីមែល Admin មិនឃើញ។ សូមស្នើ Link ចូលថ្មី។");return;}setAuthLoading(true);signInAdminWithEmailLink(savedEmail,oobCode).then((s)=>{localStorage.setItem(SESSION_KEY,JSON.stringify(s));localStorage.setItem("sesan-admin-email",savedEmail);setSession(s);window.history.replaceState({},document.title,`/${locale}/admin/news`);}).catch((e)=>setError(readableFirebaseError(e))).finally(()=>setAuthLoading(false));},[searchParams,session,email,locale]);
+  useEffect(()=>{if(session)return;const params=new URLSearchParams(window.location.search);const oobCode=params.get("oobCode");const mode=params.get("mode");if(!oobCode||mode!=="signIn")return;const savedEmail=localStorage.getItem("sesan-admin-email")||email.trim();if(!savedEmail){setError("រកអ៊ីមែល Admin មិនឃើញ។ សូមស្នើ Link ចូលថ្មី។");return;}setAuthLoading(true);signInAdminWithEmailLink(savedEmail,oobCode).then((s)=>{localStorage.setItem(SESSION_KEY,JSON.stringify(s));localStorage.setItem("sesan-admin-email",savedEmail);setSession(s);window.history.replaceState({},document.title,`/${locale}/admin/news`);}).catch((e)=>setError(readableFirebaseError(e))).finally(()=>setAuthLoading(false));},[session,email,locale]);
   useEffect(()=>{if(!session)return;listNewsArticles(session).then(setArticles).catch((e)=>setError(readableFirebaseError(e)));},[session]);
   useEffect(()=>{if(!editing)return;const timer=setTimeout(()=>localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(editing)),1200);return()=>clearTimeout(timer);},[editing]);
 
