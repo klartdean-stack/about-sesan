@@ -108,20 +108,21 @@ export default function KnowledgeAdminPage() {
   const [recoverableDraft, setRecoverableDraft] = useState<KnowledgeArticle | null>(null);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(async () => {
+    let active = true;
+    (async () => {
       try {
         const savedEmail = window.localStorage.getItem("sesan-admin-email");
-        if (savedEmail) setEmail(savedEmail);
+        if (savedEmail && active) setEmail(savedEmail);
         const savedSession = window.localStorage.getItem(SESSION_KEY);
         if (savedSession) {
           const parsed = JSON.parse(savedSession) as FirebaseSession;
           if (parsed.expiresAt > Date.now() + 30_000) {
-            setSession(parsed);
+            if (active) setSession(parsed);
           } else {
             const refreshed = await refreshAdminSession(parsed);
             if (refreshed) {
               window.localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
-              setSession(refreshed);
+              if (active) setSession(refreshed);
             } else {
               window.localStorage.removeItem(SESSION_KEY);
             }
@@ -132,15 +133,17 @@ export default function KnowledgeAdminPage() {
       } finally {
         try {
           const savedDraft = window.localStorage.getItem(AUTOSAVE_KEY);
-          if (savedDraft) setRecoverableDraft(JSON.parse(savedDraft) as KnowledgeArticle);
+          if (savedDraft && active) setRecoverableDraft(JSON.parse(savedDraft) as KnowledgeArticle);
         } catch {
           window.localStorage.removeItem(AUTOSAVE_KEY);
         }
-        setAuthLoading(false);
+        if (active) setAuthLoading(false);
       }
-    });
+    })();
 
-    return () => window.cancelAnimationFrame(frame);
+    return () => {
+      active = false;
+    };
   }, []);
 
   useEffect(() => {
