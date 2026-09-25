@@ -91,7 +91,7 @@ export async function sendAdminPasswordReset(email: string) {
     {
       method: "POST",
       headers: {"Content-Type": "application/json"},
-      body: JSON.stringify({requestType: "PASSWORD_RESET", email}),
+      body: JSON.stringify({requestType: "PASSWORD_RESET", email, continueUrl: `${window.location.origin}/${window.location.pathname.split("/")[1] || "km"}/reset-password`}),
     },
   );
 }
