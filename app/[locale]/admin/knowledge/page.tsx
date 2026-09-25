@@ -33,6 +33,7 @@ import {
   firebaseIsConfigured,
   listKnowledgeArticles,
   readableFirebaseError,
+  refreshAdminSession,
   saveKnowledgeArticle,
   sendAdminPasswordReset,
   signInAdmin,
@@ -110,17 +111,25 @@ export default function KnowledgeAdminPage() {
   useEffect(() => {
     const frame = window.requestAnimationFrame(() => {
       try {
-        const savedSession = window.sessionStorage.getItem(SESSION_KEY);
+        const savedEmail = window.localStorage.getItem("sesan-admin-email");
+        if (savedEmail) setEmail(savedEmail);
+        const savedSession = window.localStorage.getItem(SESSION_KEY);
         if (savedSession) {
           const parsed = JSON.parse(savedSession) as FirebaseSession;
           if (parsed.expiresAt > Date.now() + 30_000) {
             setSession(parsed);
           } else {
-            window.sessionStorage.removeItem(SESSION_KEY);
+            const refreshed = await refreshAdminSession(parsed);
+            if (refreshed) {
+              window.localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
+              setSession(refreshed);
+            } else {
+              window.localStorage.removeItem(SESSION_KEY);
+            }
           }
         }
       } catch {
-        window.sessionStorage.removeItem(SESSION_KEY);
+        window.localStorage.removeItem(SESSION_KEY);
       } finally {
         try {
           const savedDraft = window.localStorage.getItem(AUTOSAVE_KEY);
@@ -168,7 +177,8 @@ export default function KnowledgeAdminPage() {
     setErrorMessage("");
     try {
       const nextSession = await signInAdmin(email.trim(), password);
-      window.sessionStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
+      window.localStorage.setItem("sesan-admin-email", email.trim());
       setSession(nextSession);
       setPassword("");
     } catch (error) {
@@ -200,7 +210,7 @@ export default function KnowledgeAdminPage() {
   }
 
   function handleLogout() {
-    window.sessionStorage.removeItem(SESSION_KEY);
+    window.localStorage.removeItem(SESSION_KEY);
     setSession(null);
     setArticles([]);
   }
