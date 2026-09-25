@@ -96,6 +96,28 @@ export async function sendAdminPasswordReset(email: string) {
   );
 }
 
+export async function verifyAdminPasswordResetCode(oobCode: string) {
+  return requestJson<{email?: string}>(
+    `https://identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({oobCode}),
+    },
+  );
+}
+
+export async function confirmAdminPasswordReset(oobCode: string, newPassword: string) {
+  return requestJson<{email?: string}>(
+    `https://identitytoolkit.googleapis.com/v1/accounts:resetPassword?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({oobCode, newPassword}),
+    },
+  );
+}
+
 type FirestoreValue =
   | {stringValue: string}
   | {booleanValue: boolean}
