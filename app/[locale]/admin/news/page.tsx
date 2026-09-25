@@ -6,7 +6,7 @@ import {useParams} from "next/navigation";
 import {FormEvent, useEffect, useMemo, useState} from "react";
 import {ArrowLeft, Check, Eye, FileText, LoaderCircle, LockKeyhole, LogOut, Pencil, Plus, Save, Search, Trash2, Upload, X} from "lucide-react";
 import type {FirebaseSession} from "@/lib/firebase-rest";
-import {firebaseIsConfigured, readableFirebaseError, sendAdminPasswordReset, signInAdmin} from "@/lib/firebase-rest";
+import {firebaseIsConfigured, readableFirebaseError, refreshAdminSession, sendAdminPasswordReset, signInAdmin} from "@/lib/firebase-rest";
 import {deleteNewsArticle, listNewsArticles, type NewsArticleRecord, saveNewsArticle, uploadNewsCover} from "@/lib/news-firebase";
 import RichTextEditor from "../knowledge/RichTextEditor";
 
@@ -24,13 +24,13 @@ export default function NewsAdminPage() {
   const [articles,setArticles]=useState<NewsArticleRecord[]>([]); const [editing,setEditing]=useState<NewsArticleRecord|null>(null);
   const [language,setLanguage]=useState<"km"|"en">("km"); const [query,setQuery]=useState(""); const [saving,setSaving]=useState(false); const [uploading,setUploading]=useState(false); const [notice,setNotice]=useState(false);
 
-  useEffect(()=>{try{const raw=sessionStorage.getItem(SESSION_KEY);if(raw){const parsed=JSON.parse(raw) as FirebaseSession;if(parsed.expiresAt>Date.now()+30000)setSession(parsed);}}catch{}finally{setAuthLoading(false);}},[]);
+  useEffect(()=>{let active=true;(async()=>{try{const savedEmail=localStorage.getItem("sesan-admin-email");if(savedEmail)setEmail(savedEmail);const raw=localStorage.getItem(SESSION_KEY);if(raw){const parsed=JSON.parse(raw) as FirebaseSession;if(parsed.expiresAt>Date.now()+30000){if(active)setSession(parsed);}else{const refreshed=await refreshAdminSession(parsed);if(refreshed){localStorage.setItem(SESSION_KEY,JSON.stringify(refreshed));if(active)setSession(refreshed);}else{localStorage.removeItem(SESSION_KEY);}}}}catch{localStorage.removeItem(SESSION_KEY);}finally{if(active)setAuthLoading(false);}})();return()=>{active=false};},[]);
   useEffect(()=>{if(!session)return;listNewsArticles(session).then(setArticles).catch((e)=>setError(readableFirebaseError(e)));},[session]);
   useEffect(()=>{if(!editing)return;const timer=setTimeout(()=>localStorage.setItem(AUTOSAVE_KEY,JSON.stringify(editing)),1200);return()=>clearTimeout(timer);},[editing]);
 
-  async function login(e:FormEvent){e.preventDefault();setAuthLoading(true);setError("");setResetMessage("");try{const s=await signInAdmin(email.trim(),password);sessionStorage.setItem(SESSION_KEY,JSON.stringify(s));setSession(s);setPassword("");}catch(err){setError(readableFirebaseError(err));}finally{setAuthLoading(false);}}
+  async function login(e:FormEvent){e.preventDefault();setAuthLoading(true);setError("");setResetMessage("");try{const s=await signInAdmin(email.trim(),password);localStorage.setItem(SESSION_KEY,JSON.stringify(s));localStorage.setItem("sesan-admin-email",email.trim());setSession(s);setPassword("");}catch(err){setError(readableFirebaseError(err));}finally{setAuthLoading(false);}}
   async function forgotPassword(){const adminEmail=email.trim();setError("");setResetMessage("");if(!adminEmail){setError("សូមបញ្ចូលអ៊ីមែល Admin ជាមុនសិន។");return;}setResetLoading(true);try{await sendAdminPasswordReset(adminEmail);setResetMessage("បានផ្ញើតំណកំណត់លេខសម្ងាត់ថ្មីទៅអ៊ីមែលរបស់បងហើយ។ សូមពិនិត្យ Inbox ឬ Spam។");}catch(err){setError(readableFirebaseError(err));}finally{setResetLoading(false);}}
-  function logout(){sessionStorage.removeItem(SESSION_KEY);setSession(null);setArticles([]);}
+  function logout(){localStorage.removeItem(SESSION_KEY);setSession(null);setArticles([]);}
   function update<K extends keyof NewsArticleRecord>(key:K,value:NewsArticleRecord[K]){setEditing((a)=>a?{...a,[key]:value}:a);}
   async function save(e:FormEvent){e.preventDefault();if(!editing||!session||!editing.titleKm.trim()||!editing.titleEn.trim())return;const now=new Date().toISOString();const next={...editing,updatedAt:now,publishedAt:editing.status==="published"?(editing.publishedAt||now):editing.publishedAt};setSaving(true);setError("");try{await saveNewsArticle(session,next);setArticles((xs)=>xs.some((x)=>x.id===next.id)?xs.map((x)=>x.id===next.id?next:x):[next,...xs]);localStorage.removeItem(AUTOSAVE_KEY);setEditing(null);setNotice(true);setTimeout(()=>setNotice(false),2200);}catch(err){setError(readableFirebaseError(err));}finally{setSaving(false);}}
   async function remove(article:NewsArticleRecord){if(!session||!confirm(`លុប “${article.titleKm || article.titleEn}” មែនទេ?`))return;try{await deleteNewsArticle(session,article.id);setArticles((xs)=>xs.filter((x)=>x.id!==article.id));}catch(err){setError(readableFirebaseError(err));}}
