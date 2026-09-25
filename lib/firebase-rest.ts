@@ -295,6 +295,7 @@ export function readableFirebaseError(error: unknown) {
   if (message.includes("INVALID_PASSWORD")) return "លេខសម្ងាត់មិនត្រឹមត្រូវ។ សូមចុច «ភ្លេចលេខសម្ងាត់?» ដើម្បីកំណត់ថ្មី។";
   if (message.includes("EMAIL_NOT_FOUND")) return "រកមិនឃើញគណនីដែលប្រើអ៊ីមែលនេះទេ។";
   if (message.includes("INVALID_EMAIL")) return "ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ។";
+  if (message.includes("RESET_PASSWORD_EXCEED_LIMIT")) return "Firebase បានបិទការផ្ញើ Reset ជាបណ្ដោះអាសន្ន ព្រោះបានស្នើច្រើនដងពេក។ សូមកុំចុច Reset បន្តទៀត ហើយសាកម្ដងទៀតក្រោយពេលបន្តិច។";
   if (message.includes("TOO_MANY_ATTEMPTS")) return "បានសាកល្បងច្រើនដងពេក។ សូមរង់ចាំបន្តិច។";
   if (message.includes("PERMISSION_DENIED")) return "គណនីនេះមិនមានសិទ្ធិជា Admin ទេ។";
   if (message.includes("NOT_KNOWLEDGE_ADMIN")) return "គណនីនេះមិនមានសិទ្ធិជា Knowledge Admin ទេ។";
