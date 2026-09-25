@@ -109,7 +109,7 @@ export default function KnowledgeAdminPage() {
   const [recoverableDraft, setRecoverableDraft] = useState<KnowledgeArticle | null>(null);
 
   useEffect(() => {
-    const frame = window.requestAnimationFrame(() => {
+    const frame = window.requestAnimationFrame(async () => {
       try {
         const savedEmail = window.localStorage.getItem("sesan-admin-email");
         if (savedEmail) setEmail(savedEmail);
