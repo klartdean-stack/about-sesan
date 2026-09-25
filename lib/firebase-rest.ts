@@ -121,6 +121,60 @@ export async function refreshAdminSession(session: FirebaseSession) {
   } satisfies FirebaseSession;
 }
 
+export async function sendAdminSignInLink(email: string, locale: string) {
+  await requestJson(
+    `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({
+        requestType: "EMAIL_SIGNIN",
+        email,
+        continueUrl: `${window.location.origin}/${locale}/admin/news`,
+        canHandleCodeInApp: true,
+      }),
+    },
+  );
+}
+
+export async function signInAdminWithEmailLink(email: string, oobCode: string) {
+  const auth = await requestJson<{
+    idToken: string;
+    refreshToken?: string;
+    localId: string;
+    email: string;
+    expiresIn: string;
+  }>(
+    `https://identitytoolkit.googleapis.com/v1/accounts:signInWithEmailLink?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/json"},
+      body: JSON.stringify({email, oobCode}),
+    },
+  );
+
+  const session: FirebaseSession = {
+    idToken: auth.idToken,
+    refreshToken: auth.refreshToken,
+    uid: auth.localId,
+    email: auth.email,
+    expiresAt: Date.now() + Number(auth.expiresIn) * 1000,
+  };
+
+  const adminDocument = await requestJson<{
+    fields?: {active?: {booleanValue?: boolean}};
+  }>(
+    `${firestoreBase}/knowledgeAdmins/${encodeURIComponent(session.uid)}`,
+    {headers: {Authorization: `Bearer ${session.idToken}`}},
+  );
+
+  if (adminDocument.fields?.active?.booleanValue !== true) {
+    throw new Error("NOT_KNOWLEDGE_ADMIN");
+  }
+
+  return session;
+}
+
 export async function sendAdminPasswordReset(email: string) {
   await requestJson(
     `https://identitytoolkit.googleapis.com/v1/accounts:sendOobCode?key=${apiKey}`,
@@ -331,6 +385,8 @@ export function readableFirebaseError(error: unknown) {
   if (message.includes("INVALID_PASSWORD")) return "លេខសម្ងាត់មិនត្រឹមត្រូវ។ សូមចុច «ភ្លេចលេខសម្ងាត់?» ដើម្បីកំណត់ថ្មី។";
   if (message.includes("EMAIL_NOT_FOUND")) return "រកមិនឃើញគណនីដែលប្រើអ៊ីមែលនេះទេ។";
   if (message.includes("INVALID_EMAIL")) return "ទម្រង់អ៊ីមែលមិនត្រឹមត្រូវ។";
+  if (message.includes("INVALID_OOB_CODE")) return "តំណចូលនេះផុតកំណត់ ឬត្រូវបានប្រើរួច។ សូមស្នើ Link ថ្មី។";
+  if (message.includes("EXPIRED_OOB_CODE")) return "តំណចូលនេះផុតកំណត់។ សូមស្នើ Link ថ្មី។";
   if (message.includes("RESET_PASSWORD_EXCEED_LIMIT")) return "Firebase បានបិទការផ្ញើ Reset ជាបណ្ដោះអាសន្ន ព្រោះបានស្នើច្រើនដងពេក។ សូមកុំចុច Reset បន្តទៀត ហើយសាកម្ដងទៀតក្រោយពេលបន្តិច។";
   if (message.includes("TOO_MANY_ATTEMPTS")) return "បានសាកល្បងច្រើនដងពេក។ សូមរង់ចាំបន្តិច។";
   if (message.includes("PERMISSION_DENIED")) return "គណនីនេះមិនមានសិទ្ធិជា Admin ទេ។";
