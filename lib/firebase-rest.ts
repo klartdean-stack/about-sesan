@@ -1,5 +1,6 @@
 export type FirebaseSession = {
   idToken: string;
+  refreshToken?: string;
   uid: string;
   email: string;
   expiresAt: number;
@@ -55,6 +56,7 @@ export async function signInAdmin(email: string, password: string) {
     localId: string;
     email: string;
     expiresIn: string;
+    refreshToken?: string;
   }>(
     `https://identitytoolkit.googleapis.com/v1/accounts:signInWithPassword?key=${apiKey}`,
     {
@@ -66,6 +68,7 @@ export async function signInAdmin(email: string, password: string) {
 
   const session: FirebaseSession = {
     idToken: auth.idToken,
+    refreshToken: auth.refreshToken,
     uid: auth.localId,
     email: auth.email,
     expiresAt: Date.now() + Number(auth.expiresIn) * 1000,
@@ -83,6 +86,39 @@ export async function signInAdmin(email: string, password: string) {
   }
 
   return session;
+}
+
+export async function refreshAdminSession(session: FirebaseSession) {
+  if (!session.refreshToken) return null;
+
+  const response = await fetch(
+    `https://securetoken.googleapis.com/v1/token?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {"Content-Type": "application/x-www-form-urlencoded"},
+      body: new URLSearchParams({
+        grant_type: "refresh_token",
+        refresh_token: session.refreshToken,
+      }),
+    },
+  );
+
+  const data = (await response.json().catch(() => ({}))) as {
+    id_token?: string;
+    refresh_token?: string;
+    user_id?: string;
+    expires_in?: string;
+  };
+
+  if (!response.ok || !data.id_token) return null;
+
+  return {
+    ...session,
+    idToken: data.id_token,
+    refreshToken: data.refresh_token || session.refreshToken,
+    uid: data.user_id || session.uid,
+    expiresAt: Date.now() + Number(data.expires_in || "3600") * 1000,
+  } satisfies FirebaseSession;
 }
 
 export async function sendAdminPasswordReset(email: string) {
