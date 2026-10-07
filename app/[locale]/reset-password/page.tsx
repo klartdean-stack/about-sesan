@@ -2,15 +2,14 @@
 
 import Link from "next/link";
 import {FormEvent, useEffect, useState} from "react";
-import {useParams, useSearchParams} from "next/navigation";
+import {useParams} from "next/navigation";
 import {CheckCircle2, LoaderCircle, LockKeyhole} from "lucide-react";
 import {confirmAdminPasswordReset, readableFirebaseError, verifyAdminPasswordResetCode} from "@/lib/firebase-rest";
 
 export default function ResetPasswordPage() {
   const params = useParams<{locale:string}>();
   const locale = params.locale === "en" ? "en" : "km";
-  const search = useSearchParams();
-  const oobCode = search.get("oobCode") || "";
+  const [oobCode,setOobCode]=useState("");
   const [email,setEmail]=useState("");
   const [password,setPassword]=useState("");
   const [confirm,setConfirm]=useState("");
@@ -19,7 +18,7 @@ export default function ResetPasswordPage() {
   const [done,setDone]=useState(false);
   const [error,setError]=useState("");
 
-  useEffect(()=>{let active=true;(async()=>{if(!oobCode){setError("តំណ Reset មិនត្រឹមត្រូវ ឬខ្វះលេខកូដ។ សូមស្នើតំណថ្មីពី News Admin។");setChecking(false);return;}try{const r=await verifyAdminPasswordResetCode(oobCode);if(active)setEmail(r.email||"");}catch(e){if(active)setError(readableFirebaseError(e));}finally{if(active)setChecking(false);}})();return()=>{active=false};},[oobCode]);
+  useEffect(()=>{let active=true;const code=new URLSearchParams(window.location.search).get("oobCode")||"";setOobCode(code);(async()=>{if(!code){setError("តំណ Reset មិនត្រឹមត្រូវ ឬខ្វះលេខកូដ។ សូមស្នើតំណថ្មីពី News Admin។");setChecking(false);return;}try{const r=await verifyAdminPasswordResetCode(code);if(active)setEmail(r.email||"");}catch(e){if(active)setError(readableFirebaseError(e));}finally{if(active)setChecking(false);}})();return()=>{active=false};},[]);
 
   async function submit(e:FormEvent){e.preventDefault();setError("");if(password.length<6){setError("លេខសម្ងាត់ថ្មីត្រូវមានយ៉ាងហោចណាស់ 6 តួអក្សរ។");return;}if(password!==confirm){setError("លេខសម្ងាត់ទាំងពីរមិនដូចគ្នា។");return;}setSaving(true);try{await confirmAdminPasswordReset(oobCode,password);setDone(true);}catch(e){setError(readableFirebaseError(e));}finally{setSaving(false);}}
 
