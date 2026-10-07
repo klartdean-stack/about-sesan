@@ -35,8 +35,8 @@ import {
   readableFirebaseError,
   refreshAdminSession,
   saveKnowledgeArticle,
-  sendAdminSignInLink,
-  signInAdminWithEmailLink,
+  sendAdminPasswordReset,
+  signInAdmin,
   uploadKnowledgeCover,
 } from "@/lib/firebase-rest";
 import RichTextEditor from "./RichTextEditor";
@@ -99,30 +99,30 @@ export default function KnowledgeAdminPage() {
   const [session, setSession] = useState<FirebaseSession | null>(null);
   const [authLoading, setAuthLoading] = useState(true);
   const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [errorMessage, setErrorMessage] = useState("");
-  const [linkMessage, setLinkMessage] = useState("");
+  const [resetMessage, setResetMessage] = useState("");
   const [saving, setSaving] = useState(false);
-  const [linkLoading, setLinkLoading] = useState(false);
+  const [resetLoading, setResetLoading] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [autoSaveNotice, setAutoSaveNotice] = useState(false);
   const [recoverableDraft, setRecoverableDraft] = useState<KnowledgeArticle | null>(null);
 
   useEffect(() => {
-    let active = true;
-    (async () => {
+    const frame = window.requestAnimationFrame(() => {
       try {
         const savedEmail = window.localStorage.getItem("sesan-admin-email");
-        if (savedEmail && active) setEmail(savedEmail);
+        if (savedEmail) setEmail(savedEmail);
         const savedSession = window.localStorage.getItem(SESSION_KEY);
         if (savedSession) {
           const parsed = JSON.parse(savedSession) as FirebaseSession;
           if (parsed.expiresAt > Date.now() + 30_000) {
-            if (active) setSession(parsed);
+            setSession(parsed);
           } else {
             const refreshed = await refreshAdminSession(parsed);
             if (refreshed) {
               window.localStorage.setItem(SESSION_KEY, JSON.stringify(refreshed));
-              if (active) setSession(refreshed);
+              setSession(refreshed);
             } else {
               window.localStorage.removeItem(SESSION_KEY);
             }
@@ -133,41 +133,16 @@ export default function KnowledgeAdminPage() {
       } finally {
         try {
           const savedDraft = window.localStorage.getItem(AUTOSAVE_KEY);
-          if (savedDraft && active) setRecoverableDraft(JSON.parse(savedDraft) as KnowledgeArticle);
+          if (savedDraft) setRecoverableDraft(JSON.parse(savedDraft) as KnowledgeArticle);
         } catch {
           window.localStorage.removeItem(AUTOSAVE_KEY);
         }
-        if (active) setAuthLoading(false);
+        setAuthLoading(false);
       }
-    })();
+    });
 
-    return () => {
-      active = false;
-    };
+    return () => window.cancelAnimationFrame(frame);
   }, []);
-
-  useEffect(() => {
-    if (session) return;
-    const params = new URLSearchParams(window.location.search);
-    const oobCode = params.get("oobCode");
-    const mode = params.get("mode");
-    if (!oobCode || mode !== "signIn") return;
-    const savedEmail = window.localStorage.getItem("sesan-admin-email") || email.trim();
-    if (!savedEmail) {
-      setErrorMessage("រកអ៊ីមែល Admin មិនឃើញ។ សូមស្នើ Link ចូលថ្មី។");
-      return;
-    }
-    setAuthLoading(true);
-    signInAdminWithEmailLink(savedEmail, oobCode)
-      .then((nextSession) => {
-        window.localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
-        window.localStorage.setItem("sesan-admin-email", savedEmail);
-        setSession(nextSession);
-        window.history.replaceState({}, document.title, `/${locale}/admin/knowledge`);
-      })
-      .catch((error) => setErrorMessage(readableFirebaseError(error)))
-      .finally(() => setAuthLoading(false));
-  }, [session, email, locale]);
 
   useEffect(() => {
     if (!session) return;
@@ -196,24 +171,41 @@ export default function KnowledgeAdminPage() {
     return () => window.clearTimeout(timer);
   }, [editingArticle]);
 
-  async function handleSendLoginLink(event?: FormEvent<HTMLFormElement>) {
-    event?.preventDefault();
+  async function handleLogin(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    setAuthLoading(true);
+    setErrorMessage("");
+    try {
+      const nextSession = await signInAdmin(email.trim(), password);
+      window.localStorage.setItem(SESSION_KEY, JSON.stringify(nextSession));
+      window.localStorage.setItem("sesan-admin-email", email.trim());
+      setSession(nextSession);
+      setPassword("");
+    } catch (error) {
+      setErrorMessage(readableFirebaseError(error));
+    } finally {
+      setAuthLoading(false);
+    }
+  }
+
+  async function handleForgotPassword() {
     const adminEmail = email.trim();
     setErrorMessage("");
-    setLinkMessage("");
+    setResetMessage("");
+
     if (!adminEmail) {
       setErrorMessage("សូមបញ្ចូលអ៊ីមែល Admin ជាមុនសិន។");
       return;
     }
-    setLinkLoading(true);
+
+    setResetLoading(true);
     try {
-      window.localStorage.setItem("sesan-admin-email", adminEmail);
-      await sendAdminSignInLink(adminEmail, locale);
-      setLinkMessage("បានផ្ញើ Link ចូល Admin ទៅអ៊ីមែលរួចហើយ។ ចុច Link នោះបានតែម្តង។");
+      await sendAdminPasswordReset(adminEmail);
+      setResetMessage("បានផ្ញើតំណកំណត់លេខសម្ងាត់ថ្មីទៅអ៊ីមែលរបស់បងហើយ។ សូមពិនិត្យ Inbox ឬ Spam។");
     } catch (error) {
       setErrorMessage(readableFirebaseError(error));
     } finally {
-      setLinkLoading(false);
+      setResetLoading(false);
     }
   }
 
@@ -357,24 +349,38 @@ export default function KnowledgeAdminPage() {
             <LockKeyhole className="h-7 w-7" />
           </div>
           <h1 className="mt-5 text-2xl font-black">ចូល Knowledge Admin</h1>
-          <p className="mt-2 text-sm leading-6 text-slate-500">គ្មាន Password — ចុច Link ចូលពីអ៊ីមែល។</p>
+          <p className="mt-2 text-sm leading-6 text-slate-500">មានតែគណនី Admin របស់ Sesan ប៉ុណ្ណោះដែលអាចចូលបាន។</p>
         </div>
 
         {errorMessage && (
           <p className="mt-5 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-700">{errorMessage}</p>
         )}
 
-        {linkMessage && (
-          <p className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-700">{linkMessage}</p>
+        {resetMessage && (
+          <p className="mt-5 rounded-xl border border-green-200 bg-green-50 px-4 py-3 text-sm font-bold leading-6 text-green-700">{resetMessage}</p>
         )}
 
-        <form onSubmit={handleSendLoginLink} className="mt-6 space-y-4">
+        <form onSubmit={handleLogin} className="mt-6 space-y-4">
           <label className="block">
             <span className="mb-2 block text-sm font-black text-slate-700">អ៊ីមែល Admin</span>
             <input type="email" required autoComplete="email" value={email} onChange={(event) => setEmail(event.target.value)} className="admin-input" placeholder="admin@sesanshop.com" />
           </label>
-          <button disabled={linkLoading} type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-700 disabled:opacity-60">
-            <LockKeyhole className="h-4 w-4" /> {linkLoading ? "កំពុងផ្ញើ..." : "ផ្ញើ Link ចូល Admin"}
+          <label className="block">
+            <span className="mb-2 block text-sm font-black text-slate-700">លេខសម្ងាត់</span>
+            <input type="password" required autoComplete="current-password" value={password} onChange={(event) => setPassword(event.target.value)} className="admin-input" placeholder="••••••••" />
+          </label>
+          <div className="flex justify-end">
+            <button
+              type="button"
+              onClick={handleForgotPassword}
+              disabled={resetLoading || authLoading}
+              className="text-sm font-black text-green-700 transition hover:text-green-800 hover:underline disabled:cursor-not-allowed disabled:opacity-60"
+            >
+              {resetLoading ? "កំពុងផ្ញើ..." : "ភ្លេចលេខសម្ងាត់?"}
+            </button>
+          </div>
+          <button type="submit" className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-green-600 px-5 py-3.5 text-sm font-black text-white transition hover:bg-green-700">
+            <LockKeyhole className="h-4 w-4" /> ចូលគ្រប់គ្រង
           </button>
         </form>
       </AdminGate>
