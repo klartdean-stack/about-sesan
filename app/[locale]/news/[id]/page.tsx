@@ -28,7 +28,41 @@ function AppStoreIcon() {
 
 export async function generateMetadata({params}: PageProps): Promise<Metadata> {
   const {locale, id} = await params;
-  try { const a = await getPublishedNewsArticle(id); if (!a) return {}; return {title: `${locale === "km" ? a.titleKm : a.titleEn} | Sesan Group`, description: locale === "km" ? a.summaryKm : a.summaryEn}; } catch { return {}; }
+  try {
+    const a = await getPublishedNewsArticle(id);
+    if (!a) return {};
+
+    const title = locale === "km" ? a.titleKm : a.titleEn;
+    const description = locale === "km" ? a.summaryKm : a.summaryEn;
+    const url = `https://about.sesanshop.com/${locale}/news/${a.id}`;
+    const images = a.coverImage
+      ? [{url: a.coverImage, alt: title}]
+      : [{url: "https://about.sesanshop.com/sesan-logo.png", alt: "Sesan Group"}];
+
+    return {
+      title,
+      description,
+      alternates: {canonical: url},
+      openGraph: {
+        type: "article",
+        url,
+        siteName: "Sesan Group",
+        title,
+        description,
+        images,
+        publishedTime: a.publishedAt || a.updatedAt,
+        modifiedTime: a.updatedAt,
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: images.map((image) => image.url),
+      },
+    };
+  } catch {
+    return {};
+  }
 }
 
 export default async function NewsDetailPage({params}: PageProps) {
